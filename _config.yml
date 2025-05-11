@@ -17,8 +17,6 @@ permalink: /:categories/:title/
 # Header navigation
 header_pages:
   - index.md
-  - about.md
-  - blog.md
 
 # Custom includes
 include:
