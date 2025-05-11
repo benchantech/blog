@@ -1,0 +1,9 @@
+title: BenchanTech Blog
+description: Blog for BenchanTech on tech, music, languages and more
+baseurl: ""
+url: "https://blog.benchantech.com"
+
+theme: minima
+
+plugins:
+  - jekyll-feed
