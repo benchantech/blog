@@ -1,6 +1,6 @@
 ---
 layout: home
-title: Welcome
+title: 
 ---
 
 ![BenchanTech Logo](/assets/images/logo.jpg)
