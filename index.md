@@ -1,6 +1,9 @@
 ---
 layout: home
-title: "Welcome to BenchanTech Blog"
+title: Welcome
 ---
 
-This is the homepage of **blog.benchantech.com**. Explore our latest posts and insights.
+![BenchanTech Logo](/assets/images/logo.png)
+
+# Welcome to BenchanTech
+Exploring tech, music, language, and more.

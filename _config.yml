@@ -1,9 +1,48 @@
-title: BenchanTech Blog
-description: Blog for BenchanTech on tech, music, languages and more
+# Site settings
+title: BenchanTech
+description: >-
+  Exploring tech, music, language, and more.
+url: "https://benchantech.com"
 baseurl: ""
-url: "https://blog.benchantech.com"
 
+# Build settings
 theme: minima
+markdown: kramdown
+highlighter: rouge
+timezone: America/New_York
 
+# Permalinks
+permalink: /:categories/:title/
+
+# Header navigation
+header_pages:
+  - index.md
+  - about.md
+  - blog.md
+
+# Custom includes
+include:
+  - _includes/head-custom.html
+  - assets/images
+
+# Minima theme customization
+minima:
+  skin: classic
+  social_links:
+    github: benchantech
+    linkedin: your-linkedin
+    youtube: your-channel
+    email: contact@benchantech.com
+
+# Plugins
 plugins:
   - jekyll-feed
+  - jekyll-seo-tag
+  - jekyll-sitemap
+
+# Exclude
+exclude:
+  - Gemfile
+  - Gemfile.lock
+  - README.md
+  - node_modules

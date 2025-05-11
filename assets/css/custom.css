@@ -1,0 +1,6 @@
+/* Custom styles for BenchanTech */
+.site-title::before {
+  content: url('/assets/images/logo.png');
+  margin-right: 10px;
+  vertical-align: middle;
+}
