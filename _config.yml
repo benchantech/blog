@@ -1,7 +1,7 @@
 # Site settings
 title: Ben Chan Tech LLC
 description: >-
-  Exploring tech, music, language, and more.
+  Exploring tech, music, language, and more!
 url: "https://blog.benchantech.com"
 baseurl: ""
 
@@ -30,9 +30,9 @@ minima:
   skin: classic
   social_links:
     github: benchantech
-    linkedin: your-linkedin
-    youtube: your-channel
-    email: contact@benchantech.com
+    linkedin: benchantechllc
+    youtube: benchanviolin
+    email: ben@benchantech.com
 
 # Plugins
 plugins:
