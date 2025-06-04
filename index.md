@@ -9,7 +9,7 @@ title:
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Brandhaus Analytics Platform</title>
+  <title>Analytics Platform</title>
   <style>
     body { font-family: Arial, sans-serif; margin: 0; background: #f9f9f9; color: #333; }
     header { background: #0d6efd; color: white; padding: 40px 20px; text-align: center; }
@@ -26,14 +26,14 @@ title:
 <body>
 
 <header>
-  <h1>Brandhaus Analytics Platform</h1>
+  <h1>Analytics Platform</h1>
   <p>Advanced Marketing Performance Tracking for Meta Advertisers</p>
 </header>
 
 <section>
   <h2>What We Do</h2>
   <p>
-    Brandhaus is a private analytics platform built for performance-driven eCommerce brands. 
+    Ben Chan Tech, LLC runs a private analytics platform built for performance-driven eCommerce brands. 
     Our system connects directly with the <strong>Meta Marketing API</strong> to help businesses monitor and optimize their ad campaigns on Facebook and Instagram.
   </p>
   <p>
@@ -77,7 +77,7 @@ title:
 </section>
 
 <footer>
-  &copy; 2025 Brandhaus, Inc. All rights reserved.
+  &copy; 2025 Ben Chan Tech, LLC All rights reserved.
 </footer>
 
 </body>
