@@ -66,7 +66,7 @@ title:
 
 <section>
   <h2>Example Dashboard</h2>
-  <p>Below is a sample visualization of how clients use our reporting tools. (Coming soon)</p>
+  <p>Below is a sample visualization of how clients use our reporting tools.</p>
   <img src="assets/images/screenshot-placeholder.png" alt="Sample Dashboard Screenshot" style="width:100%; max-width:800px; margin: 20px auto; display: block;" />
 </section>
 
