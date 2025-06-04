@@ -73,10 +73,8 @@ title:
 
 <section>
   <h2>Contact Us</h2>
-  <p>Business Name: Brandhaus, Inc.</p>
-  <p>Email: support@brandhaus.com</p>
-  <p>Business Address: 123 Growth Lane, Austin, TX, USA</p>
-  <p><a href="/privacy.html" target="_blank">View our Privacy Policy</a></p>
+  <p>Business Name: Ben Chan Tech, LLC</p>
+  <p>Email: info@benchantech.com</p>    
 </section>
 
 <footer>
