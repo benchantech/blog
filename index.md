@@ -76,9 +76,5 @@ title:
   <p>Email: info@benchantech.com</p>    
 </section>
 
-<footer>
-  &copy; 2025 Ben Chan Tech, LLC All rights reserved.
-</footer>
-
 </body>
 </html>
