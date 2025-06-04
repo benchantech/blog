@@ -70,11 +70,5 @@ title:
   <img src="assets/images/screenshot-placeholder.png" alt="Sample Dashboard Screenshot" style="width:100%; max-width:800px; margin: 20px auto; display: block;" />
 </section>
 
-<section>
-  <h2>Contact Us</h2>
-  <p>Business Name: Ben Chan Tech, LLC</p>
-  <p>Email: info@benchantech.com</p>    
-</section>
-
 </body>
 </html>
