@@ -22,6 +22,8 @@ title:
     footer { background: #eee; padding: 20px; text-align: center; font-size: 0.9em; }
     a { color: #0d6efd; text-decoration: none; }
   </style>
+  <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4665892079810603"
+     crossorigin="anonymous"></script>
 </head>
 <body>
 
