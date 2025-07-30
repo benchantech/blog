@@ -1,8 +1,8 @@
 # Site settings
 title: Ben Chan Tech LLC
 description: >-
-  Exploring tech, music, language, and more!
-url: "https://blog.benchantech.com"
+   Engineering systems at the edge of tech, music, and language.
+url: "https://benchantech.com"
 baseurl: ""
 
 # Build settings
