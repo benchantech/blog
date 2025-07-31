@@ -3,6 +3,10 @@ layout: page
 title: About
 ---
 
-<script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4665892079810603"
-     crossorigin="anonymous"></script>
-BenchanTech is a blog about technology, language, and music.
+BenchanTech LLC is where technology, narrative architecture, and music intersect.
+
+Founded by Ben Chan, this company explores how **stories, systems, and sound** can echo forward in time. From the *YY and Me* podcast to the *Open Code Orchestra* initiative and the **BenChanViolin** YouTube channel, the work spans creative and technical domains while maintaining one goal:
+
+**Build in plain sight.**
+
+BenchanTech LLC helps others design **recursive systems**—projects that outlast metrics and resonate across generations. Whether through code, consulting, or composition, the focus is on building frameworks that sustain value and meaning over time.

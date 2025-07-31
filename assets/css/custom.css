@@ -1,4 +1,165 @@
-/* Custom styles for BenchanTech */
-.site-title::before {
+/* Global */
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    background: #f9f9f9;
+    color: #222;
+    margin: 0;
+  }
   
-}
+  /* Header */
+  .site-header {
+    background: #fff;
+    border-bottom: 1px solid #e5e5e5;
+    padding: 0.5rem 1rem;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+  }
+  
+  .header-content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  
+  .site-logo {
+    height: 50px;
+  }
+  
+  .header-tagline {
+    font-size: 0.85rem;
+    color: #555;
+    margin-left: 1rem;
+  }
+  
+  .site-nav ul {
+    list-style: none;
+    display: flex;
+    gap: 1rem;
+    margin: 0;
+  }
+  
+  .site-nav a {
+    text-decoration: none;
+    color: #333;
+    font-weight: 500;
+  }
+  
+  .menu-toggle {
+    display: none;
+    font-size: 1.8rem;
+    background: none;
+    border: none;
+  }
+  
+  /* Mobile Menu */
+  .mobile-menu {
+    position: fixed;
+    top: 0;
+    right: -100%;
+    width: 70%;
+    height: 100%;
+    background: #fff;
+    transition: right 0.3s ease;
+    padding: 1rem;
+    z-index: 2000;
+  }
+  
+  .mobile-menu.open {
+    right: 0;
+  }
+  
+  .mobile-menu .close-menu {
+    font-size: 2rem;
+    background: none;
+    border: none;
+    float: right;
+  }
+  
+  .mobile-menu ul {
+    list-style: none;
+    padding: 2rem 0 0;
+  }
+  
+  .mobile-menu a {
+    display: block;
+    padding: 0.5rem 0;
+    color: #222;
+    text-decoration: none;
+    font-size: 1.2rem;
+  }
+  
+  /* Hero */
+  .hero {
+    text-align: center;
+    padding: 3rem 1rem;
+    background: #fff;
+    margin-bottom: 2rem;
+  }
+  
+  .hero-logo {
+    max-width: 250px;
+  }
+  
+  .tagline {
+    font-size: 1.3rem;
+    color: #555;
+    margin-top: 0.5rem;
+  }
+  
+  .hero-links {
+    margin-top: 1.5rem;
+  }
+  
+  .hero-button {
+    display: inline-block;
+    margin: 0.3rem;
+    padding: 0.5rem 1rem;
+    background: #333;
+    color: #fff;
+    text-decoration: none;
+    border-radius: 4px;
+    font-size: 0.9rem;
+  }
+  
+  .hero-button:hover {
+    background: #555;
+  }
+  
+  /* Blog Cards */
+  .post-list {
+    list-style: none;
+    padding: 0;
+  }
+  
+  .post-card {
+    background: #fff;
+    margin: 1rem 0;
+    padding: 1rem;
+    border-radius: 4px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+  }
+  
+  .post-card a {
+    text-decoration: none;
+    color: inherit;
+  }
+  
+  .post-card h3, .post-card h4 {
+    margin-top: 0;
+    color: #222;
+  }
+  
+  .post-card p {
+    color: #555;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .site-nav { display: none; }
+    .menu-toggle { display: block; }
+    .header-tagline { display: none; }
+  }
+  

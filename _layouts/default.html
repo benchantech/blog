@@ -8,25 +8,62 @@
     {%- feed_meta -%}
     {%- seo -%}
     <link rel="stylesheet" href="{{ "/assets/main.css" | relative_url }}">
+    <link rel="stylesheet" href="{{ "/assets/css/custom.css" | relative_url }}">
     <link rel="icon" href="/favicon.ico" type="image/x-icon">
 
     {% include head-custom.html %}
   </head>
   <body>
-    <header class="site-header" role="banner">
-      {% include header.html %}
+    <header class="site-header">
+      <div class="header-content">
+        <a href="{{ "/" | relative_url }}" class="logo-link">
+          <img src="/assets/images/logo.jpg" alt="BenchanTech LLC Logo" class="site-logo">
+        </a>
+        <span class="header-tagline">Building in Plain Sight</span>
+        <nav class="site-nav">
+          <ul>
+            <li><a href="{{ "/" | relative_url }}">Home</a></li>
+            <li><a href="{{ "/blog/" | relative_url }}">Blog</a></li>
+            <li><a href="https://yyand.me" target="_blank">YY and Me</a></li>
+            <li><a href="https://oco.benchantech.com" target="_blank">Open Code Orchestra</a></li>
+            <li><a href="https://youtube.com/benchanviolin" target="_blank">BenChanViolin</a></li>
+            <li><a href="{{ "/about/" | relative_url }}">About</a></li>
+            <li><a href="{{ "/contact/" | relative_url }}">Contact</a></li>
+          </ul>
+        </nav>
+        <button class="menu-toggle" aria-label="Open Menu">&#9776;</button>
+      </div>
     </header>
 
-    <main class="page-content" aria-label="Content">
+    <div class="mobile-menu">
+      <button class="close-menu" aria-label="Close Menu">&times;</button>
+      <ul>
+        <li><a href="{{ "/" | relative_url }}">Home</a></li>
+        <li><a href="{{ "/blog/" | relative_url }}">Blog</a></li>
+        <li><a href="https://yyand.me" target="_blank">YY and Me</a></li>
+        <li><a href="https://oco.benchantech.com" target="_blank">Open Code Orchestra</a></li>
+        <li><a href="https://youtube.com/benchanviolin" target="_blank">BenChanViolin</a></li>
+        <li><a href="{{ "/about/" | relative_url }}">About</a></li>
+        <li><a href="{{ "/contact/" | relative_url }}">Contact</a></li>
+      </ul>
+    </div>
+
+    <main class="page-content">
       <div class="wrapper">
-      {{ content }}
+        {{ content }}
       </div>
     </main>
 
-    <footer class="" role="contentinfo">
-      {% include footer.html %}
+    <footer class="site-footer">
+      <p>&copy; {{ site.time | date: "%Y" }} BenchanTech LLC. All rights reserved.</p>
     </footer>
+
+    <script>
+      const menuToggle = document.querySelector('.menu-toggle');
+      const mobileMenu = document.querySelector('.mobile-menu');
+      const closeMenu = document.querySelector('.close-menu');
+      menuToggle.addEventListener('click', () => mobileMenu.classList.add('open'));
+      closeMenu.addEventListener('click', () => mobileMenu.classList.remove('open'));
+    </script>
   </body>
 </html>
-
-
