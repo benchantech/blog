@@ -18,7 +18,7 @@ When you can't sleep, you build. Here's what emerged from my 3 AM productivity b
 - **Patreon page setup**: Complete with paid subscription tiers that actually make sense
 - **New Stripe business account**: Because apparently I'm launching this thing
 - **Practice Log project optimization**: README.md and LICENSE files that don't embarrass me
-- **New subdomain creation**: oco.Ben Chan Tech.com with its own GitHub Pages repository
+- **New subdomain creation**: oco.benchantech.com with its own GitHub Pages repository
 - **Content rewrite**: Previous post polished with 3 AM clarity
 - **Bug bite treatment**: Finally took an antihistamine
 - **This blog post**: Documenting the whole creative cascade (in French and Spanish, this means _waterfall_)
