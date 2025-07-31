@@ -4,7 +4,7 @@ title: Contact
 permalink: /contact/
 ---
 
-<h2>Contact BenchanTech LLC</h2>
+<h2>Contact Ben Chan Tech LLC</h2>
 <p>Use the form below to get in touch:</p>
 
 <div class="contact-form">

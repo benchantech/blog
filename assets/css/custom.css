@@ -156,6 +156,18 @@ body {
     color: #555;
   }
   
+  /* Footer */
+  .site-footer {
+    background: #fff;
+    border-top: 1px solid #e5e5e5;
+    padding: 1rem;
+    text-align: center;
+    color: #666;
+    font-size: 0.85rem;
+    width: 100%;
+    margin-top: 2rem;
+  }
+  
   /* Responsive */
   @media (max-width: 768px) {
     .site-nav { display: none; }
