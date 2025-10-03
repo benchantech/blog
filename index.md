@@ -4,7 +4,7 @@ title: Home
 ---
 
 <section class="latest-posts">
-  <h3>Latest Blog Posts</h3>
+  <h3>Latest Posts</h3>
   <ul class="post-list">
     {% for post in site.posts limit:3 %}
     <li class="post-card">
