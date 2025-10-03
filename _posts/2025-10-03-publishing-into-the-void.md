@@ -3,10 +3,7 @@ layout: post
 title: "Publishing into the Void: How to Stay Motivated When No One's Listening"
 date: 2025-09-24 09:00:00 +0000
 categories: writing creativity motivation
-excerpt: "24 views. That's what I got on my first YouTube video in 2007. Eighteen years and 16 million views later, I'm back in the Void again—this time with writing. Here's what keeps me going."
-seo_title: "How to Stay Motivated Writing When No One Reads Your Work"
-seo_description: "From 24 views to 16 million: practical strategies for staying motivated when publishing to silence. Learn how to build consistency, overcome perfectionism, and keep creating when nobody's watching."
-keywords: ["creative motivation", "publishing consistency", "overcoming perfectionism", "building audience from zero", "content creation mindset"]
+excerpt: "24 views. That's what I got on my first YouTube video in 2007. Eighteen years and 16 million views later, I'm back in the Void again—this time with writing."
 ---
 
 Hello world.
@@ -40,22 +37,16 @@ Here's what I'm telling myself:
 
 My biggest challenge is perfectionism: iterating endlessly and never committing. That was past me; I'm older, wiser, and still screwing things up — just faster now.
 
-Accepting roughness isn't enough. I needed a system to keep going when motivation fades.
-
-**Publishing Cadence** — I'm going to publish once every two weeks, no matter what. Even when it's embarrassing. Even when I re-read it the next day and cringe. If I miss, I'll pay it back with an extra post.
-
-**Quantity Over Quality** — I can't guarantee quality yet, but I can guarantee quantity. It hurt my ears to start violin, but I kept making noise. Just keep writing.
-
-**Asking For Feedback** — I can ask family, friends, and YouTube viewers for feedback. I'm not above begging, but I'm hoping they don't make me… they probably will.
-
-Bring it on, Void.
-
-## Taking Action
-
-My trash is filled with failed drafts. Fear didn't stop me in 2007 — and it won't stop me now.
-
-Eighteen years ago, 24 people showed up for my first video. If you're reading this, you're early — and that matters.
+Accepting roughness isn't enough. I needed a system to keep going when motivation fades...
 
 ---
 
-*This essay is part of an ongoing series on building creative work in public. For more on skill transfer, writing systems, and staying motivated through uncertainty, [subscribe to my Substack](https://benchanviolin.substack.com) where I document the journey as it happens.*
+**[Read the full essay on Substack →](https://benchanviolin.substack.com/p/publishing-into-the-void)**
+
+*This essay continues with my specific goals for publishing cadence, overcoming perfectionism, and taking action despite fear. I publish the complete versions on [Substack](https://benchanviolin.substack.com), where I document the journey of building creative work in public—from skill transfer to staying motivated through uncertainty.*
+
+*Subscribe there to join the conversation.*
+
+---
+
+*Originally published September 24, 2025*
