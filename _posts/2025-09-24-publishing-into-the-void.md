@@ -16,7 +16,7 @@ I felt frustrated, annoyed. Confused. I had thought that the quality of my playi
 
 I kept publishing. Weeks of silence.
 
-*The Void is gamer shorthand for grinding early levels with no rewards — for creators, it's publishing when no one notices.*
+> *The Void is gamer shorthand for grinding early levels with no rewards — for creators, it's publishing when no one notices.*
 
 Eighteen years and 16 million views later, I'm back in the Void again. No one's listening—yet.
 
