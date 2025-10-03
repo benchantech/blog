@@ -4,7 +4,7 @@ title: Posts
 permalink: /posts/
 ---
 
-<h3>Full versions live on Substack/h3>
+<h3>Full versions live on Substack</h3>
 <ul class="post-list">
   {% for post in site.posts %}
   <li class="post-card">
