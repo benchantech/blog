@@ -3,11 +3,6 @@ layout: default
 title: Home
 ---
 
-<div class="hero">
-  <img src="/assets/images/logo.jpg" alt="Ben Chan Tech LLC Logo" class="hero-logo">
-  <h2 class="tagline">Building in Plain Sight</h2>
-</div>
-
 <section class="latest-posts">
   <h3>Latest Blog Posts</h3>
   <ul class="post-list">
