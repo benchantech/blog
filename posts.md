@@ -1,10 +1,10 @@
 ---
 layout: page
-title: Blog
-permalink: /blog/
+title: Posts
+permalink: /posts/
 ---
 
-<h2>All Blog Posts</h2>
+<h3>Full versions live on Substack/h3>
 <ul class="post-list">
   {% for post in site.posts %}
   <li class="post-card">
