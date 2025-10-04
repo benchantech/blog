@@ -12,7 +12,7 @@ While I love being recognized as "that guy who plays violin on YouTube" or "that
 
 So how does mastery in one domain speed up learning in a new one? Can decades of violin discipline accelerate piano, Mandarin, even cooking?
 
-> *New Game Plus is gamer shorthand for starting a quest over with all your accumulated skills intact.*
+> *New Game Plus means starting a new quest with skills earned from the last one.*
 
 That's what I'm testing: how existing skills transfer to fresh, new domains — starting with piano.
 
@@ -20,7 +20,7 @@ That's what I'm testing: how existing skills transfer to fresh, new domains — 
 
 I started teaching myself piano during COVID lockdown: five years of daily practice, propelled by violin discipline. When my parents gifted us the family grand piano earlier this year, I thought I was ready. My dad bought that Steinway in the '70s: the same keys my siblings played Chopin on, the same bench I sat on as a kid, unable to keep up. Turns out, ivory keys require much greater sensitivity and balance than electric ones.
 
-My ear transfers perfectly; I can tell immediately if the notes are right, just like with violin. My practice routine transfers: break the piece into measures, play slowly, adjust. But my hands? My left fingers are stronger than the right, sometimes causing the accompaniment to outshine the melody.
+Perfect pitch helps me catch wrong notes in a chord. Practice drills are similar: group by measure, play slowly, adjust. But my hands? My left hand overpowers my right, constantly.
 
 Sightreading is brutal; reading two clefs simultaneously is no joke. Muscle memory exists, but it's fighting against 40 years of string tension. I have to unlearn violin habits while building new ones. Four decades of mastery — but on piano, no one can tell. The strings are attached, but they're waging a tug-o-war.
 
