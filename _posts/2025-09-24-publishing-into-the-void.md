@@ -2,6 +2,7 @@
 layout: post
 title: "Publishing into the Void: How to Stay Motivated When No One's Listening"
 date: 2025-09-24 09:00:00 +0000
+canonical_url: "https://benchanviolin.substack.com/p/publishing-into-the-void"
 categories: writing creativity motivation
 excerpt: "24 views. That's what I got on my first YouTube video in 2007. Eighteen years and 16 million views later, I'm back in the Void again—this time with writing."
 ---
