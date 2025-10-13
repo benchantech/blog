@@ -49,4 +49,4 @@ Accepting roughness isn't enough. I needed a system to keep going when motivatio
 
 ---
 
-*Originally published September 24, 2025 using [The YY Method™](https://yymethod.com)*
+*Originally published September 24, 2025 using the [YY Method™](https://yymethod.com)*
