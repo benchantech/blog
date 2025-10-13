@@ -42,4 +42,4 @@ I can hear the different tones clearly, the musician advantage. After hundreds o
 
 ---
 
-*Originally published October 3, 2025 on Substack*
+*Originally published October 3, 2025 on Substack using [The YY Method™](https://yymethod.com)*
