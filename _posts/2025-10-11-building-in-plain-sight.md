@@ -60,4 +60,4 @@ I’m a busy adult; not much time for me. But I’m trying something new — sho
 
 ---
 
-*Originally published October 11, 2025 on Substack*
+*Originally published October 11, 2025 on Substack using [The YY Method™](https://yymethod.com)*
