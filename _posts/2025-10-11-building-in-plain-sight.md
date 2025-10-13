@@ -2,6 +2,7 @@
 layout: post
 title: "Building in Plain Sight: How to Level Up as a Busy Adult"
 date: 2025-10-11 18:30:00 +0000
+canonical_url: "https://benchanviolin.substack.com/p/building-in-plain-sight"
 categories: habits productivity learning
 excerpt: "You're busy — so am I. But there's still enough time, by the end of the day, to level up in plain sight — one log at a time."
 ---
