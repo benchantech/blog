@@ -2,6 +2,7 @@
 layout: post
 title: "New Strings Attached: How Skills Transfer to Fresh Domains"
 date: 2025-10-03 18:35:00 +0000
+canonical_url: "https://benchanviolin.substack.com/p/new-strings-attached"
 categories: skill-transfer learning mastery
 excerpt: "Yes, I mean 'New' not 'No'. I've been playing violin for almost 40 years; these strings are already firmly attached. Now I'm testing how those skills transfer to piano, Mandarin, and cooking."
 ---
