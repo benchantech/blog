@@ -35,7 +35,9 @@ Violin grounded me, gave me a loud voice to hide behind. Computer Science stayed
 
 ## Settlement Period
 
-Two early startups failed, despite my best efforts. Partners blamed the product — my coding — both times. A third startup stalled on funding. By then, I had a wife, toddler, baby, new house. No tech degree, by choice. Some savings left, but…
+Two early startups failed, despite my best efforts. Partners blamed the product — my coding — both times. _Back then, I believed them._ 
+
+A third startup stalled on funding. I had a wife, toddler, baby, new house. No tech degree, by choice. Some savings left, but…
 
 I had worked so hard: early mornings, late evenings, baby on my lap while pushing new code. I enjoyed creating, but struggled to make my opinion heard.
 
