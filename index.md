@@ -5,6 +5,7 @@ description: Ben Chan is an engineer and the creator of the YY Method — a fram
 ---
 
 <section class="intro">
+  <p>However you got here — through the method, the podcast, or something else entirely — welcome.</p>
   <p>The YY Method started as a discipline for encoding the reasoning inside codebases and teams — the why behind decisions, not just the decisions themselves. It turned out to work the same way everywhere judgment under constraint is required: personal finance, family architecture, creative work.</p>
   <p>This site is where that work accumulates.</p>
 </section>
