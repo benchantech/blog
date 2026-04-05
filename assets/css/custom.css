@@ -81,6 +81,27 @@ footer .container {
   flex-wrap: wrap;
 }
 
+.footer-cta {
+  font-size: 0.85rem;
+  color: var(--fg);
+}
+
+.footer-cta a {
+  color: var(--fg);
+  font-weight: 500;
+}
+
+.footer-cta a:hover {
+  color: var(--accent);
+  text-decoration: none;
+}
+
+.footer-meta {
+  margin-top: 0.625rem;
+  padding-top: 0.625rem;
+  border-top: 1px solid var(--border);
+}
+
 footer a { color: var(--muted); }
 footer a:hover { color: var(--fg); text-decoration: none; }
 .sep { color: var(--border); }
