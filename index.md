@@ -50,5 +50,4 @@ description: Ben Chan is an engineer and the creator of the YY Method — a fram
   <p>Ben Chan is a systems architect and the creator of the YY Method — a personal epistemological framework for making decisions durable under constraint.</p>
   <p>The method applies in technical environments: codebases, teams, knowledge systems where the reasoning behind decisions decays faster than the decisions themselves. It applies equally outside them — a housing decision, a retirement transition, a child's school arc. The structure is the same. Judgment under constraint, captured before it disappears.</p>
   <p>The work spans systems, music, and language. The thread is the method.</p>
-  <p class="contact"><a href="mailto:ben@benchantech.com">ben@benchantech.com</a></p>
 </section>
