@@ -1,7 +1,7 @@
 # Site settings
 title: Ben Chan Tech LLC
 description: >-
-   Engineering systems at the edge of tech, music, and language.
+  Ben Chan is an engineer and the creator of the YY Method — a framework for making decisions durable under constraint.
 url: "https://benchantech.com"
 baseurl: ""
 
@@ -15,22 +15,13 @@ timezone: America/New_York
 permalink: /:categories/:title/
 
 # Header navigation
-header_pages:
-  - index.md
+header_pages: []
 
 # Custom includes
 include:
   - _includes/head-custom.html
   - assets/images
 
-# Minima theme customization
-minima:
-  skin: classic
-  social_links:
-    github: Ben Chan Tech
-    linkedin: Ben Chan Techllc
-    youtube: benchanviolin
-    email: ben@benchantech.com
 
 # Plugins
 plugins:

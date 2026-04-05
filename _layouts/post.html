@@ -1,0 +1,14 @@
+---
+layout: default
+---
+
+<article>
+  <div class="post-header">
+    <h1>{{ page.title | escape }}</h1>
+    <p class="post-meta">{{ page.date | date: "%B %-d, %Y" }}{% if page.canonical_url %} · <a href="{{ page.canonical_url }}" target="_blank" rel="noopener noreferrer">Read on Substack →</a>{% endif %}</p>
+  </div>
+  <div class="post-content">
+    {{ content }}
+  </div>
+  <p class="post-back"><a href="{{ "/" | relative_url }}">← Back</a></p>
+</article>
