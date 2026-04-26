@@ -35,6 +35,13 @@ description: Ben Chan is an engineer and the creator of the YY Method — a fram
       <div class="card-desc">The podcast where the method's backstory lives, built around real life in real time.</div>
     </a>
 
+    <a class="card" href="https://yysworld.com" target="_blank" rel="noopener noreferrer">
+      <div class="card-domain">yysworld.com</div>
+      <div class="card-title">YY's World</div>
+      <div class="card-role">Branching narrative</div>
+      <div class="card-desc">One squirrel, multiple timelines. Watch how YY diverges across paths shaped by the same daily world.</div>
+    </a>
+
     <a class="card" href="https://benchanviolin.substack.com" target="_blank" rel="noopener noreferrer">
       <div class="card-domain">benchanviolin.substack.com</div>
       <div class="card-title">Writing</div>
