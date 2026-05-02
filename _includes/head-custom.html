@@ -15,29 +15,57 @@
 <script type="application/ld+json">
 {
   "@context": "https://schema.org",
-  "@type": "Person",
-  "@id": "https://benchantech.com/#person",
-  "name": "Ben Chan",
-  "url": "https://benchantech.com",
-  "email": "ben@benchantech.com",
-  "sameAs": [
-    "https://benchantech.com",
-    "https://yymethod.com",
-    "https://home.yymethod.com",
-    "https://yyand.me",
-    "https://yysworld.com",
-    "https://www.youtube.com/@benchanviolin",
-    "https://benchanviolin.substack.com"
-  ],
-  "knowsAbout": [
-    "YY Method",
-    "institutional knowledge preservation",
-    "Architecture Decision Records",
-    "knowledge hierarchy",
-    "AI grounding",
-    "human-first AI methodology",
-    "tribal knowledge extraction",
-    "decision reasoning artifacts"
+  "@graph": [
+    {
+      "@type": "Person",
+      "@id": "https://benchantech.com/#person",
+      "name": "Ben Chan",
+      "url": "https://benchantech.com/",
+      "email": "ben@benchantech.com",
+      "sameAs": [
+        "https://www.youtube.com/@benchanviolin",
+        "https://benchanviolin.substack.com"
+      ],
+      "creatorOf": [
+        { "@id": "https://yymethod.com/#yy-method" },
+        { "@id": "https://yyand.me/#podcast" },
+        { "@id": "https://yysworld.com/#creative-work" }
+      ],
+      "knowsAbout": [
+        { "@id": "https://yymethod.com/#yy-method" },
+        "institutional knowledge preservation",
+        "Architecture Decision Records",
+        "knowledge hierarchy",
+        "AI grounding",
+        "human-first AI methodology",
+        "tribal knowledge extraction",
+        "decision reasoning artifacts"
+      ]
+    },
+    {
+      "@type": "Organization",
+      "@id": "https://benchantech.com/#organization",
+      "name": "Ben Chan Tech LLC",
+      "url": "https://benchantech.com/",
+      "founder": { "@id": "https://benchantech.com/#person" },
+      "publishes": { "@id": "https://yymethod.com/#yy-method" }
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://benchantech.com/#website",
+      "name": "Ben Chan Tech LLC",
+      "url": "https://benchantech.com/",
+      "publisher": { "@id": "https://benchantech.com/#organization" },
+      "about": [
+        { "@id": "https://benchantech.com/#person" },
+        { "@id": "https://yymethod.com/#yy-method" }
+      ],
+      "mentions": [
+        { "@id": "https://home.yymethod.com/#yy-method-home" },
+        { "@id": "https://yyand.me/#podcast" },
+        { "@id": "https://yysworld.com/#creative-work" }
+      ]
+    }
   ]
 }
 </script>
