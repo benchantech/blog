@@ -28,8 +28,8 @@ description: Ben Chan is an engineer and the creator of the YY Method — a fram
       <div class="card-desc">A live registry of decisions made under the method — from tax strategy to systems architecture.</div>
     </a>
 
-    <a class="card" href="https://yyand.me" target="_blank" rel="noopener noreferrer">
-      <div class="card-domain">yyand.me</div>
+    <a class="card" href="https://yyandme.benchantech.com" target="_blank" rel="noopener noreferrer">
+      <div class="card-domain">yyandme.benchantech.com</div>
       <div class="card-title">YY and Me</div>
       <div class="card-role">Origin + narrative</div>
       <div class="card-desc">The podcast where the method's backstory lives, built around real life in real time.</div>
