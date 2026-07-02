@@ -1,0 +1,10 @@
+# Jekyll build
+_site/
+.jekyll-cache/
+Gemfile.lock
+
+# Vercel
+.vercel
+.env.local
+
+.DS_Store
