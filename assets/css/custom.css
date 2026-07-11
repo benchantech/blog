@@ -222,6 +222,104 @@ main { padding: 0 0 64px; }
 
 .card--paper { background: var(--bg); }
 
+/* Ecosystem sections */
+.functions {
+  border-top: 1px solid var(--hairline);
+  padding: 54px 0 58px;
+}
+
+.functions p,
+.partnership p {
+  font-size: 16.5px;
+  line-height: 1.72;
+  color: var(--body);
+}
+
+.functions p + p { margin-top: 22px; }
+
+.proof-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 26px 0;
+}
+
+.proof-list span {
+  font-family: var(--mono);
+  font-size: 11px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: var(--card-warm-accent);
+  background: var(--card-warm-bg);
+  border: 1px solid var(--card-warm-border);
+  padding: 8px 10px;
+}
+
+.partnership {
+  border-top: 1px solid var(--hairline);
+  padding: 54px 0 58px;
+}
+
+.partnership-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.role-panel {
+  background: var(--card-parchment);
+  border: 1px solid var(--border);
+  padding: 26px 28px;
+}
+
+.role-panel--ai {
+  background: var(--card-warm-bg);
+  border-color: var(--card-warm-border);
+}
+
+.panel-label {
+  font-family: var(--mono);
+  font-size: 11px !important;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+  color: var(--muted) !important;
+  margin-bottom: 16px;
+}
+
+.role-panel ul {
+  list-style: none;
+}
+
+.role-panel li {
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--body);
+}
+
+.role-panel li + li { margin-top: 6px; }
+
+.role-panel li::before {
+  content: "—";
+  color: var(--muted-light);
+  margin-right: 8px;
+}
+
+.principle {
+  margin-top: 30px;
+  padding-top: 26px;
+  border-top: 1px solid var(--hairline);
+}
+
+.principle p {
+  font-size: 18px;
+  color: var(--fg);
+}
+
+.principle p + p {
+  margin-top: 10px;
+  color: var(--body);
+}
+
 /* About */
 .about {
   border-top: 1px solid var(--hairline);
@@ -345,7 +443,8 @@ article { max-width: 680px; margin: 0 auto; padding-top: 56px; }
   .container { padding: 0 24px; }
   header .container { padding: 16px 24px; }
   footer .container { padding: 14px 24px; }
-  .system-grid { grid-template-columns: 1fr; }
+  .system-grid,
+  .partnership-grid { grid-template-columns: 1fr; }
   .intro { padding: 52px 0 44px; }
   .intro h1 { font-size: 29px; }
 }
