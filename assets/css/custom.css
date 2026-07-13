@@ -344,6 +344,75 @@ main { padding: 0 0 64px; }
   color: var(--muted);
 }
 
+/* Lab */
+.lab-hero .section-label {
+  display: block;
+  margin-bottom: 20px;
+}
+
+.lab-section {
+  border-top: 1px solid var(--hairline);
+  padding: 54px 0 58px;
+}
+
+.lab-feature {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+  gap: 24px;
+  align-items: start;
+}
+
+.lab-feature--reverse {
+  grid-template-columns: minmax(280px, 0.85fr) minmax(0, 1.15fr);
+}
+
+.lab-feature h3 {
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--fg);
+  margin-bottom: 14px;
+}
+
+.lab-feature p,
+.lab-copy p,
+.lab-callout p {
+  font-size: 16.5px;
+  line-height: 1.72;
+  color: var(--body);
+}
+
+.lab-feature p + p,
+.lab-copy p + p {
+  margin-top: 18px;
+}
+
+.lab-link-card {
+  min-height: 100%;
+}
+
+.lab-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 18px;
+}
+
+.lab-grid--three {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.lab-grid-follow {
+  margin-top: 18px;
+}
+
+.lab-proof-list {
+  margin-top: 0;
+}
+
+.lab-close {
+  margin-bottom: -58px;
+}
+
 /* Footer */
 footer {
   border-top: 1px solid var(--hairline);
@@ -444,7 +513,11 @@ article { max-width: 680px; margin: 0 auto; padding-top: 56px; }
   header .container { padding: 16px 24px; }
   footer .container { padding: 14px 24px; }
   .system-grid,
-  .partnership-grid { grid-template-columns: 1fr; }
+  .partnership-grid,
+  .lab-feature,
+  .lab-feature--reverse,
+  .lab-grid,
+  .lab-grid--three { grid-template-columns: 1fr; }
   .intro { padding: 52px 0 44px; }
   .intro h1 { font-size: 29px; }
 }
