@@ -11,6 +11,26 @@ description: "BenChanTech is the map of a living reasoning ecosystem: evidence, 
   <p>This is where those relationships stay visible.</p>
 </section>
 
+<section class="lab-section home-lab">
+  <div class="section-head">
+    <h2 class="section-label">Current Lab</h2>
+    <span class="section-rule"></span>
+    <span class="section-note">Neon Postgres · deterministic routing · musician-developer tools</span>
+  </div>
+  <div class="lab-feature">
+    <div>
+      <h3>BenChanTech is building Neon-backed expert learning infrastructure.</h3>
+      <p>The live wedge is the <a href="https://benchanviolin.com/library" target="_blank" rel="noopener noreferrer">BenChanViolin Library</a>: database-backed teaching clips, transcript-grounded retrieval, and deterministic routing that can absorb early traffic without turning every visit into an AI bill.</p>
+      <p>The larger bet is a toolkit other musician-developers can use to build their own Postgres-backed teaching archives before layering AI on top.</p>
+    </div>
+    <a class="card card--warm lab-link-card" href="{{ "/lab/" | relative_url }}">
+      <div class="card-top"><span class="card-domain">benchantech.com/lab</span><span class="card-role">Current build</span></div>
+      <div class="card-title">Open the Lab</div>
+      <p class="card-desc">The concise map for Neon/Postgres reviewers, infrastructure partners, and musician-developers.</p>
+    </a>
+  </div>
+</section>
+
 <section class="system">
   <div class="section-head">
     <p class="section-label">The System</p>
