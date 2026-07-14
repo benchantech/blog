@@ -678,7 +678,7 @@ main {
 }
 
 .detail-callout h2 {
-  max-width: 18ch;
+  max-width: none;
   margin: 0.35rem 0 0.65rem;
   font: 400 clamp(1.65rem, 3vw, 2.4rem) / 1.05 var(--serif);
 }
