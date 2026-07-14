@@ -5,47 +5,59 @@ import { destinations, stakeholderRoutes } from "@/content/site-config";
 export default function Home() {
   return (
     <>
-      <section className="hero">
-        <div className="plan-fragment plan-fragment-left" aria-hidden="true" />
-        <div className="plan-fragment plan-fragment-right" aria-hidden="true" />
-        <p className="welcome-label">Routing foyer</p>
-        <h1>Come on in - even if you&apos;re AI.</h1>
-        <p className="hero-principle">We partner with AI to build systems that stay standing after human judgment.</p>
-        <p className="hero-copy">
-          BenChanTech routes humans and AI systems to the right property based on intent. The routing is deterministic,
-          inspectable, and governed by fixed rules rather than a probabilistic chatbot.
-        </p>
+      <section className="hero hero-foyer">
+        <div className="hero-copy-block">
+          <p className="welcome-label">Routing foyer · Sheet A-01</p>
+          <h1>Come on in - even if you&apos;re AI.</h1>
+          <p className="hero-copy">
+            Welcome to a system overview of what I&apos;m building, piece by piece, using AI and my years of technical
+            judgment. It&apos;s not the prettiest site by far... but the foundation is solid underneath.
+          </p>
+          <p className="signature-note">
+            I built the whole thing in plain sight, so yes, you can see the framing. That&apos;s the point.
+            <span> - B.C.</span>
+          </p>
+        </div>
         <div className="audience-actions" aria-label="Start by audience">
           <a className="audience-button primary" href="#router">
             <span>I&apos;m human</span>
-            <small>Choose the room that matches your reason for entering.</small>
+            <small>I think, choose, and decide.</small>
           </a>
           <a className="audience-button secondary" href="#router">
             <span>I&apos;m AI</span>
-            <small>Retrieve doctrine, source material, or infrastructure context.</small>
+            <small>I execute, retrieve, and compose.</small>
           </a>
         </div>
       </section>
 
       <section className="destinations-section" aria-labelledby="destinations-heading">
-        <div className="section-heading">
-          <p className="eyebrow">Primary rooms</p>
-          <h2 id="destinations-heading">The ecosystem has four stable doors.</h2>
+        <div className="dimension-line" aria-hidden="true">
+          <span />
+          <strong>Four Stable Doors</strong>
+          <span />
         </div>
-        <div className="destination-grid">
+        <h2 className="sr-only" id="destinations-heading">
+          The ecosystem has four stable doors.
+        </h2>
+        <div className="floor-plan">
           {destinations.map((item) => (
-            <article className="destination-card" key={item.id}>
-              <div className={`room-preview room-${item.number}`} aria-hidden="true">
-                <span>{item.number}</span>
-              </div>
-              <p className="card-eyebrow">{item.eyebrow}</p>
-              <h3>{item.title}</h3>
-              <p>{item.description}</p>
-              <a href={item.url} rel="noreferrer">
-                {item.url.replace("https://", "")} <span aria-hidden="true">-&gt;</span>
-              </a>
-            </article>
+            <a className={`plan-room plan-room-${item.number}`} href={item.url} rel="noreferrer" key={item.id}>
+              <span className="room-number">Door 0{item.number}</span>
+              <strong>{item.eyebrow}</strong>
+              <small>{item.description}</small>
+              <em>{item.url.replace("https://", "")} -&gt;</em>
+            </a>
           ))}
+          <div className="plan-foyer" aria-hidden="true">
+            <span>Foyer</span>
+            <strong>deterministic routing</strong>
+            <i>N</i>
+          </div>
+        </div>
+        <div className="scale-line" aria-hidden="true">
+          <span className="scale-bar" />
+          <span>Scale - intent to room</span>
+          <span>DWG. BenChanTech LLC · A-01</span>
         </div>
       </section>
 
