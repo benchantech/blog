@@ -24,7 +24,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           <nav className="desktop-nav" aria-label="Primary navigation">
             <Link href="/studio">Studio.com</Link>
             <Link href="/neon">Neon</Link>
-            <Link href="/system">System map</Link>
+            <a href="https://yymethod.com" rel="noreferrer">
+              YY Method
+            </a>
           </nav>
         </header>
         <main id="main">{children}</main>
