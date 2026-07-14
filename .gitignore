@@ -3,6 +3,11 @@ _site/
 .jekyll-cache/
 Gemfile.lock
 
+# Next.js
+.next/
+out/
+node_modules/
+
 # Vercel
 .vercel
 .env.local
