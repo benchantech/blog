@@ -13,6 +13,18 @@ export default function NeonPage() {
         language, and future YY Method practice threads meet without turning the archive into a black-box chatbot.
       </p>
 
+      <aside className="detail-callout">
+        <p className="eyebrow">Primary review path</p>
+        <h2>Inspect the live BenChanViolin Library.</h2>
+        <p>
+          Neon reviewers can start with the working library surface: reviewed technique clips, canonical tags, learner
+          phrases, transcript clues, and timestamped YouTube entry points.
+        </p>
+        <a className="detail-link" href="https://benchanviolin.com/library">
+          Visit benchanviolin.com/library <span aria-hidden="true">-&gt;</span>
+        </a>
+      </aside>
+
       <div className="detail-grid">
         <article>
           <h2>Current library</h2>

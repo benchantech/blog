@@ -670,6 +670,30 @@ main {
   font: 400 1.65rem / 1.1 var(--serif);
 }
 
+.detail-callout {
+  margin: 2rem 0;
+  padding: 1.35rem;
+  border: 1.5px solid var(--ink);
+  background: var(--plan);
+}
+
+.detail-callout h2 {
+  max-width: 18ch;
+  margin: 0.35rem 0 0.65rem;
+  font: 400 clamp(1.65rem, 3vw, 2.4rem) / 1.05 var(--serif);
+}
+
+.detail-callout p {
+  max-width: 700px;
+}
+
+.detail-link {
+  display: inline-flex;
+  margin-top: 0.5rem;
+  font: 700 0.76rem / 1 var(--mono);
+  text-transform: uppercase;
+}
+
 .site-footer {
   margin-bottom: 2rem;
   padding: 28px 52px 34px;
