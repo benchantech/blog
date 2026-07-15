@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { ConsentBanner } from "@/components/ConsentBanner";
+import { GoogleAnalytics } from "@/components/GoogleAnalytics";
+import { SiteFooter } from "@/components/SiteFooter";
 import "./globals.css";
 
 export const metadata: Metadata = {
@@ -39,10 +42,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
           </nav>
         </header>
         <main id="main">{children}</main>
-        <footer className="site-footer">
-          <span>BenChanTech LLC</span>
-          <span>AI executes inside boundaries; human judgment sets them.</span>
-        </footer>
+        <SiteFooter />
+        <GoogleAnalytics />
+        <ConsentBanner />
       </body>
     </html>
   );

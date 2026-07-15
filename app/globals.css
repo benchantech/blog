@@ -697,8 +697,9 @@ main {
 .site-footer {
   margin-bottom: 2rem;
   padding: 28px 52px 34px;
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: start;
   gap: 1rem;
   background: var(--ink);
   color: rgba(236, 238, 241, 0.72);
@@ -706,10 +707,103 @@ main {
   text-transform: uppercase;
 }
 
-.site-footer span:first-child {
+.site-footer div {
+  display: grid;
+  gap: 0.4rem;
+}
+
+.site-footer span {
   color: var(--sheet);
   font: italic 1.15rem / 1.35 var(--serif);
   text-transform: none;
+}
+
+.site-footer small {
+  color: rgba(236, 238, 241, 0.72);
+  font: 500 0.72rem / 1.4 var(--mono);
+  text-transform: uppercase;
+}
+
+.site-footer nav {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.7rem 1rem;
+  max-width: 560px;
+}
+
+.site-footer a {
+  color: rgba(236, 238, 241, 0.82);
+  text-decoration: none;
+}
+
+.site-footer a:hover {
+  color: var(--sheet);
+  text-decoration: underline;
+  text-underline-offset: 0.28em;
+}
+
+.legal-page {
+  padding: 56px 52px;
+}
+
+.legal-page h1 {
+  max-width: 14ch;
+  margin: 0.8rem 0 1.2rem;
+  font: 400 clamp(2.6rem, 5vw, 4.4rem) / 0.98 var(--serif);
+}
+
+.legal-page h2 {
+  margin: 2rem 0 0.6rem;
+  font: 400 1.45rem / 1.1 var(--serif);
+}
+
+.legal-page p {
+  max-width: 760px;
+  color: var(--ink-soft);
+  font-size: 1.08rem;
+}
+
+.consent-banner {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 80;
+  display: grid;
+  gap: 1rem;
+  width: min(430px, calc(100% - 40px));
+  padding: 18px;
+  background: var(--sheet);
+  border: 1.5px solid var(--ink);
+  box-shadow: 0 20px 48px rgba(27, 36, 48, 0.22);
+}
+
+.consent-banner p {
+  margin: 0;
+  color: var(--ink-soft);
+}
+
+.consent-banner div {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.7rem;
+}
+
+.consent-banner button {
+  min-height: 42px;
+  padding: 0.65rem 0.9rem;
+  border: 1.5px solid var(--ink);
+  background: var(--sheet);
+  color: var(--ink);
+  cursor: pointer;
+  font: 700 0.72rem / 1 var(--mono);
+  text-transform: uppercase;
+}
+
+.consent-banner button:last-child {
+  background: var(--ink);
+  color: var(--sheet);
 }
 
 @media (max-width: 900px) {
@@ -816,7 +910,11 @@ main {
   }
 
   .site-footer {
-    flex-direction: column;
+    grid-template-columns: 1fr;
+  }
+
+  .site-footer nav {
+    justify-content: flex-start;
   }
 }
 
