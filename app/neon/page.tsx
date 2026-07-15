@@ -10,7 +10,7 @@ export default function NeonPage() {
       </p>
       <p>
         The database is not just storage for videos. It is the layer that lets human review, musical taxonomy, transcript
-        language, and future YY Method practice threads meet without turning the archive into a black-box chatbot.
+        language, and future YY Method™ practice threads meet without turning the archive into a black-box chatbot.
       </p>
 
       <aside className="detail-callout">
@@ -51,7 +51,7 @@ export default function NeonPage() {
           </p>
         </article>
         <article>
-          <h2>YY Method expansion</h2>
+          <h2>YY Method™ expansion</h2>
           <p>
             The same structure can feed Capture, Why, Why-Not, Commit, and Timestamp. A musician arrives with an
             observation; the system retrieves relevant human teaching, keeps competing explanations alive, and returns a

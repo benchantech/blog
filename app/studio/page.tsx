@@ -4,7 +4,7 @@ export default function StudioPage() {
       <p className="eyebrow">Studio.com route</p>
       <h1>Violin Stand Partner turns practice uncertainty into one useful next question.</h1>
       <p>
-        YY Method for Violin is the public framework. Violin Stand Partner is the private continuity system that applies
+        YY Method™ for Violin is the public framework. Violin Stand Partner is the private continuity system that applies
         it at the stand: capture what actually happened, test one bounded change, preserve the conditions, and return
         tomorrow with a better question instead of starting over.
       </p>

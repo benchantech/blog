@@ -1,7 +1,5 @@
 .git
 .next
 node_modules
-_site
-.jekyll-cache
 .env*
 .DS_Store

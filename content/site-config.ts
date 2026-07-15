@@ -28,7 +28,7 @@ export const destinations = [
     title: "Inspect the method",
     description: "Doctrine, operating boundaries, and reasoning architecture.",
     url: "https://yymethod.com/doctrine",
-    eyebrow: "YY Method",
+    eyebrow: "YY Method™",
     audiences: ["human", "ai"]
   },
   {

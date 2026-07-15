@@ -34,7 +34,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <Link href="/studio">Studio.com</Link>
             <Link href="/neon">Neon</Link>
             <a href="https://yymethod.com" rel="noreferrer">
-              YY Method
+              YY Method™
             </a>
           </nav>
         </header>
