@@ -7,7 +7,7 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "BenChanTech",
-  description: "A deterministic routing foyer for the BenChanTech reasoning ecosystem.",
+  description: "Shipyard log for Ben Chan's independent systems, publications, and experiments.",
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
@@ -34,8 +34,8 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <span>BenChanTech</span>
           </Link>
           <nav className="desktop-nav" aria-label="Primary navigation">
-            <Link href="/studio">Studio.com</Link>
-            <Link href="/neon">Neon</Link>
+            <Link href="/neon">Current Build</Link>
+            <Link href="/studio">Runtime</Link>
             <a href="https://yymethod.com" rel="noreferrer">
               YY Method™
             </a>

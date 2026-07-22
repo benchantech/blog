@@ -1,83 +1,99 @@
 import Link from "next/link";
-import { IntentRouter } from "@/components/IntentRouter";
-import { destinations, stakeholderRoutes } from "@/content/site-config";
+import { currentBuild, registry, vessels, yardLog } from "@/content/site-config";
 
 export default function Home() {
   return (
     <>
-      <section className="hero hero-foyer">
+      <section className="hero yard-hero">
         <div className="hero-copy-block">
-          <p className="welcome-label">Routing foyer · Sheet A-01</p>
-          <h1>Come on in - even if you&apos;re AI.</h1>
-          <p className="hero-copy">
-            Welcome to a system overview of what I&apos;m building, piece by piece, using AI and my years of technical
-            judgment. It&apos;s not the prettiest site by far... but the foundation is solid underneath.
-          </p>
-          <p className="signature-note">
-            I built the whole thing in plain sight, so yes, you can see the framing. That&apos;s the point.
-            <span> - B.C.</span>
-          </p>
+          <p className="welcome-label">BenChanTech · Yard record</p>
+          <h1>Shipyard log.</h1>
+          <p className="hero-copy">Independent systems, publications, and experiments by Ben Chan.</p>
         </div>
-        <div className="audience-actions" aria-label="Start by audience">
-          <a className="audience-button primary" href="#router">
-            <span>I&apos;m human</span>
-            <small>I think, choose, and decide.</small>
-          </a>
-          <a className="audience-button secondary" href="#router">
-            <span>I&apos;m AI</span>
-            <small>I execute, retrieve, and compose.</small>
-          </a>
+        <div className="yard-stamp" aria-label="Current yard status">
+          <span>Log open</span>
+          <strong>July 2026</strong>
         </div>
       </section>
 
-      <section className="destinations-section" aria-labelledby="destinations-heading">
-        <div className="dimension-line" aria-hidden="true">
-          <span />
-          <strong>Four Stable Doors</strong>
-          <span />
+      <section className="current-build-section" aria-labelledby="current-build-heading">
+        <div className="section-heading compact">
+          <p className="eyebrow">Current build</p>
+          <h2 id="current-build-heading">{currentBuild.title}</h2>
+          <p>{currentBuild.summary}</p>
         </div>
-        <h2 className="sr-only" id="destinations-heading">
-          The ecosystem has four stable doors.
-        </h2>
-        <div className="floor-plan">
-          {destinations.map((item) => (
-            <a className={`plan-room plan-room-${item.number}`} href={item.url} rel="noreferrer" key={item.id}>
-              <span className="room-number">Door 0{item.number}</span>
-              <strong>{item.eyebrow}</strong>
-              <small>{item.description}</small>
-              <em>{item.url.replace("https://", "")} -&gt;</em>
-            </a>
-          ))}
-          <div className="plan-foyer" aria-hidden="true">
-            <span>Foyer</span>
-            <strong>deterministic routing</strong>
-            <i>N</i>
+        <div className="build-ledger">
+          <span>{currentBuild.status}</span>
+          <strong>Deterministic routing · transcript-grounded retrieval</strong>
+          <div>
+            {currentBuild.links.map((link) => (
+              <Link href={link.href} key={link.href}>
+                {link.label}
+              </Link>
+            ))}
           </div>
         </div>
-        <div className="scale-line" aria-hidden="true">
-          <span className="scale-bar" />
-          <span>Scale - intent to room</span>
-          <span>DWG. BenChanTech LLC · A-01</span>
+      </section>
+
+      <section className="yard-section" aria-labelledby="yard-heading">
+        <div className="section-heading compact">
+          <p className="eyebrow">In the yard</p>
+          <h2 id="yard-heading">Active vessels and present condition.</h2>
+        </div>
+        <div className="yard-grid">
+          {vessels.map((vessel) => (
+            <a className="vessel-entry" href={vessel.href} rel="noreferrer" key={vessel.id}>
+              <span className="vessel-meta">{vessel.type}</span>
+              <strong>{vessel.name}</strong>
+              <small>{vessel.latest}</small>
+              <span className="vessel-footer">
+                <em>{vessel.status}</em>
+                <time>{vessel.latestDate}</time>
+              </span>
+            </a>
+          ))}
         </div>
       </section>
 
-      <IntentRouter />
-
-      <section className="stakeholder-section" aria-labelledby="stakeholder-heading">
-        <div className="section-heading compact">
-          <p className="eyebrow">Review routes</p>
-          <h2 id="stakeholder-heading">Two rooms are built for current reviewers.</h2>
+      <section className="yard-record-section" aria-labelledby="yard-log-heading">
+        <div className="yard-log-panel">
+          <div className="section-heading compact">
+            <p className="eyebrow">Recent movements</p>
+            <h2 id="yard-log-heading">Yard log</h2>
+          </div>
+          <ol className="yard-log">
+            {yardLog.map((entry) => (
+              <li key={`${entry.date}-${entry.event}`}>
+                <time>{entry.date}</time>
+                <p>{entry.event}</p>
+              </li>
+            ))}
+          </ol>
         </div>
-        <div className="stakeholder-grid">
-          {stakeholderRoutes.map((item) => (
-            <Link className="stakeholder-card" href={item.url} key={item.id}>
-              <span>
-                <strong>{item.title}</strong>
-                <small>{item.description}</small>
-              </span>
-              <span aria-hidden="true">-&gt;</span>
-            </Link>
-          ))}
+
+        <div className="registry-panel">
+          <div className="section-heading compact">
+            <p className="eyebrow">Registry</p>
+            <h2>Vessel record</h2>
+          </div>
+          <table className="registry-table">
+            <thead>
+              <tr>
+                <th scope="col">Vessel</th>
+                <th scope="col">Launched</th>
+                <th scope="col">Status</th>
+              </tr>
+            </thead>
+            <tbody>
+              {registry.map((entry) => (
+                <tr key={entry.vessel}>
+                  <td>{entry.vessel}</td>
+                  <td>{entry.launched}</td>
+                  <td>{entry.status}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
         </div>
       </section>
     </>

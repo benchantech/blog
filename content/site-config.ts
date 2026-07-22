@@ -4,6 +4,8 @@ export type DestinationId = "method" | "violin" | "human" | "theory";
 
 export type StakeholderId = "studio" | "neon";
 
+export type VesselId = "resonant-patterns" | "yy-method" | "yy-and-me" | "yys-world" | "violin-library";
+
 export type Destination = {
   id: DestinationId;
   number: number;
@@ -19,6 +21,27 @@ export type StakeholderRoute = {
   title: string;
   description: string;
   url: string;
+};
+
+export type Vessel = {
+  id: VesselId;
+  name: string;
+  href: string;
+  type: string;
+  status: string;
+  latest: string;
+  latestDate: string;
+};
+
+export type YardLogEntry = {
+  date: string;
+  event: string;
+};
+
+export type RegistryEntry = {
+  vessel: string;
+  launched: string;
+  status: string;
 };
 
 export const destinations = [
@@ -74,3 +97,84 @@ export const stakeholderRoutes = [
     url: "/neon"
   }
 ] satisfies StakeholderRoute[];
+
+export const currentBuild = {
+  title: "Neon-backed teaching infrastructure",
+  status: "At the workbench",
+  summary: "Deterministic routing, transcript-grounded retrieval, and musician-developer infrastructure.",
+  links: [
+    { label: "Build notes", href: "/neon" },
+    { label: "Coaching runtime", href: "/studio" }
+  ]
+};
+
+export const vessels = [
+  {
+    id: "resonant-patterns",
+    name: "Resonant Patterns",
+    href: "https://benchanviolin.substack.com",
+    type: "Dispatches",
+    status: "Underway",
+    latest: "Active publication channel",
+    latestDate: "July 2026"
+  },
+  {
+    id: "yy-method",
+    name: "The YY Method",
+    href: "https://yymethod.com",
+    type: "Publication",
+    status: "Active",
+    latest: "YY Essays established",
+    latestDate: "22 July 2026"
+  },
+  {
+    id: "yy-and-me",
+    name: "YY & Me",
+    href: "https://yyandme.benchantech.com",
+    type: "Archive",
+    status: "Active",
+    latest: "Personal record online",
+    latestDate: "2026"
+  },
+  {
+    id: "yys-world",
+    name: "YY's World",
+    href: "https://yysworld.benchantech.com",
+    type: "Experimental vessel",
+    status: "Unpredictable",
+    latest: "Branching world runtime",
+    latestDate: "2026"
+  },
+  {
+    id: "violin-library",
+    name: "BenChanViolin Library",
+    href: "https://benchanviolin.com/library",
+    type: "Teaching library",
+    status: "In refit",
+    latest: "Retrieval infrastructure",
+    latestDate: "July 2026"
+  }
+] satisfies Vessel[];
+
+export const yardLog = [
+  {
+    date: "22 July 2026",
+    event: "YY Essays established as an official series."
+  },
+  {
+    date: "18 July 2026",
+    event: "Library routing moved into deployment work."
+  },
+  {
+    date: "02 July 2026",
+    event: "Coaching runtime entered adversarial review."
+  }
+] satisfies YardLogEntry[];
+
+export const registry = [
+  { vessel: "YY & Me", launched: "2026", status: "Active" },
+  { vessel: "Resonant Patterns", launched: "2026", status: "Active" },
+  { vessel: "The YY Method", launched: "2026", status: "Active" },
+  { vessel: "YY's World", launched: "2026", status: "Experimental" },
+  { vessel: "BenChanViolin Library", launched: "2026", status: "In development" }
+] satisfies RegistryEntry[];

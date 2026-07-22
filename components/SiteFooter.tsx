@@ -15,7 +15,7 @@ export function SiteFooter() {
     <footer className="site-footer">
       <div>
         <span>Ben Chan Tech LLC</span>
-        <small>AI executes inside boundaries; human judgment sets them.</small>
+        <small>Independent systems, publications, and experiments.</small>
       </div>
       <nav aria-label="Legal and company information">
         {legalLinks.map((link) => (
