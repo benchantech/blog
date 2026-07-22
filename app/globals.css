@@ -869,6 +869,43 @@ main {
   font: 400 1.65rem / 1.1 var(--serif);
 }
 
+.detail-list {
+  margin: 1rem 0;
+  padding-left: 1.1rem;
+  color: var(--ink-soft);
+}
+
+.detail-list li {
+  margin: 0.38rem 0;
+}
+
+.detail-list.columns {
+  columns: 2;
+  column-gap: 2rem;
+}
+
+.method-list {
+  margin: 1rem 0;
+  display: grid;
+  gap: 0.75rem;
+}
+
+.method-list div {
+  padding-bottom: 0.75rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.method-list dt {
+  color: var(--ink);
+  font: 700 0.72rem / 1.2 var(--mono);
+  text-transform: uppercase;
+}
+
+.method-list dd {
+  margin: 0.2rem 0 0;
+  color: var(--ink-soft);
+}
+
 .detail-callout {
   margin: 2rem 0;
   padding: 1.35rem;
@@ -1112,6 +1149,10 @@ main {
 
   .registry-table {
     font-size: 0.92rem;
+  }
+
+  .detail-list.columns {
+    columns: 1;
   }
 
   .dimension-line {
