@@ -113,45 +113,45 @@ export const vessels = [
     id: "resonant-patterns",
     name: "Resonant Patterns",
     href: "https://benchanviolin.substack.com",
-    type: "Dispatches",
+    type: "Personal essays",
     status: "Underway",
-    latest: "Active publication channel",
+    latest: "My truest tuning-fork surface: personal observations of the patterns that resonate with me.",
     latestDate: "July 2026"
   },
   {
     id: "yy-method",
     name: "The YY Method",
     href: "https://yymethod.com",
-    type: "Publication",
+    type: "Doctrine",
     status: "Active",
-    latest: "YY Essays established",
+    latest: "Current doctrine expressed through the YY lens, including the canonical YY Essays.",
     latestDate: "22 July 2026"
   },
   {
     id: "yy-and-me",
     name: "YY & Me",
     href: "https://yyandme.benchantech.com",
-    type: "Archive",
+    type: "Personal record",
     status: "Active",
-    latest: "Personal record online",
+    latest: "The lived experience through which the method, metaphors, and discoveries emerged.",
     latestDate: "2026"
   },
   {
     id: "yys-world",
     name: "YY's World",
     href: "https://yysworld.benchantech.com",
-    type: "Experimental vessel",
+    type: "Creative world",
     status: "Unpredictable",
-    latest: "Branching world runtime",
+    latest: "The zany, anything-goes island.",
     latestDate: "2026"
   },
   {
     id: "violin-library",
     name: "BenChanViolin Library",
     href: "https://benchanviolin.com/library",
-    type: "Teaching library",
-    status: "In refit",
-    latest: "Retrieval infrastructure",
+    type: "Teaching infrastructure",
+    status: "In development",
+    latest: "Ben's teaching archive and the retrieval system being built around it.",
     latestDate: "July 2026"
   }
 ] satisfies Vessel[];
