@@ -192,9 +192,7 @@ main {
 }
 
 .yard-hero {
-  width: min(calc(100% - 2rem), 1320px);
   min-height: 430px;
-  grid-template-columns: minmax(0, 1fr) 176px;
   align-items: end;
   background:
     linear-gradient(90deg, rgba(27, 36, 48, 0.05) 1px, transparent 1px),
@@ -208,6 +206,7 @@ main {
 
 .yard-hero h1 {
   max-width: none;
+  white-space: nowrap;
 }
 
 .yard-stamp {
