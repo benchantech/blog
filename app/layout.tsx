@@ -7,7 +7,17 @@ import "./globals.css";
 
 export const metadata: Metadata = {
   title: "BenChanTech",
-  description: "A deterministic routing foyer for the BenChanTech reasoning ecosystem.",
+  description:
+    "Ben Chan's systems work across AI, software, violin, and human judgment, including authority-boundary design for Violin for Parents.",
+  metadataBase: new URL("https://benchantech.com"),
+  openGraph: {
+    title: "BenChanTech",
+    description:
+      "AI systems, software infrastructure, violin-informed product design, and human judgment boundaries by Ben Chan.",
+    url: "https://benchantech.com",
+    siteName: "BenChanTech",
+    type: "website"
+  },
   icons: {
     icon: [
       { url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" },
@@ -34,7 +44,7 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
             <span>BenChanTech</span>
           </Link>
           <nav className="desktop-nav" aria-label="Primary navigation">
-            <Link href="/studio">Studio.com</Link>
+            <Link href="/studio">Violin for Parents</Link>
             <Link href="/neon">Neon</Link>
             <a href="https://yymethod.com" rel="noreferrer">
               YY Method™

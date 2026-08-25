@@ -1,75 +1,59 @@
+const productUrl = "https://studio.com/apps/benchanviolin/violin-for-parents";
+
 export default function StudioPage() {
   return (
     <section className="detail-page">
       <p className="eyebrow">Studio.com route</p>
-      <h1>Violin Stand Partner turns practice uncertainty into one useful next question.</h1>
+      <h1>Violin for Parents helps adults handle the uncertain moments between violin lessons.</h1>
       <p>
-        YY Method™ for Violin is the public framework. Violin Stand Partner is the private continuity system that applies
-        it at the stand: capture what actually happened, test one bounded change, preserve the conditions, and return
-        tomorrow with a better question instead of starting over.
+        Violin for Parents is the current public product: an audio-first, adult-facing AI continuity coach for parents
+        and caregivers between violin lessons.
       </p>
       <p>
-        The Studio.com fit is not a generic AI tutor. It is a product built around a sharper constraint: the app may
-        support attention, continuity, retrieval, and comparison, but the violinist remains the authority over what they
-        hear, feel, test, reject, keep, and bring back to a teacher.
+        It helps the parent establish what actually happened, consider the most important missing side, decide who owns
+        the decision, and choose one bounded next step without becoming the child&apos;s second violin teacher.
+      </p>
+      <p>
+        <a className="detail-link" href={productUrl} target="_blank" rel="noopener">
+          Get help with today&apos;s violin situation
+        </a>
       </p>
 
       <div className="detail-grid">
         <article>
           <h2>First move</h2>
           <p>
-            A player arrives with a conclusion: my shifting is bad, my sound is wrong, I did not understand the lesson.
-            The app should not rush to diagnose. It asks the smallest observable question that collapses the most
-            uncertainty.
+            A parent often arrives with a conclusion. The product should first separate observation from interpretation:
+            what did the child say, what did the parent see or hear, what changed, and what remains uncertain?
           </p>
         </article>
         <article>
-          <h2>Practice thread</h2>
+          <h2>AI boundary</h2>
           <p>
-            The product preserves open pages, teacher cues, unresolved evidence, yesterday&apos;s Echo, and the next
-            bounded move. A practice page is not a task list item. It is a living musical question with enough context to
-            revisit intelligently.
+            AI may organize observations, retrieve approved teaching, compare possibilities, prepare better questions,
+            and expose options. It must not silently replace the parent, child, current teacher, clinician, luthier, or
+            Ben Chan&apos;s actual source material.
           </p>
         </article>
         <article>
           <h2>Human authority</h2>
           <p>
-            AI can retrieve Ben&apos;s teaching language, suggest a comparison, or prepare a teacher-ready question. A
-            recommendation remains provisional until the violinist tests it, corrects it, rejects it, or makes it their
-            own.
+            The parent owns immediate protective action and family context. The teacher owns individualized violin
+            instruction. Appropriate professionals own medical and instrument-repair decisions.
           </p>
         </article>
         <article>
-          <h2>Why now</h2>
+          <h2>Why this belongs here</h2>
           <p>
-            This is the Studio.com launch context: public method, real teaching archive, private practice continuity,
-            and clear human-AI boundaries already exist. The product can be evaluated as a concrete coaching system, not
-            a speculative AI demo.
-          </p>
-        </article>
-      </div>
-
-      <div className="detail-grid">
-        <article>
-          <h2>The loop</h2>
-          <p>
-            Capture: what happened before explaining it. Why: what might be contributing. Why-Not: what should not be
-            concluded too quickly. Commit: one honest experiment. Timestamp: what changed, and under what conditions it
-            may still be true.
-          </p>
-        </article>
-        <article>
-          <h2>What this is not</h2>
-          <p>
-            It is not a diagnosis engine, rigid curriculum, teacher replacement, or promise that one exercise fixes a
-            problem. It is a way to preserve musical judgment under changing conditions.
+            Ben Chan is a violinist, teacher, parent, and CTO building with AI. Violin for Parents is an applied example
+            of designing AI around explicit authority and judgment boundaries.
           </p>
         </article>
       </div>
 
       <p>
-        The product succeeds if the violinist becomes harder to mislead, better at noticing, and less dependent on the
-        app over time. The app should eventually step back and let the player hear their own judgment return.
+        The public position is simple: use AI to see options and decide for yourself. In this product, AI helps narrow
+        the situation; it does not take over the lesson.
       </p>
     </section>
   );

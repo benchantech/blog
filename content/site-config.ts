@@ -64,7 +64,7 @@ export const stakeholderRoutes = [
   {
     id: "studio",
     title: "For Studio.com",
-    description: "Product logic, coaching architecture, and human-AI boundaries.",
+    description: "Violin for Parents product logic, parent continuity, and human-AI authority boundaries.",
     url: "/studio"
   },
   {
