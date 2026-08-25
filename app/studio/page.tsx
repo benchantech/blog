@@ -27,19 +27,26 @@ const successSignals = [
   "becomes less dependent on the application over time"
 ];
 
+const productUrl = "https://studio.com/apps/benchanviolin/violin-for-parents";
+
 export default function StudioPage() {
   return (
     <section className="detail-page">
       <p className="eyebrow">Studio.com route</p>
-      <h1>Violin Stand Partner helps parents handle the uncertain moments between violin lessons.</h1>
+      <h1>Violin for Parents helps adults handle the uncertain moments between violin lessons.</h1>
       <p>
         A child resists practice. An instruction is remembered differently at home. A string will not stay in tune.
         Something hurts. A parent is unsure whether to help, wait, stop, or contact someone more qualified.
       </p>
       <p>
-        Violin Stand Partner begins with that situation. It helps the parent establish what actually happened, consider
+        Violin for Parents begins with that situation. It helps the parent establish what actually happened, consider
         the most important missing side, and choose one bounded next step without becoming the child&apos;s second violin
         teacher.
+      </p>
+      <p>
+        <a className="detail-link" href={productUrl} target="_blank" rel="noopener">
+          Get help with today&apos;s violin situation
+        </a>
       </p>
 
       <aside className="detail-callout">
@@ -103,7 +110,7 @@ export default function StudioPage() {
         </article>
 
         <article>
-          <h2>Ben is the teacher</h2>
+          <h2>Ben is a source, not a fabricated voice</h2>
           <p>
             Ben&apos;s approved stories, demonstrations, principles, decision trees, and teaching materials remain the
             primary instructional source. The AI may retrieve, compare, summarize, and apply that material to today&apos;s
@@ -178,13 +185,23 @@ export default function StudioPage() {
         <article>
           <h2>Why now</h2>
           <p>
+            Ben Chan is a violinist, teacher, parent, and CTO building with AI. Violin for Parents is an applied example
+            of designing AI around explicit authority boundaries: the system can execute, retrieve, compare, and expose
+            possibilities while the human decision remains human.
+          </p>
+          <p>
             The necessary pieces now exist: a parent-first problem, an approved teaching archive, explicit authority
             boundaries, situation-specific response kits, safety and professional-jurisdiction rules, continuity across
             unresolved concerns, and a method designed to strengthen rather than replace human judgment.
           </p>
           <p>
-            This allows the product to be evaluated as a governed coaching application rather than a speculative AI
-            demonstration.
+            The public position is simple: use AI to see options and decide for yourself. In this product, AI helps
+            narrow the situation; it does not take over the lesson.
+          </p>
+          <p>
+            <a className="detail-link" href={productUrl} target="_blank" rel="noopener">
+              Get help with today&apos;s violin situation
+            </a>
           </p>
         </article>
       </div>

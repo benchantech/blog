@@ -99,12 +99,13 @@ export const stakeholderRoutes = [
 ] satisfies StakeholderRoute[];
 
 export const currentBuild = {
-  title: "Neon-backed teaching infrastructure",
+  title: "Violin for Parents authority-boundary runtime",
   status: "At the workbench",
-  summary: "Deterministic routing, transcript-grounded retrieval, and musician-developer infrastructure.",
+  summary:
+    "A parent-facing AI continuity coach built around explicit teacher, parent, child, clinician, luthier, and source-authority boundaries.",
   links: [
     { label: "Build notes", href: "/neon" },
-    { label: "Coaching runtime", href: "/studio" }
+    { label: "Violin for Parents runtime", href: "/studio" }
   ]
 };
 
@@ -148,11 +149,11 @@ export const vessels = [
   {
     id: "violin-library",
     name: "BenChanViolin Library",
-    href: "https://benchanviolin.com/library",
+    href: "https://benchanviolin.com/parents",
     type: "Teaching infrastructure",
     status: "In development",
-    latest: "Ben's teaching archive and the retrieval system being built around it.",
-    latestDate: "July 2026"
+    latest: "Parent-facing violin and AI answers connected to Ben's teaching archive and source retrieval.",
+    latestDate: "August 2026"
   }
 ] satisfies Vessel[];
 
@@ -166,8 +167,8 @@ export const yardLog = [
     event: "Library routing moved into deployment work."
   },
   {
-    date: "02 July 2026",
-    event: "Coaching runtime entered adversarial review."
+    date: "25 August 2026",
+    event: "Violin for Parents positioning aligned around parent judgment, teacher continuity, and bounded AI authority."
   }
 ] satisfies YardLogEntry[];
 
