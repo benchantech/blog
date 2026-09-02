@@ -1,4 +1,4 @@
-const productUrl = "https://studio.com/apps/benchanviolin/violin-for-parents";
+const productUrl = "https://benchanviolin.com/violin-for-parents";
 
 export default function StudioPage() {
   return (
