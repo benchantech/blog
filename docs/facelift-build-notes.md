@@ -237,3 +237,159 @@ and render guard.
 **If a later phase makes one of these fail, the fix is to revert the edit, not to
 relax the assertion.** WYS telemetry layers *on top of* this implementation
 (plan §8.1); it does not modify it.
+
+---
+
+## 7. Phase 1 — provenance substrate
+
+Pure TypeScript. No page, component or stylesheet was written in this phase;
+the components that render these types are built in Phase 4, after §4.2's
+tokens exist, so nothing here can reference an `--accent` or `--muted` that has
+not been defined.
+
+### 7.1 What landed
+
+| Module | What it carries |
+|---|---|
+| `lib/content-status.ts` | The two enums (nine origins), the `(surfaceKind, origin) -> label` map, the draft marks, `RENDER_BEN_REVIEWED`, `RENDER_MARKED_DRAFT`, `renderPolicyFor()`, `validateProvenance()`. No JSX, no CSS import. |
+| `components/provenance/types.ts` | Prop shapes only: `ProvenanceLabel`, `DraftMark`, `BenSlot`, `MediaSlot`, `DashedSlot`. |
+| `lib/approval-state.ts` | `CaptainsStamp \| null`, captain's round, snapshot, Standing Orders status, the keel record, and every governance string on the site. |
+| `content/authority-chain.ts` | The four-link chain, each with a hash field present and empty. |
+| `lib/canonical-text.ts` | `CanonicalText`, the five variants, the resolver, per-record validation. |
+| `content/claims.ts` | The nine named canonical components from packet: one-definition. |
+| `lib/wys/coach-schema.ts` | Type-only `WysCoachAction` plus all sixteen §22 rules as comments. |
+| `scripts/preview-content.mjs` | The draft preview dump. Not a route (§6.11). |
+| `tests/content-status.test.ts`, `tests/governance-strings.test.ts`, `tests/canonical-text.test.ts` | 59 new test cases, all against pure modules — no component import, no CSS. |
+
+`content/site-config.ts` is byte-identical to `main`.
+
+### 7.2 The two ratified constants
+
+Both are typed `boolean`, not the literal `false`, so flipping either is one
+character and no comparison anywhere narrows to a dead branch.
+
+- **`RENDER_BEN_REVIEWED = false`** (Q13 default). Production renders
+  `published` only. WYS §7 makes `ben_reviewed` Ben's explicit choice.
+- **`RENDER_MARKED_DRAFT = false`** (Q21 default). WYS §7's literal
+  public-rendering whitelist wins over handoff README bucket 3, because plan R3
+  subordinates the README to the spec and WYS §33 step 25 agrees with the spec.
+
+**ESCALATION (Q21 / SC-13).** Shipping the public course with draft scenario
+prose requires Ben's answer. With the constant `false`, every README bucket-3
+object still exists, still compiles and still carries its label — it is visible
+only through `node scripts/preview-content.mjs`. Flipping it is one line and no
+component change. This must appear in the §38 report.
+
+**ESCALATION (Q1 / SC-1).** The disclosure strip's fourth sentence — the one
+asserting that every published word was approved by Ben — is deliberately NOT
+stored as renderable copy in `content/claims.ts`, and
+`tests/canonical-text.test.ts` fails if any record starts storing it. Nothing is
+stamped, so the sentence cannot be made true by copy (R8). Phase 5 renders the
+first three sentences plus a truthful unstamped line bound to `approvalState`.
+The final wording is Ben's.
+
+**ESCALATION (§6.3 / Q1).** Five provenance label strings are NEW copy this
+build authored, because WYS §23 supplies none for those origins and the
+`marked` policy needs all of them. A provenance label is a claim about who
+wrote something, so each goes on the Final-copy escalation list for Ben's stamp:
+
+```
+Implementation placeholder — not Ben's words
+Drafted during implementation — not Ben's words
+External source — not Ben's words
+Yours. Stored in this browser only.
+Approved by Ben
+```
+
+They are exported as `NEW_PROVENANCE_LABELS` so the escalation list cannot
+drift from the code.
+
+### 7.3 Deviations reported from Phase 1
+
+1. **A fourth surface kind, `general`.** WYS §23 groups its strings by three
+   surface kinds (`human-source`, `fictional-scenario`, `judgment`), but
+   `WysRitual`, `WysCarry`, principle bodies, the claim records and the ship
+   prose all render publicly and all need a label. `general` is the fourth.
+   Safe direction (R9): it adds labels where §23 supplies none, and removes
+   none.
+2. **A third render surface, `archive`.** §6.2 rule 3 blocks historical and
+   superseded material "reached from a current surface", but Q25's ratified
+   default makes superseded Bridge positions `historical` objects **rendered in
+   the Log** — which is not a current surface. `RenderSurface` therefore has
+   three values, and an archive render is `marked`, never `canon`: a superseded
+   position must not read as a current one.
+3. **`AwaitingCopy` instead of `full: string`.** §6.8's interface types `full`
+   as `string`; §8b.1 forbids writing legal copy before the code is frozen.
+   They resolve only if an unwritten variant is structurally NOT text — the same
+   mechanism §6.4 uses for Ben slots. `resolveVariant()` returns
+   `kind: "awaiting"` for those, so no renderer can turn a descriptor into
+   prose, and Phase 11 replaces the descriptor with the real `full`.
+4. **`variantSources` on `CanonicalText`.** The `minimal-trust` record's `short`
+   is artboard `5c` and its `full` is WYS §18 verbatim (§8b.3). Without
+   per-variant source metadata the record could not record that honestly.
+5. **`approvalState.keel` carries `name`, `shortName` and `version`.** The
+   artboards render the keel three ways ("YY Method Professional v2.3",
+   "YY Method v2.3", "v2.3 · the keel"). One record, three presentations —
+   §6.8's own mechanism, not three definitions.
+
+### 7.4 The handoff-README provenance mapping
+
+Recorded because every later content phase depends on it:
+
+| Handoff README bucket | status | origin |
+|---|---|---|
+| "Final copy" (hero, bullets, contrast statements, disclosure strip, Data page wording, Standing Orders titles, nav labels) | `published` | `BEN_APPROVED` |
+| "Slots awaiting Ben" | never text — `components/provenance/types.ts` | — |
+| "Draft placeholders" (fictional scenarios, choice labels, revealed judgment text, 18/61/21, stop titles A-H) | `draft` | `AI_SYNTHESIS` / `IMPLEMENTATION_PLACEHOLDER` |
+
+**`status` and the Captain's Stamp are two different axes.** "Final copy" is
+`published` because the handoff says "Ship as-is"; the site still says
+"Not yet stamped", from `approvalState.stamp === null`. Conflating them would
+either block the whole site or claim an approval nothing evidences.
+
+`content/authority-chain.ts` is `draft` / `IMPLEMENTATION_PLACEHOLDER`, because
+the packet is NOT YET STAMPED (R5) and the descriptive lines were drafted during
+implementation. Under the Q21 default that means the chain does not render
+publicly. **Phase 9 must report that consequence rather than soften the
+origin.**
+
+### 7.5 Hazards this phase creates for later phases
+
+- `tests/governance-strings.test.ts` fails if `Not yet stamped`,
+  `approval pending`, `Standing Orders · draft`, `approved by Ben` or
+  `captain's round` appears anywhere in `app/` or `components/`. The fix is
+  always to render it from `lib/approval-state.ts` — never to add an exemption.
+- `tests/canonical-text.test.ts` fails if any `.tsx` under `app/` or
+  `components/` carries a >= 12-word string literal or JSX text run that is not
+  imported from `content/`. The exemption list is the 16 preserved surfaces
+  frozen at Phase 0. **It may shrink; it may never grow.**
+- The same test fails if a 64-hex digest appears anywhere in `app/`,
+  `components/`, `content/` or `lib/` while `approvalState.keel.sha256` is
+  `null`. That is the stale-governance-hash check, and it is the one that fires
+  the moment Ben publishes the v2.3 SHA-256 on yymethod.com/work.
+- `provenanceLabelFor()` is total by type. A `(surfaceKind, origin)` pair with
+  no declared label is a **compile error at the call site**, not a blank label.
+  Adding a pair means adding a string, and a new string is an escalation.
+- The label is a branded type. A component prop typed `ProvenanceLabel` cannot
+  be satisfied by a hand-typed string, so `JudgmentCard`'s header can never be a
+  hardcoded "BEN'S JUDGMENT".
+- **`tests/canonical-text.test.ts` only sees what it imports.** `canonicalRecords`
+  is `claims` today and `contentObjects` is `claims` + `authorityChain`. All
+  eight governance checks run over those two arrays and nothing else, so a
+  content module added in Phase 6 or 9 that is not added to those two constants
+  escapes every check silently. **Extend both in the same commit that adds a
+  content module** — that is not optional bookkeeping, it is the check.
+- **`judgment` × `LEARNER_OWNED` is deliberately unmapped and will be a compile
+  error in Phase 7.** The `5c` Practice screen draws a learner-authored outlined
+  row, so a learner's own committed judgment will need that pair. The string
+  already exists (`Yours. Stored in this browser only.`) and is already on the
+  Ben escalation list, so the fix is a one-line addition to the label table plus
+  a line in the deviation register — not a new escalation.
+- **`LEARNER_OWNED` objects must be constructed at `status: "published"`.** At
+  `draft` they are `blocked` under the Q21 default, which would empty the
+  learner's own rulebook. Learner material is not draft Ben doctrine; it is the
+  learner's, and it renders `marked` with its own label.
+- **`AwaitingCopy.writtenBy` is `"ben" | "phase-8" | "phase-11"`.** Gate fix:
+  the `analytics` record's `short` descriptor said it was written in Phase 8
+  while its `writtenBy` claimed Phase 11. In a module whose entire purpose is
+  not letting a claim drift from its source, that had to agree.
