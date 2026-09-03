@@ -6,11 +6,12 @@ type ConsentChoice = "granted" | "denied";
 
 const storageKey = "bct_analytics_consent";
 
-declare global {
-  interface Window {
-    gtag?: (command: "consent", action: "update", params: Record<string, string>) => void;
-  }
-}
+// The `declare global` block that used to sit here moved to `types/gtag.d.ts`
+// in Phase 3 (plan §8.4). It was consent-only, and a repo-wide consent-only
+// `Window.gtag` makes the first `gtag("event", ...)` a build-time type error.
+// This is a type-location change only: the call below is unchanged, and so are
+// `storageKey`, the three-state machine, the hardcoded `ad_*` denials and the
+// `NEXT_PUBLIC_GA_MEASUREMENT_ID` render guard.
 
 function updateConsent(choice: ConsentChoice) {
   window.gtag?.("consent", "update", {

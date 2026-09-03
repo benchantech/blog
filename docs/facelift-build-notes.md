@@ -601,3 +601,195 @@ it cannot be forgotten silently.
   are curriculum progress. If Q20's kept/revised judgments should survive a
   restart, that is a one-line change here and a Ben decision, not a component
   change.
+
+---
+
+## 9. Phase 3 — telemetry substrate
+
+Plan §8.2–§8.8 and the Phase 3 task table. The existing GA4 implementation is
+preserved unchanged and the WYS adapter layers on top of it.
+
+**Files added:** `types/gtag.d.ts`, `lib/wys/telemetry.ts`, `lib/wys/aggregate.ts`,
+`content/watch-your-step/config.ts`, `tests/wys-telemetry.test.ts`,
+`tests/no-private-state-in-urls.test.ts`.
+**File changed:** `components/ConsentBanner.tsx` — the `declare global` block
+removed, nothing else. **`components/GoogleAnalytics.tsx`: zero edits.**
+
+### 9.1 The shape of the refusal
+
+`trackWys` is a refusal before it is a sender. In order:
+
+1. **Event name** against the closed thirteen-name (WYS §19.4) list, verbatim
+   and in spec order. The two aggregate-only names get their own refusal reason
+   (`aggregate-only-event`) so a mis-wired call is distinguishable from a typo.
+2. **Property keys** against the closed four-key (WYS §19.1A) list, snake_case
+   only. A camelCase spelling of an allowlisted key is refused, not translated
+   (plan §8.2: a mapping shim is a second place a name can be spelled).
+3. **Property VALUES** against per-key domains. A key allowlist alone would
+   carry a learner's sentence under `content_version`; the value domains are
+   what make "never accept free-text properties" true. The canary
+   `DO_NOT_SEND_WYS_TEST_9f31` fails all four domains, and is refused as an
+   event name, as a property key, as a value under every allowlisted key, and as
+   the whole props object.
+4. **Gates:** the global kill switch, `NEXT_PUBLIC_GA_MEASUREMENT_ID`, a
+   `window`, then consent. All fail closed.
+
+The validated props object is **rebuilt key by key**, never spread, so nothing
+unlisted survives even if a later edit forgets a check. Refusals are **loud in
+development and silent in production, but DROPPED in both** — and the refusal
+message carries the key name, never the refused value, so a refused free-text
+value is not echoed into a console either.
+
+### 9.2 Decisions settled at their build-now default in Phase 3
+
+| Q | Default implemented | Where it lives |
+|---|---|---|
+| **Q7 / SC-2** | Full suppression unless `bct_analytics_consent === "granted"`. Unreadable, absent or thrown all mean do not send. | `analyticsConsentGranted()` in `lib/wys/telemetry.ts` |
+| **Q12 / SC-8** | Aggregate counter off; adapter disabled and documented; **no `app/api/wys/aggregate/route.ts`**. `wys_scenario_choice` and `wys_scenario_skip` send nothing at all. | `WYS_AGGREGATE_ENABLED`, `lib/wys/aggregate.ts` |
+| **Q22 / SC-12** | The Data page's aggregate sentence is a state-bound string: it renders only while the flag is true. The string and the flag are in one module so copy cannot outrun code. | `aggregateCounterSentence()` in `content/watch-your-step/config.ts` |
+
+**Escalations recorded, per the ratification instruction.** Q7 and Q22 both
+concern published sentences whose truth this build changes:
+
+- **Q7 / SC-2.** Lesson Zero step 9 and Data card 2 state flatly that coarse
+  counts are sent. With full suppression that is true only for a visitor who
+  granted analytics. The copy must be conditioned on consent state when those
+  surfaces are built (Phases 7 and 8), not reworded. Ben decides whether WYS
+  events should instead fire for a declining visitor under Consent Mode v2's
+  cookieless pings.
+- **Q22 / SC-12.** Artboard `5c` card 2's third sentence describes a first-party
+  counter that this build deliberately does not create. It is absent from the
+  DOM while the flag is off. Ben decides: condition it (shipped default), cut
+  it, or build the counter (which is Q12, and a vendor relationship the spec
+  says the builder must not make alone).
+- **Q12.** The aggregate flag is a **build-time content constant, not an env
+  var** — a runtime env var could flip the claim without flipping the
+  implementation, which is the false-claim-fixed-in-copy failure R8 forbids. If
+  Ben prefers an env var it becomes `NEXT_PUBLIC_WYS_AGGREGATE_ENABLED`, never
+  the unprefixed name.
+
+### 9.3 Deviations reported from Phase 3
+
+1. **The arguments-vs-array claim is UNVERIFIED.** Plan §8.3 asks for one GA4
+   DebugView check before committing to the arguments-shaped shim. No live GA4
+   debug stream was available in this build, so the plan's default shape ships
+   unverified: `pushGtagArguments` pushes a real `arguments` object and
+   `types/gtag.d.ts` types `dataLayer` as `IArguments[]`. If the check later
+   shows a plain tuple is equivalent, this becomes `push(args)` with a typed
+   rest parameter and the ambient type widens to `IArguments[] | unknown[]`.
+   Nothing else changes. **This check is still owed.**
+2. **The flush sentinel is `ga4-init`'s own `config` command, not an `onReady`
+   callback.** Plan §8.3 offers both. `onReady` would require adding a prop to
+   the `<Script id="ga4-init">` element in `components/GoogleAnalytics.tsx`,
+   which the Phase 3 task table freezes at **zero edits**. Polling `dataLayer`
+   for an entry whose first argument is `"config"` needs no edit to that file at
+   all. `ga4ConfigMarkerPresent()` is the whole mechanism; a partially-run
+   `ga4-init` (js / consent / set, no config yet) is asserted **not** to be a
+   flush signal.
+3. **`route_type`'s vocabulary is authored, not specified.** (WYS §19.1A) names
+   the property and not its values. `WYS_ROUTE_TYPES` is a closed eight-value
+   list taken from the Kind column of the plan's §5.2 route table. A closed set
+   is the point — an open string here is a free-text field wearing a permitted
+   name.
+4. **Every firing point in the decision-use table is authored.** §19.4 lists
+   event names, §19.1A lists categories, and neither names a trigger, so
+   "wire the events at the points §19.4 names" names nothing. The table in
+   `lib/wys/telemetry.ts` is the map, and it is the input to §38 item 5.
+5. **`content/watch-your-step/config.ts` is opened three phases early.** Plan
+   §8.6 names that exact file as the home of `WYS_AGGREGATE_ENABLED`, so Phase 3
+   creates it carrying **one flag and one state-bound string, and nothing else**.
+   Phase 6 owns the rest of the §35-class content flags (Q20's two, the posture
+   options, the admission wording); this file must not pre-empt them.
+
+### 9.4 Wired but unfired, on purpose
+
+`wys_view` and `wys_transfer_check_complete` are on the closed list, carry full
+decision-use rows, and **fire nowhere in v0** (plan §8.7). `wys_view` would
+double-count a fact the preserved `send_page_view: true` config already records;
+`wys_transfer_check_complete` measures a surface Q24 defers. Both are asserted
+unfired by `tests/wys-telemetry.test.ts`, which greps `app/`, `components/`,
+`lib/` and `content/` for a `trackWys("<name>"` call — an assertion that holds
+trivially today and keeps holding once Phase 7 lands the course.
+
+### 9.5 Hazards this phase creates for later phases
+
+- **A URL is telemetry.** `send_page_view: true` is preserved, so
+  `page_location` (query string included) and `page_title` reach GA4 on every
+  route, **outside `trackWys` and outside its allowlist**. No adapter can police
+  a URL it never sees. `tests/no-private-state-in-urls.test.ts` is the guard;
+  its two assertions are statically decidable, and it proves its own teeth
+  against a synthetic violating page because the real course tree does not exist
+  until Phase 7. Lesson Zero step state is a step **index** only.
+- **`[stopId]` is the only dynamic segment allowed under
+  `app/watch-your-step/`.** Adding a second one fails a test. A stop id is
+  content data; a posture, a cadence or an answer is not.
+- **Do not build `app/api/wys/aggregate/route.ts`** without Ben answering Q12.
+  A test asserts its absence, and it would also introduce the first
+  `ƒ (Dynamic)` route into a fully prerendered build.
+- **Do not import `lib/wys/local-state` into a `metadata` or `generateMetadata`
+  export.** A page title built from learner state reaches GA4 as `page_title`.
+- **The consent copy is now conditional.** Any surface that says coarse counts
+  are sent must render that claim against actual consent state (Phases 7, 8).
+- **`WYS_TELEMETRY_ENABLED` is the global off switch** (WYS §19.5, "be easy to
+  disable globally"). One constant, no component change.
+
+### 9.6 Fixed at the Phase 3 gate
+
+Two things the implementer's own tests did not cover. Both are recorded here
+because they change how a later phase must verify itself, not only what Phase 3
+shipped.
+
+1. **The emission chokepoint was unproved.** The refusal tests show that an
+   unlisted event or property cannot get through `trackWys`. On their own they
+   say nothing about a component that never calls `trackWys`: `types/gtag.d.ts`
+   overload 2 types `window.gtag("event", name: string, props)` with an **open**
+   event name, and `window.dataLayer.push(…)` is open to anything. Either path
+   emits past the allowlist, past the consent gate and past the ga4-init flush
+   rule while every refusal test stays green — so the Exit criterion "no
+   component **can** emit an unlisted event or property" was only half met.
+
+   Five assertions were added to `tests/wys-telemetry.test.ts`: no `dataLayer`
+   access outside the adapter; no `window.gtag` access outside the adapter and
+   the two preserved surfaces; **no `gtag("event", …)` command anywhere at all**
+   (the adapter pushes to `dataLayer`, the banner issues only `consent`, and
+   `GoogleAnalytics.tsx` issues js / consent / set / config — so the `event`
+   command legitimately appears in no source file); exactly one push site in the
+   adapter, and it is the arguments-shaped shim; plus a positive control so an
+   empty offenders list is proof rather than an artefact of a small tree.
+
+   **The predicates are code-shaped, not bare identifier greps, and that is
+   load-bearing.** The first draft used `/\bgtag\b/` and flagged
+   `app/privacy/page.tsx:22` — *"BenChanTech may use GA4 through direct gtag.js
+   collection"* — which is preserved published prose. A test that fires on
+   preserved copy is a test that gets satisfied one day by editing preserved
+   copy, which is exactly backwards (R8, user constraint 2). The predicates now
+   match a member access or a call, and the positive-control test asserts that
+   the live privacy sentence does **not** trip them.
+
+2. **`npx tsc --noEmit` was red on the branch and is green on `main`.**
+   `next build` type-checks the app module graph; `npm test` runs through `tsx`,
+   which **strips types without checking them**. So a type error inside
+   `tests/` passes both phase gates. `tests/wys-telemetry.test.ts` carried two:
+   `TS2556` and `TS2554`, both from spreading arguments into a bare
+   `(function () { … })` IIFE whose own type is `() => void`. Fixed by giving
+   each shim the same annotated-const shape the adapter uses
+   (`const push: (...args: unknown[]) => void = function () { … }`).
+
+   **Next phases: `npx tsc --noEmit` is a third gate, and nothing else runs it.**
+   `tsconfig.json` includes `**/*.ts`, so `tests/` is in the project; run it
+   alongside `npm test` and `PORT=3999 npm run build`. It writes
+   `tsconfig.tsbuildinfo`, which is untracked and not gitignored — delete it
+   before committing.
+
+Verified at the gate: `scripts/check-no-deletions.sh` exits 0, and both
+`--diff-filter=D` and `--diff-filter=R` against `main...HEAD` are empty, as is
+the working tree's deletion set; `npm test` is green at **169 tests, 0
+failures** (Phase 2 left it at 158; the implementer landed 164, the gate added
+5); `npx tsc --noEmit` is clean; `PORT=3999 npm run build` type-checks and emits
+the same 14 static pages, `/` at 2.77 kB / 109 kB, shared 102 kB, every route
+`○ Static`, zero `ƒ`. `components/GoogleAnalytics.tsx` is byte-identical to
+`main`, as are `content/site-config.ts`, `lib/route-graph.ts`,
+`lib/route-resolver.ts`, `next.config.ts`, `tsconfig.json`, `vercel.json`,
+`scripts/check-secrets.sh` and `scripts/guard-next-build.mjs`;
+`components/ConsentBanner.tsx` differs from `main` only by the Phase 2
+`try/catch` blocks and the removed `declare global` block.
