@@ -393,3 +393,211 @@ origin.**
   the `analytics` record's `short` descriptor said it was written in Phase 8
   while its `writtenBy` claimed Phase 11. In a module whose entire purpose is
   not letting a claim drift from its source, that had to agree.
+
+---
+
+## 8. Phase 2 — local state substrate
+
+Plan §7.1–§7.5. Two guarantees, both structural rather than procedural: a
+learner dossier cannot be persisted, and a `localStorage` read cannot reach the
+server render.
+
+### 8.1 What landed
+
+| File | What it is |
+|---|---|
+| `lib/wys/local-state.ts` | The verbatim `WysLocalStateV1` shape, the write-side allowlist, value-domain validation, `parse` / `migrate` / `serialize` / `validate`, guarded browser access, `restartCourse()` / `clearAllWysData()`, `cadencePathFor()`, and the Data page row mapping. Pure TypeScript — no React, no CSS. |
+| `lib/wys/browser-keys.ts` | `BROWSER_KEYS` — the registry §7.5 requires so the Data page key list is generated, not hand-maintained. |
+| `components/wys/useWysState.ts` | The hydration-safe hook: `{ loaded: false }` sentinel, `useEffect`-only read, and no `localStorage` reference of its own. |
+| `components/ConsentBanner.tsx` | `try/catch` hardening only. |
+| `tests/wys-local-state.test.ts` | 33 tests. Suite total 90 → 123, all green. |
+
+### 8.2 The one edit to a preserved surface
+
+`components/ConsentBanner.tsx` gained `try/catch` around its two `localStorage`
+calls and nothing else. `const storageKey = "bct_analytics_consent"`, the
+three-state `useState<ConsentChoice | null | "unknown">("unknown")` machine, the
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` render guard, the three hardcoded `ad_*`
+denials, the body copy and the labels `Decline` / `Allow analytics` are
+byte-identical. `tests/analytics-frozen.test.ts` still passes unchanged, and
+`tests/wys-local-state.test.ts` now also asserts the guarded shape, so a later
+phase cannot quietly un-harden it. A throw is read as *no stored choice*, which
+is the behaviour an unguarded read produced on every browser that did not throw.
+
+### 8.3 Deviations and additions reported from Phase 2
+
+**1. Value domains are an injected parameter with a fail-closed default.**
+§7.2 sources the posture-option domain from `content/watch-your-step/config.ts`,
+which does not exist until Phase 6 and carries two open Ben content decisions
+(§35.1, §35.2). Rather than invent it early, the serializer takes a
+`WysStateDomains` argument (`postureChoiceIds`, `scenarioIds`, `choiceKeys`,
+`noticeIds`, `stopIds`) defaulting to `DEFAULT_WYS_STATE_DOMAINS`, in which every
+ID list is **empty**. With no content wired, an ID-bearing value is therefore
+DROPPED rather than let through. Passing domains as an argument also avoids the
+import cycle a `content/*` import would create.
+
+> **Phase 6 must pass the real domains** at the point it wires the hook.
+> Forgetting loses a preference — visible — instead of accreting a dossier —
+> invisible. That asymmetry is the reason the default is empty rather than
+> permissive. The static WYS routes need no content vocabulary and resolve under
+> the default; only `/watch-your-step/stop/<id>` depends on `stopIds`.
+
+**2. Two value domains beyond §7.2's enumerated list.** §7.2 names
+`postureChoice`, `cadence`, `timeBudget`, `lastRoute`, `dismissedNotices`,
+`replayCounts` keys, `localJudgments` keys and choice keys. Two more declared
+fields are typed as bare `string` and would otherwise take arbitrary free text:
+
+- the five timestamp fields (`startedAt`, `lastOpenedAt`, `rulebook[].createdAt`
+  / `updatedAt`, `localJudgments[].updatedAt`, `appetite.recordedAt`) must be an
+  ISO-8601 instant;
+- the ID arrays (`completedLessonIds`, `completedScenarioIds`,
+  `completedCarryIds`, `transferCheckIds`, `rulebook[].id`) must match
+  `/^[A-Za-z0-9][A-Za-z0-9._:-]{0,63}$/` — **no whitespace**, so a From Memory
+  scratch line or a personal situation cannot be persisted under an ID-shaped
+  declared key even before Phase 6 supplies the real vocabularies.
+
+These are additions in the direction §7.2 argues for, not narrowings. The ID
+arrays deliberately do **not** get a content-vocabulary domain, because that
+would empty a learner's progress the moment a stop ID was renamed.
+
+**3. `rulebook[].text` is the one free-text field, and is unbounded.** No length
+cap: truncating a learner's own rule silently is worse than storing it. It
+round-trips byte-intact, asserted directly. What keeps it off the wire is the
+Phase 3 telemetry property allowlist, not this guard.
+
+**4. An unreadable `schemaVersion` resolves to a clean empty state.** `v1` is the
+only version that exists. `migrateWysState()` stamps a missing version, passes a
+`1` through, and returns `null` for anything else rather than guessing — guessing
+is the one path by which a stale or foreign shape could smuggle undeclared keys
+past the allowlist. The caller falls back to `emptyWysState()`.
+
+**5. Restart and Clear explanation copy is build-authored.** `RESTART_COURSE_EXPLANATION`
+and `CLEAR_ALL_WYS_DATA_EXPLANATION` are factual build description under §2.1 —
+no first person, no modal upgrade, no claim about anything outside this browser.
+The clearing text states plainly that it does **not** erase hosting logs and does
+**not** erase anything already recorded in Google Analytics, and that the
+analytics choice lives under a different key and is untouched. Phase 9 renders
+these strings; Ben's wording replaces them if he prefers his own.
+
+**6. `clearAllWysData()` sweeps the `wys:` prefix, not just `wys:v1`.** It
+enumerates the store and removes every matching key, so a key added in a later
+phase is swept without an edit here. It never touches `bct_analytics_consent` —
+wiping that would reset a legally-referenced decision and re-prompt the visitor.
+Asserted, with an unrelated third key left in place as a control.
+
+### 8.4 Escalation to Ben — the Data page rows (§7.5, to be carried with §8b.4)
+
+§7.5's rule is that card 1's rows derive from the `WysLocalStateV1` **field set**,
+not from `BROWSER_KEYS`, so a field added later surfaces automatically instead of
+quietly making "Generated from what's actually stored right now" false. That rule
+produces **nine** rows, where artboard `5c` draws five.
+
+| Row | Field | Source |
+|---|---|---|
+| Onboarding · Pace · time | `onboarding` | artboard `5c` (two lines, one field) |
+| Stops · scenarios · carries | `progress` | artboard `5c` |
+| Rulebook | `rulebook` | artboard `5c` |
+| Deeper-practice interest | `appetite` | artboard `5c` |
+| **Local judgments** | `localJudgments` | **NEW — (WYS §20) requires it; `5c` omits it** |
+| **Last route · Dismissed notices** | `ui` | **NEW — (WYS §20) requires last route; `5c` omits it** |
+| **Schema version** | `schemaVersion` | **NEW — falls out of the bijection rule** |
+| **Started** | `startedAt` | **NEW — falls out of the bijection rule** |
+| **Last opened** | `lastOpenedAt` | **NEW — falls out of the bijection rule** |
+
+The Data page wording is Final copy (handoff README:18), so all five NEW rows are
+a **Final-copy amendment awaiting Ben**, escalated alongside the clearing
+footnote in §8b.4. They are marked `source: "new-unapproved"` in the data, not in
+a comment, so Phase 9 can render them differently or withhold them on a one-line
+change without touching a component.
+
+**The bijection is field-to-row; lines are presentation.** Artboard `5c` draws
+"Onboarding" and "Pace · time" as two rows, both from `onboarding`. Collapsing
+them would edit approved copy (R1), so a row carries one or more `lines` and the
+one-field-one-row mapping still holds. `tests/wys-local-state.test.ts` asserts
+the mapping is total in both directions.
+
+### 8b. Phase 2 gate corrections
+
+The gate re-ran `npm test`, `PORT=3999 npm run build` and
+`scripts/check-no-deletions.sh`, ran the two `--diff-filter` commands and the
+working-tree check directly (all four empty), and then tested the exit criteria
+against evidence rather than against the report. Three gaps were found and
+fixed. Nothing was reverted.
+
+**1. The dossier guarantee was proven of the serializer, not of the write
+paths.** The suite exercised `sanitizeWysState()` and `serializeWysState()`
+thoroughly, but `updateWysState` was not even imported, and no test inspected
+the bytes that actually land in `localStorage`. "No code path can persist an
+undeclared field or scratch text" is a claim about every write path. Two tests
+now close it:
+
+- *every exported write path persists sanitized bytes and nothing else* — runs
+  one hostile payload (undeclared root/nested keys, an employer, scratch text
+  under every declared bare-`string` field, out-of-domain IDs) through
+  `writeWysState`, `updateWysState` and `restartCourse`, then reads the stored
+  string back out of a fake `Storage` and asserts the sentinels are absent, the
+  undeclared keys are gone, the persisted bytes revalidate clean, and
+  `rulebook[].text` — the one deliberate exception — survives all three.
+- *there is exactly one place that writes `wys:v1`, and it sanitizes first* — a
+  source assertion pinning the write chokepoint. A second `setItem` call site is
+  a way around the guard that no value-level test would ever see, so it now
+  fails the suite instead.
+
+Two smaller hostile-input tests came with them: a `__proto__` payload neither
+pollutes `Object.prototype` nor survives the write, and a corrupt or foreign
+stored payload (`""`, `"null"`, `"[]"`, `"{"`, a bare string, a number, an
+unreadable `schemaVersion`) always reads back as a valid empty state.
+
+**2. The hydration guarantee was proven by reading the source, not by running
+it.** The only evidence for "no `localStorage` access during server or first
+client render" was a regex over `useWysState.ts`. It now also *runs*: a server
+render of the hook via `react-dom/server`'s `renderToStaticMarkup`, with a
+`window.localStorage` whose getter counts accesses and throws, asserts zero
+touches, `loaded: false`, and an emitted state deep-equal to `emptyWysState()`.
+`useWysState.ts` imports no CSS, so it loads under `node --import tsx` with no
+stub and no new dependency — which also settles, for hook-shaped modules, the
+Phase 0 CSS question recorded at §4.1.
+
+**3. A latent infinite render loop in `useWysState`.** The effect and both
+callbacks depended on `[domains]` — the object *identity*. Every real caller
+passes a module constant, but a caller passing an inline object literal would
+hand the effect a new dependency on every render, and the effect sets a
+freshly-parsed state object each time. Fixed by depending on
+`wysDomainsKey(domains)`, a content-derived string, with the live domains held
+in a ref; the source test now also asserts `[domains]` does not come back.
+
+Verified unchanged at the gate: `components/GoogleAnalytics.tsx`,
+`content/site-config.ts`, `lib/route-graph.ts`, `lib/route-resolver.ts`,
+`next.config.ts`, `tsconfig.json`, `vercel.json`, `scripts/check-secrets.sh`,
+`scripts/guard-next-build.mjs` and `.githooks/` are byte-identical to `main`.
+`components/ConsentBanner.tsx` differs from `main` only by the two `try/catch`
+blocks. Build output is identical to the Phase 0 baseline: 14 static pages,
+`/` at 2.77 kB / 109 kB, shared 102 kB, every route `○ Static`.
+
+**Left in place, recorded rather than fixed.** `isWysStorageAvailable()` writes
+and immediately removes a transient `wys:probe` key. It is currently unused, and
+the key never coexists with a Data page render, so it does not make the
+"What this site knows about you" key list false — but if a later phase calls it,
+the probe key belongs in `BROWSER_KEYS`. The write-chokepoint test counts it, so
+it cannot be forgotten silently.
+
+### 8.5 Hazards this phase creates for later phases
+
+- **Nothing may read `wys:v1` during render.** The hook exists so that rule has
+  one implementation. A test asserts `components/wys/useWysState.ts` contains no
+  `localStorage` reference of its own and that the read sits inside `useEffect`.
+  If a later phase reaches for `window.localStorage` in a component, that test
+  will not catch it — the Phase 12 audit must sweep for it.
+- **Every `wys:` key literal in `lib/` or `components/` must be added to
+  `BROWSER_KEYS` in the same commit.** A test fails otherwise. That is the check,
+  not bookkeeping: an unregistered key makes the Data page key list false.
+- **`WYS_DATA_PAGE_ROWS` must gain a row in the same commit any field is added
+  to `WysLocalStateV1`.** The totality test fails otherwise. Do not add a field
+  to the verbatim shape casually — §5.3's visit counter is derived precisely so
+  `progress` never grows a `visits` field.
+- **Phase 6 wires the real `WysStateDomains`.** Until it does, a posture choice,
+  a scenario ID and a stop route are all dropped by design.
+- **`restartCourse()` clears `localJudgments` and `ui`** on the reading that both
+  are curriculum progress. If Q20's kept/revised judgments should survive a
+  restart, that is a one-line change here and a Ben decision, not a component
+  change.
