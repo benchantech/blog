@@ -98,11 +98,28 @@
  * which is a `<details>` summary drawn flat — so it is one, with the marker
  * removed and the arrow left where the artboard put it.
  */
+/*
+ * The 10px was the drawn gap under the key list while `.summary` was a bare
+ * 16.5px text line. The summary is now a 44px control (below), so the gap is
+ * carried by the control's own leading instead: the drawn distance from the
+ * list to the words moves 10px -> ~13.75px, and the card grows 17.5px rather
+ * than 27.5px. Recorded in docs/facelift-unapproved.md.
+ */
 .disclosure {
-  margin: 10px 0 0;
+  margin: 0;
 }
 
+/*
+ * `key: wys:v1 · raw JSON ↓` is a course control — it reveals the raw local
+ * state — and /accessibility publishes "course controls are at least
+ * forty-four pixels tall". It measured 16.5px at the Phase 12 pass. The 11px
+ * mono line artboard `5c` draws is unchanged; only the box around it grows,
+ * which is the R8 fix (architecture, never copy).
+ */
 .summary {
+  display: flex;
+  align-items: center;
+  min-height: 44px;
   cursor: pointer;
   font: 400 11px / 1.5 var(--mono);
   color: var(--muted);

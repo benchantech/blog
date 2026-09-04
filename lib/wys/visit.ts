@@ -137,3 +137,40 @@ export function visitPositionFor(
 export function visitLabel(position: VisitPosition): string {
   return `visit ${position.visit} of ${position.total}`;
 }
+
+/**
+ * The current stop, derived from PROJECTED stops rather than from the content
+ * model (plan §5.3, §5.4).
+ *
+ * Same rule `app/watch-your-step/(shell)/today/current-stop.ts` states: the
+ * current stop is the first stop whose derived position is not complete, and
+ * the last one when they are all complete. It lives HERE, taking
+ * `VisitCountableStop[]`, because the one component that has to evaluate it in
+ * the browser — `CurrentStopGate` — must not reach the week records to do so.
+ *
+ * WHY THAT MATTERS, and it is the module-graph half of the leak
+ * `visitCountableStop()` above already closes for props. A client component
+ * that IMPORTS a content module pulls that module into a client JavaScript
+ * chunk, whatever it goes on to read from it: `CurrentStopGate` imported
+ * `letteredStops()`, and the Phase 12 audit found every stop title, short
+ * title, aim and scaffold note — `draft` + `IMPLEMENTATION_PLACEHOLDER`, and
+ * therefore BLOCKED under Q21's ratified default — sitting in plain text in
+ * `static/chunks/*.js`, served to every visitor of the page that had just
+ * honestly drawn "Implementation placeholder — not Ben's words" in its DOM.
+ * Emptying `text` at the gate does nothing about that; only keeping the import
+ * out of the client graph does.
+ *
+ * So the derivation is content-free and the projection crosses the boundary:
+ * an id, the cadence paths, an off-site flag. All three are structure, none is
+ * prose. `lib/` importing no content module is what makes that checkable.
+ */
+export function currentStopIdFrom(
+  stops: readonly VisitCountableStop[],
+  progress: WysLocalStateV1["progress"],
+  cadence?: WysCadence
+): string | null {
+  for (const stop of stops) {
+    if (!visitPositionFor(stop, progress, cadence).complete) return stop.id;
+  }
+  return stops[stops.length - 1]?.id ?? null;
+}

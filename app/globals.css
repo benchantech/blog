@@ -281,6 +281,13 @@ main {
   text-decoration: none;
   font: 600 19px / 1 var(--sans);
   letter-spacing: -0.01em;
+  /*
+   * Hit area only. The brand measured 32px tall at the Phase 12 accessibility
+   * pass; the header's own height is set by the 44.5px menu button beside it,
+   * so raising this to 44px changes NO drawn geometry (the header stays 72.5px
+   * at 390px) and nothing about the 19px/600 mark the handoff README specifies.
+   */
+  min-height: 44px;
 }
 
 .brand-mark {
@@ -311,7 +318,16 @@ main {
 
 .desktop-nav a {
   text-decoration: none;
-  padding-block: 10px; /* §4.6: touch targets >= 44px */
+  /*
+   * §4.6, and the /accessibility claim about navigation links. MEASURED at the
+   * Phase 12 pass: at 14px the padded rect came to 41px, so `min-height` is
+   * declared rather than inferred from padding — padding alone is font-size
+   * dependent and this rule is shared by two navs at two sizes.
+   */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-block: 10px;
 }
 
 /* --- hero --------------------------------------------------------------- */
@@ -923,7 +939,15 @@ main {
 .site-footer a {
   color: var(--accent-on-dark);
   text-decoration: none;
-  padding-block: 10px; /* §4.6: touch targets >= 44px */
+  /*
+   * §4.6 touch target, and the /accessibility claim "links in navigation ...
+   * are at least forty-four pixels tall". MEASURED at the Phase 12 pass, not
+   * assumed: at 10px the rect came to 42.5px (10 + a 22.5px line box + 10),
+   * so the rule's old comment was 1.5px false on every page. 11px makes it
+   * 44.5px. Fixed in the architecture rather than by narrowing the sentence
+   * (plan R8).
+   */
+  padding-block: 11px;
 }
 
 /* --- consent banner (visual only; the state machine is frozen) ----------- */

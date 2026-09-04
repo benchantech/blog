@@ -8,7 +8,42 @@ at" is one short list rather than something to be excavated from build notes.
 Nothing here is written in Ben's first person. Where a source needs Ben's words,
 the build renders a labelled empty slot (plan R10).
 
-Opened at Phase 4 (the design system). Later phases append.
+Opened at Phase 4 (the design system). Later phases append. **Closed at the
+Phase 12 gate**, with §Z below and the completeness index at the foot.
+
+---
+
+## THE PREVIEW — read this before looking for a URL
+
+**There is no preview URL, and there was never going to be one.**
+
+The plan's Phase 12 table asks for the branch to be pushed to `origin` so Vercel
+produces a preview build, and for that URL to sit here at the head of this file
+with a deep link beside each screen awaiting a stamp. Its reasoning is sound:
+this document hands Ben roughly thirty items requiring **visual** judgment, and
+Vercel builds production from `main`, so as written there is no path from this
+branch to Ben's eyes.
+
+It did not happen. The build's operating constraints for this branch are *never
+push, never open a PR, nothing merges to `main`*, and a hard rule outranks a task
+row (plan R6 — the user's constraints override every source, including the plan).
+So the task is **recorded as unexecuted** rather than quietly dropped.
+
+**Two things follow, and both need Ben.**
+
+1. **Everything in this file is currently reviewable only by running the branch
+   locally** (`npm run build && npx next start`) or by pushing it. Until one of
+   those happens, "for Ben's stamp" is aspirational.
+2. **The GA scoping question the plan attaches to the push is unanswered and
+   must be answered before anyone pushes.** A Vercel preview deployment inherits
+   `NEXT_PUBLIC_GA_MEASUREMENT_ID` unless it is scoped per-environment. If it is
+   not scoped, **preview traffic lands in the production GA4 stream** — the
+   stream user constraint 4 pins byte-for-byte. Before pushing: scope that
+   variable to **Production only**, or leave it **unset for Preview**, and
+   **record which**, because it changes what the preview build does. This build
+   did not inspect or change the Vercel project settings.
+
+Recorded again, with the rest of the deferrals, in `docs/facelift-deferred.md` §7.
 
 ---
 
@@ -174,10 +209,19 @@ strand orphan rules. "Change no markup" and "replace the blueprint identity"
 cannot both hold for these three, and §4.4 resolves it in favour of retiring both.
 
 **Verification:** `grep -c` for each of `dimension-line`, `plan-foyer`,
-`scale-line`, `scale-bar` returns `0` across `app/` and `components/`. A line
-range would have stranded the `@media (max-width: 700px)` members of each family,
-and the className→rule scan only checks one direction, so it could not have
-flagged the orphans.
+`scale-line`, `scale-bar` returns `0` for markup and for rules across `app/` and
+`components/`. A line range would have stranded the `@media (max-width: 700px)`
+members of each family, and the className→rule scan only checks one direction, so
+it could not have flagged the orphans.
+
+**Re-measured at the Phase 12 audit, and corrected.** A bare
+`grep -rn 'dimension-line\|plan-foyer\|scale-line\|scale-bar' app/ components/`
+now returns **2**, not 0 — both hits are `app/page.tsx:51-52`, the explanatory
+comment that records this retirement. No `className`, no JSX element and no CSS
+selector survives in either directory. The unqualified "returns 0" sentence above
+was true when it was written and stopped being true when the comment was added, so
+it is qualified rather than defended: the claim is zero markup and zero rules, not
+zero occurrences of the string.
 
 **The `.floor-plan` consequence.** With the foyer gone, the four doors no longer
 sit either side of a centre column. The grid is now a 2×2 card layout in the new
@@ -196,6 +240,7 @@ by `grid-area` on `.plan-room-1` … `.plan-room-4`.
 | **D-d** | **The inverted hover treatment is gone.** `.audience-button`, `.plan-room` and `.stakeholder-card` used to flip to `background: var(--ink); color: var(--sheet)` on hover. | The approved register has no inverted hover anywhere. They now shift fill within the palette (§A1). |
 | **D-e** | **No divider rule under the header, and none above the footer.** | §4.9: "the only chrome border in the entire approved set is the mobile tab bar's top hairline." |
 | **D-f** | **`main { overflow: hidden }` became `main { overflow-x: clip }`.** | §4.5 note 2. It clipped *both* axes on the element wrapping every page, which would cut the demo card's 80px shadow and its deliberate overhang. The page still cannot scroll sideways. |
+| **D-g** | **Twelve legacy rule sets lost `text-transform: uppercase`, so preserved copy that used to render in ALL CAPS now renders in the case it is typed in.** The selectors are `.desktop-nav`, `.audience-button span`, `.plan-room em`, `.stepper li`, `.option-grid button`, `.text-button`, `.result-primary a`, `.secondary-results a`, `.detail-link`, `.site-footer`, `.site-footer small` and `.consent-banner button`. Every one of those selectors still exists and still has rules; only the one declaration was dropped. Visible on every preserved route — e.g. `/studio`'s CTA renders "Get help with today's violin situation" where it read "GET HELP WITH TODAY'S VIOLIN SITUATION", `/contact` renders `ben@benchantech.com` where it read `BEN@BENCHANTECH.COM`, `/neon`'s callout renders "Visit benchanviolin.com/library", and the IntentRouter's Back / Reset / Why / Why-Not / Commit labels are no longer capitalised by CSS. | §4.4 names "the uppercase mono micro-labels" among the untokenised blueprint geometry the restyle replaces, and this file's own rule is that **caps are typed in the copy, never applied with `text-transform`** — so the declaration had to go wherever the approved register does not draw caps. **No character of copy changed**: the DOM text is byte-identical on both sides of the diff, and the difference exists only in rendered letter-case (`innerText` reports it; the prerendered HTML does not). It is listed because it is a visible change to approved-as-live preserved pages, which D-a to D-f are also listed for. The caps that survive are typed: the `.welcome-label` / `.eyebrow` / `.question-label` / `.room-number` group (D-b) and the new footer group labels (G-f). |
 
 ---
 
@@ -2499,3 +2544,191 @@ Phase 11 task table name `docs/facelift-copy-diff.md`. The plan is the contract,
 so the diff lives at the plan's filename and the other is a one-line pointer to
 it. Two copies of a diff about drift would have been an unfortunate way to
 create some.
+
+---
+
+# Z. Phase 12 — the hardening gate's own changes
+
+Four items. Three are changes this gate made to shipped surfaces; one is a task
+it could not perform. All four are here because §Z's rule is the same as the rest
+of the file's: **a visible change to an approved-as-live surface gets an entry,
+even when the change is a correction.**
+
+## Z1. The preview deployment, and the GA scoping decision it hides
+
+See **THE PREVIEW** at the head of this file. Summary: the branch was not pushed
+(the constraint outranks the task row), so no preview URL exists, and
+**`NEXT_PUBLIC_GA_MEASUREMENT_ID`'s per-environment scoping is unverified and
+must be settled before anyone pushes** — an unscoped variable puts preview
+traffic into the production GA4 stream that user constraint 4 pins.
+
+**Ben's decision, not a build decision.**
+
+## Z2. Five interactive rules grew to a 44px hit area, and three surfaces moved
+
+`/accessibility` publishes *"Buttons, links in navigation and course controls are
+at least forty-four pixels tall."* Measured in a live browser at the Phase 12
+pass, five rule sets were below it:
+
+| Rule | Was | Now | Mechanism |
+|---|---|---|---|
+| `.site-footer a` | 42.5px | **44.5px** | `padding-block: 10px → 11px` |
+| `.shipNav a` (header) | 42.5px | **44px** | `min-height: 44px` + `inline-flex` centring |
+| `.desktop-nav a` (header ecosystem row) | 41px | **44px** | same |
+| `.brand` | 32px | **44px** | same |
+| `.summary` — the Data page's `key: wys:v1 · raw JSON ↓` | 16.5px | **44px** | `min-height` + `flex` centring, with `.disclosure`'s 10px top margin dropped to absorb half the growth |
+
+**What moved on screen, measured after:**
+
+- **390px: the header is unchanged at 72.5px.** Its height was already set by the
+  44.5px "Menu" button, so the brand growing to 44px cost nothing.
+- **1280px: the header grows 3px** (139.5 → **142.5px**), entirely from the
+  ecosystem nav row.
+- **Footer links gain 2px each** — with seven links in the tallest group, the
+  footer is a little taller on every page.
+- **The Data page's disclosure card grows 17.5px**, and the drawn gap between the
+  key list and the words moves **10px → ~13.75px**.
+
+**Why it is here rather than in the build notes.** These are visible geometry
+changes to surfaces `4a`, `5c` and `5d` draw, and to every preserved page's
+footer. **No character of copy changed**, and the 11px mono line the artboard
+draws for the Data disclosure is unchanged — only the box around it. But plan R8
+("a false public claim is fixed in architecture, never in copy") left no other
+move: the alternative was narrowing a published accessibility sentence to fit the
+CSS, which is exactly what R8 forbids.
+
+**Ben should know one thing about how this was missed.** The test guarding the
+claim asserted that `min-height: 44px` appeared *somewhere* in `app/globals.css`.
+It was green the whole time four navigation rules sat under 44px. It has been
+replaced with a per-rule check that reads each named rule body individually and
+does the footer's padding arithmetic inside the assertion; it is
+negative-controlled. `docs/facelift-qa.md` §7.3.
+
+## Z3. `package.json` gains a `sideEffects` array, and one module lost a derivation
+
+**Not a visual change — a build-behaviour change, which is why it is reported
+rather than left in the build notes.**
+
+The Phase 12 doctrine audit found that the withheld draft curriculum was being
+**published in the client JavaScript**: a 19.8 kB chunk loaded as `<script async>`
+on **every page, `/contact` and `/studio` included**, carried the entire scenario
+bank verbatim — settings, decision moments, every choice label, and the internal
+authoring notes — all of it `status: "draft"`, i.e. blocked under Q21. The DOM
+drew "Implementation placeholder — not Ben's words" while the page's own asset
+graph shipped the words. Full write-up: `docs/facelift-captains-round.md`
+question 8.
+
+Three changes closed it, and two of them are worth Ben's attention:
+
+1. **`"sideEffects": ["*.css"]` in `package.json`.** Without it webpack must keep
+   whole modules and cannot drop the scenario and week records from a chunk that
+   only wanted an id list. `"*.css"` keeps `globals.css` and every CSS module
+   side-effectful; **verified after the change** — 9 CSS files / 81,306 bytes
+   still emitted, stylesheets linked on every page, `--accent-text-on-tint` and
+   `.skip-link` still present, 44/44 module classes on `/practice` still ruled.
+   **It adds no package**; `package-lock.json` is untouched.
+2. **`WYS_STOP_IDS` is now a literal list** rather than `wysWeeks.map(w => w.id)`.
+   This is **not** §6.9's forbidden hardcoded count — `stopCount()` is still
+   `wysWeeks.length` and no `9` is typed anywhere — and a new test, *"the stop id
+   vocabulary is exactly the stops, in order"*, makes drift a suite failure.
+3. `CurrentStopGate` now receives plain stop shapes as a prop and imports no
+   content-record module, which is the module-graph twin of the projection the
+   prop path already performed.
+
+**And the guarantee is now a script, not a habit.**
+`scripts/check-bundle-provenance.mjs` runs as the last step of `npm run build`,
+enumerates every record whose render policy is `blocked`, and fails on any of
+their ≥5-word strings appearing in a client bundle — **583 withheld strings, 54
+bundles, 0 found.** Negative-controlled: reverting only the `sideEffects` field
+makes it fail with the scenario bank.
+
+## Z4 (= SL7). The Ship's Log now has three entries where `5d` draws two
+
+A third entry was added at this gate: **"Site rebuilt to the approved design;
+nothing removed"**, dated 2026-09-04, at `approval pending` like the other two,
+tagged Orders 05 / 08 / 09.
+
+**Why this is not artboard drift.** A log is append-only and time-ordered. The
+artboard is a snapshot of the Log on the day it was drawn, not a fixed-height
+card, and a Log that cannot gain an entry is not a Log. The facelift build is the
+first thing this repo did that the Log exists to record.
+
+**What it costs, stated plainly.** `/ships-log` renders one more card than `5d`
+draws; the new entry sorts **first**, because the timeline is newest-first, so it
+is the first thing on the page. Its body is factual build description authored by
+this build (plan §2.1 names "Ship's Log entry bodies" as copy the build writes),
+it is `origin: "IMPLEMENTATION_PLACEHOLDER"`, and it therefore renders **with the
+label saying it is not Ben's words**. `/author-ship/state.json` gains a matching
+`resolved_decisions` row.
+
+**Ben's call:** whether the entry belongs, and whether its wording is his to
+rewrite before it is stamped.
+
+---
+
+# Completeness index — what is on this list, and how to read it
+
+The plan asks that this file list **every deviation from the approved artboards
+and every NEW or unapproved surface**. It does. This index exists so that can be
+checked rather than trusted.
+
+## Every NEW surface — nothing on this list is drawn by an approved artboard
+
+| Surface | Entry |
+|---|---|
+| The compact mobile header (`<details>` menu) | **F1** |
+| The footer as the complete mobile path to every link | **F2** |
+| The stacked mobile disclosure strip | **F3** |
+| Root chrome on course and ship screens | **F4** |
+| `/_not-found`, `error`, `global-error` | **F5** |
+| Header behaviour between 700px and the artboard width | **F6** |
+| `/crew` — the Crew Manifest, **NEW in full, at every width** | **CRW1** |
+| `llms.txt`, `robots.txt`, `sitemap.xml`, `author-ship/state.json` | **GT2** |
+| The whole interaction-state layer (`:hover`, `:focus`, `:active`, transitions, error / empty / loading) | **A1** |
+| The twenty-primitive inventory | **A2** |
+| Fifteen desktop (1280px) compositions on course and ship screens | **GT1** |
+| Lesson Zero steps that no artboard draws (five of ten) | **LZ1** |
+| `/watch-your-step/end` — the completion surface, no artboard geometry at all | **G1–G5** |
+| Practice's three replay states | **R3** |
+| Progress's six rulebook controls | **R4** |
+| The Data page's confirmation panels and post-clear panel | **DM8, DM9** |
+| The optional-practices block on Plan | **P1** |
+| `AGENTS.md`'s new section | **GT9** |
+
+## Every deviation from an artboard that does settle the question
+
+| Deviation | Entry |
+|---|---|
+| `--accent-text-on-tint` — the Q23 contrast miss | **B1** |
+| Commit is ink, not `5b`'s teal (Q17) | **B2**, **T5** |
+| Selection no longer reflows (Q18) | **B3** |
+| `:focus-visible` stays 3px / 3px | **B4** |
+| The blueprint scaffolding retired (six `aria-hidden` lines on `/`) | **C** |
+| Seven identity-swap deltas, **D-a** to **D-g** — including **D-g**, the twelve rule sets that lost `text-transform: uppercase` | **D** |
+| Departures from an artboard that does settle it | **G** |
+| Phase 6 content-model departures and escalations | **H1–H7** |
+| The tab shell, per-stop route and JUDGE composite | **I1–I8** |
+| Plan view — four authored strings and the §12 gap | **P1–P6** |
+| Today — six departures | **T1–T14** |
+| Practice — eleven authored strings and one narrowing | **R1–R11** |
+| Progress — derived counts and a narrowed row | **R1–R10** (Progress block) |
+| Lesson Zero — fourteen | **LZ1–LZ14** |
+| Data page — twelve | **DM1–DM12** |
+| Standing Orders / Bridge / Crew / Ship's Log / Quarters | **SO1–SO5, BR1–BR5, CRW1–CRW6, SL1–SL7, BQ1–BQ9** |
+| Home and the WYS landing | **HM1–HM11** |
+| Legal and disclosure refresh | **LG1–LG7** |
+| Governance and machine surfaces | **GT1–GT9** |
+| **Phase 12's own changes** | **Z1–Z4** |
+
+## What is deliberately NOT here
+
+- **What was not built.** That is `docs/facelift-deferred.md`.
+- **Why a thing was built the way it was.** That is
+  `docs/facelift-build-notes.md`.
+- **Measurements.** Those are `docs/facelift-qa.md` and
+  `docs/facelift-baseline.md`.
+- **The two preserved sentences that were narrowed by one word.** Those are copy
+  edits to live pages, and they live in `docs/facelift-copy-diff.md` §1 — but
+  they are named again here so a reader of this file does not conclude no
+  preserved copy changed: `/privacy` and `/ai-disclosure` each gained the word
+  **"server-side"**, because the unqualified sentence was false.

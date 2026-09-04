@@ -470,5 +470,41 @@ export function wysWeekById(id: string): WysWeek {
   return record;
 }
 
-/** Every stop id, in order — the serializer's `stopIds` domain (plan §7.2). */
-export const WYS_STOP_IDS: readonly string[] = wysWeeks.map((week) => week.id);
+/**
+ * Every stop id, in order — the serializer's `stopIds` domain (plan §7.2).
+ *
+ * WRITTEN OUT RATHER THAN DERIVED, AND THAT IS A PROVENANCE FIX, NOT A STYLE
+ * CHOICE. `content/watch-your-step/domains.ts` is imported by every course
+ * CLIENT component (it is the vocabulary `useWysState` hands the serializer),
+ * so anything this list touches is pulled into a client JavaScript chunk and
+ * served to every visitor. While it read `wysWeeks.map(...)` it referenced the
+ * whole week bank, and webpack could not drop it: the Phase 12 audit found all
+ * nine stop titles, aims and scaffold notes — `draft` +
+ * `IMPLEMENTATION_PLACEHOLDER`, and therefore BLOCKED under Q21's ratified
+ * default — sitting in `static/chunks/*.js` in plain text, unlabelled, on the
+ * same pages that honestly drew "Implementation placeholder — not Ben's words"
+ * in the DOM. That is exactly the leak `withoutBlockedProse` in
+ * `lib/wys/content-gate.ts` exists to prevent, one layer down: the label was
+ * true of the pixels and false of the page's asset graph.
+ *
+ * A vocabulary of ids is not prose and carries no provenance, so listing it is
+ * safe where quoting a title would not be. It is also the idiom already used
+ * beside the scenario bank (`WYS_SCENARIO_IDS` in `./scenarios.ts`), and it is
+ * NOT the hardcoded count §6.9 forbids — `stopCount()` is still
+ * `wysWeeks.length` and nothing here types a 9.
+ *
+ * `tests/wys-content.test.ts` asserts this list equals `wysWeeks.map(w => w.id)`
+ * exactly, so the two cannot drift: adding a stop without adding its id fails
+ * the suite rather than silently shrinking a domain.
+ */
+export const WYS_STOP_IDS: readonly string[] = [
+  "stop-zero",
+  "stop-a",
+  "stop-b",
+  "stop-c",
+  "stop-d",
+  "stop-e",
+  "stop-f",
+  "stop-g",
+  "stop-h"
+];

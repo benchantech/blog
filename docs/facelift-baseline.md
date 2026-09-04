@@ -249,11 +249,85 @@ under `.next` after the first successful build.
 
 ---
 
+## 3c. Phase 12 re-measure — the performance gate (WYS §28)
+
+Clean build (`rm -rf .next && PORT=3999 npm run build`) at the Phase 12 gate.
+Incremental builds report inflated First Load figures (126 kB for `/`); **only a
+clean build reproduces these numbers**, and that is why the procedure below says
+`rm -rf .next`.
+
+### 3c.1 The four things §28 and plan §5.3 ask for
+
+| Gate | Baseline | Now | Verdict |
+|---|---|---|---|
+| **No AI / chat / Studio / auth SDK in the client bundle** | n/a | `openai` · `anthropic` · `login` · `signin` · `cloud sync` · `getUserMedia` · `pseudonym` · `streak` · `coach-schema` → **0 client chunks each**. The three non-zero hits from the 18-item do-not-build scan (`chat`, `account`, `upload`) are fictional scenario copy or struck anti-feature pills, inspected in context. | **pass** |
+| **Media lazy-loaded** | n/a | There is no media. `public/` gains **zero files**; `brand-mark.png` is still the only image on the site. Every media surface is a labelled slot. | **pass, vacuously — stated as such** |
+| **Runtime deps still exactly three** | `next`, `react`, `react-dom` | `next`, `react`, `react-dom`. `package-lock.json` untouched by this branch. `package.json` gains a `"sideEffects"` array (a bundler hint) and one build-script step (a gate) — **zero packages**. | **pass** |
+| **Every route `○` or `●`, zero `ƒ`** | 12 rows, all `○` | **32 rows + 9 SSG stop paths, every one `○` or `●`. Zero `ƒ`.** | **pass** |
+
+### 3c.2 First Load JS against the measured baseline
+
+| | Phase 0 baseline | Phase 12 | Δ |
+|---|---|---|---|
+| **Shared by all** | **102 kB** | **102 kB** | **0** |
+| `/` (home) | **109 kB** | **119 kB** | **+10 kB** |
+| `/_not-found` | 103 kB | 104 kB | +1 kB |
+| `/accessibility` `/copyright` `/terms` `/contact` `/neon` `/studio` `/system` | 103 kB | 103 kB | **0** |
+| `/privacy` `/cookies` `/ai-disclosure` | 103 kB | 106 kB | +3 kB |
+
+**The number to watch, and what it is.** `docs/facelift-baseline.md` flagged the
+home figure at Phase 0 as "the number to watch as Phases 5–10 mount them". It
+moved **109 → 119 kB**. The shared chunk did not move at all, so the +10 kB is
+route-level: `/` now mounts the live demo card (the same client component
+`/watch-your-step` uses, per Q3) on top of the preserved `IntentRouter`. The
++3 kB on three legal pages is the consent-linked client code Phase 11 added.
+
+**The new routes, for the record** (no baseline to compare against — they did not
+exist):
+
+| Route | First Load JS |
+|---|---|
+| `/watch-your-step/start` `/practice` `/data` | 121 kB |
+| `/watch-your-step/today` | 120 kB |
+| `/watch-your-step/end` | 118 kB |
+| `/watch-your-step/progress` | 116 kB |
+| `/watch-your-step/plan`, `/stop/[stopId]` | 114 kB |
+| `/watch-your-step` | 113 kB |
+| `/ben` `/crew` `/ships-log` `/standing-orders` | 105 kB |
+| `/bridge` | 104 kB |
+| the four machine surfaces | 103 kB |
+
+### 3c.3 CSS
+
+**9 files, 81,306 bytes total.** Verified after the Phase 12 `sideEffects`
+change, which is the one edit that could plausibly have dropped a stylesheet:
+every page still links its stylesheets, `--accent-text-on-tint` and `.skip-link`
+are still emitted, and 44/44 module classes on `/practice` still have rules.
+
+### 3c.4 The gate that did not exist at Phase 0
+
+`scripts/check-bundle-provenance.mjs` now runs as the last step of
+`npm run build` and reports:
+
+```
+[bundle-provenance] OK — 583 withheld strings, none in 54 client bundles.
+```
+
+It is a **performance-adjacent gate that is really a provenance gate**: it
+enumerates every record whose public render policy is `blocked` and fails if any
+of their >=5-word strings appears in a client bundle. It exists because a
+19.8 kB chunk loaded on every page was found carrying the entire draft scenario
+bank. See `docs/facelift-captains-round.md` question 8.
+
+---
+
 ## 4. How to re-measure
 
 ```sh
 cd /Users/benchan/yy/benchantech
-npm test                      # 31 tests at the end of Phase 0; 169 at the end of Phase 4
+npm test                      # 31 at the end of Phase 0; 169 at Phase 4; 523 at Phase 12
+npx tsc --noEmit              # exit 0
+rm -rf .next                  # incremental builds report inflated First Load JS
 PORT=3999 npm run build       # never `npm run dev` — it blocks
 scripts/check-no-deletions.sh # exits 0; both --diff-filter=D and =R print nothing
 ```

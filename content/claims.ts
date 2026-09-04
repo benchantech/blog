@@ -206,12 +206,32 @@ export const claims = [
     ],
     variantSources: {
       inline: ["artboard-5a-posture-footnote"],
-      short: ["artboard-5b-rulebook-note"],
       full: ["wys-spec-17", "wys-spec-18", "code-wys-local-state"]
     },
     variants: {
       inline: "Stays in this browser. Never sent.",
-      short: "Stored here only. Export as text any time.",
+      /**
+       * NO `short` VARIANT, AND THAT IS THE FIX FOR A STANDING ORDER 07 BREACH
+       * FOUND AT THE PHASE 12 GATE.
+       *
+       * This key used to read "Stored here only. Export as text any time." —
+       * the same eight words, from the same source (`artboard-5b-rulebook-note`),
+       * as `rulebookStorageText` in `content/watch-your-step/progress.ts`. Two
+       * canonical nodes for one artboard sentence is exactly what Order 07
+       * ("One idea, one canonical definition") forbids, and `/standing-orders`
+       * publishes that order live.
+       *
+       * The Progress record is the owner — it is the one that renders, on the
+       * screen the artboard draws — and this variant had no consumer at all:
+       * `/privacy` and `/cookies` read `full`, Lesson Zero reads `inline`.
+       * Nothing that renders anywhere was removed, and no line of preserved
+       * copy was touched. A caller asking for a shorter form here now falls
+       * back to `full`, which is the documented direction.
+       *
+       * The check that should have caught this had a twelve-word floor and the
+       * sentence is eight words long; `tests/canonical-text.test.ts` now floors
+       * both duplicate checks at six.
+       */
       /**
        * PHASE 11, /privacy and /cookies. The list is (WYS §18)'s own "This
        * browser can store" list, plus §17's local judgments, and the key is

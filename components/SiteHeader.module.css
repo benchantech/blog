@@ -40,7 +40,13 @@
 .shipNav a {
   color: var(--body);
   text-decoration: none;
-  padding-block: 10px; /* §4.6: touch targets >= 44px */
+  /* §4.6. Measured 42.5px at the Phase 12 pass with padding alone; the row's
+     height is set by the 46.5px CTA beside these, so declaring 44px here moves
+     no drawn geometry. */
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-block: 10px;
   white-space: nowrap;
 }
 

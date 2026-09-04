@@ -27,7 +27,8 @@
  */
 
 import type { WysCadence, WysLocalStateV1 } from "@/lib/wys/local-state";
-import { visitPositionFor } from "@/lib/wys/visit";
+import { currentStopIdFrom, visitCountableStop, visitPositionFor } from "@/lib/wys/visit";
+import type { VisitCountableStop } from "@/lib/wys/visit";
 import type { WysWeek } from "@/content/watch-your-step/types";
 import { letteredStops } from "@/content/watch-your-step/weeks";
 
@@ -65,10 +66,24 @@ export function currentTodayStop(
   return stops[stops.length - 1] ?? null;
 }
 
-/** The id form, for the one client component that has to compare ids. */
+/**
+ * The stops, reduced to the three structural fields a position is derived from.
+ *
+ * This is what `CurrentStopGate` receives as a prop. It exists so the browser
+ * can evaluate "which stop am I on" WITHOUT importing this module, which
+ * imports `weeks.ts`: a client component that imports a content module pulls
+ * that module into a client JavaScript chunk whatever it reads from it, and the
+ * Phase 12 audit found every draft stop title sitting in `static/chunks/*.js`
+ * because of exactly that edge. `visitCountableStop()` carries the reasoning.
+ */
+export function todayStopShapes(): readonly VisitCountableStop[] {
+  return todayStops().map(visitCountableStop);
+}
+
+/** The id form. Server and test callers; the browser uses `currentStopIdFrom`. */
 export function currentTodayStopId(
   progress: WysLocalStateV1["progress"],
   cadence?: WysCadence
 ): string | null {
-  return currentTodayStop(progress, cadence)?.id ?? null;
+  return currentStopIdFrom(todayStopShapes(), progress, cadence);
 }

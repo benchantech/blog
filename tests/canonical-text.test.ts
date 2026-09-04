@@ -288,7 +288,24 @@ test("no concept has more than one current canonical node", () => {
   }
 });
 
-test("the same prose is never defined in two different records (>= 12 words)", () => {
+/**
+ * SIX WORDS, NOT TWELVE — lowered at the Phase 12 gate, because the twelve-word
+ * floor let a real duplicate through.
+ *
+ * `claims["localStorage"].short` and `rulebookStorageText` both cited
+ * `artboard-5b-rulebook-note` and both typed "Stored here only. Export as text
+ * any time." — one artboard sentence, two canonical nodes, which Standing Order
+ * 07 forbids and `/standing-orders` publishes. Eight words sat under the floor,
+ * so both checks below stayed green for six phases. The fix pointed one at the
+ * other; this is the floor that would have caught it.
+ *
+ * Six is the lowest floor that stays free of false positives across the whole
+ * corpus: below it, shared UI labels ("Restart the course", "Back to Progress")
+ * are legitimately repeated names rather than duplicated claims.
+ */
+const DUPLICATE_PROSE_MIN_WORDS = 6;
+
+test("the same prose is never defined in two different records (>= 6 words)", () => {
   const seen = new Map<string, string>();
   const duplicates: string[] = [];
 
@@ -296,7 +313,7 @@ test("the same prose is never defined in two different records (>= 12 words)", (
     for (const key of CANONICAL_TEXT_VARIANT_KEYS) {
       const value = record.variants[key];
       if (typeof value !== "string") continue;
-      if (words(value).length < 12) continue;
+      if (words(value).length < DUPLICATE_PROSE_MIN_WORDS) continue;
       const hash = proseHash(value);
       const owner = seen.get(hash);
       if (owner && owner !== record.id) duplicates.push(`"${owner}" and "${record.id}" define the same prose`);
@@ -307,24 +324,61 @@ test("the same prose is never defined in two different records (>= 12 words)", (
   assert.deepEqual(duplicates, []);
 });
 
-test("no >= 12-word string literal is defined twice across content/", () => {
+/**
+ * THE ONE EXEMPTION, NAMED RATHER THAN ABSORBED BY A HIGHER FLOOR.
+ *
+ * Dropping to six words surfaced a second repeat that is NOT a duplicated
+ * claim: `prn-minimum-necessary.shortName` in `principles.ts` and `stop-b`'s
+ * `title` in `weeks.ts` are the same (WYS §11) principle NAME, because the stop
+ * is named after the principle — `weeks.ts`'s own header records that the `5b`
+ * long forms were pinned precisely BECAUSE they match the §11 names. A name
+ * carried by two objects is not one sentence written twice.
+ *
+ * It is exempted here, singly and by hash, rather than by raising the floor
+ * back to twelve, because raising the floor is what let the real duplicate
+ * through for six phases. Whether the stop title should reference the principle
+ * or stay independently editable is a content decision for Ben, recorded in
+ * docs/facelift-build-notes.md; either answer leaves this check honest.
+ *
+ * The exemption is self-expiring: the test below fails if it stops being a real
+ * repeat, so a stale entry cannot sit here unnoticed.
+ */
+const DUPLICATE_LITERAL_EXEMPTIONS: readonly { prose: string; reason: string }[] = [
+  {
+    prose: "Minimum Necessary Is Not Minimum Possible",
+    reason:
+      "a (WYS §11) principle name, carried by the principle and by the stop named after it — not a claim written twice"
+  }
+];
+
+test("no >= 6-word string literal is defined twice across content/", () => {
+  const exempt = new Set(DUPLICATE_LITERAL_EXEMPTIONS.map((entry) => proseHash(entry.prose)));
   const seen = new Map<string, string>();
   const duplicates: string[] = [];
+  const hit = new Set<string>();
 
   for (const file of contentFiles) {
     const source = readFileSync(file, "utf8").replace(/\/\*[\s\S]*?\*\//g, " ");
     for (const match of source.matchAll(/"((?:[^"\\\n]|\\.){20,})"/g)) {
       const literal = match[1];
-      if (words(literal).length < 12) continue;
+      if (words(literal).length < DUPLICATE_PROSE_MIN_WORDS) continue;
       const hash = proseHash(literal);
       const owner = seen.get(hash);
       const here = path.relative(repoRoot, file);
-      if (owner && owner !== here) duplicates.push(`${owner} and ${here} carry the same prose`);
-      else seen.set(hash, here);
+      if (owner && owner !== here) {
+        if (exempt.has(hash)) hit.add(hash);
+        else duplicates.push(`${owner} and ${here} carry the same prose`);
+      } else seen.set(hash, here);
     }
   }
 
   assert.deepEqual(duplicates, []);
+  for (const entry of DUPLICATE_LITERAL_EXEMPTIONS) {
+    assert.ok(
+      hit.has(proseHash(entry.prose)),
+      `the exemption for "${entry.prose}" is stale — it is no longer a repeat, so delete the entry`
+    );
+  }
 });
 
 /* -------------------------------------------------------------------------- */

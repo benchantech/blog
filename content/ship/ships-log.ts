@@ -1,7 +1,7 @@
 /**
  * The Ship's Log (mockup `5d`; packet: Ship's Log).
  *
- * TWO ENTRIES AND ONE FORWARD-LOOKING NOTE, and the note is a DISTINCT OBJECT
+ * THREE ENTRIES AND ONE FORWARD-LOOKING NOTE, and the note is a DISTINCT OBJECT
  * rather than a third entry. The artboard draws it as an ink card headed
  * "NEXT · CAPTAIN'S ROUND", which is not a record of something that happened —
  * it is a statement of what happens next. Typing it as a log entry would put a
@@ -21,6 +21,14 @@
  * gains `approvedAt` / `approvedBy` only when Ben stamps it, and the chip flips
  * from that one value (plan §6.6).
  *
+ * THE THIRD ENTRY WAS ADDED AT THE PHASE 12 GATE. Artboard `5d` draws two, but
+ * a log is append-only and time-ordered, not a fixed-height card: the artboard
+ * is a snapshot of the Log on the day it was drawn, and a Log that cannot gain
+ * an entry is not a Log. The facelift build is the first thing this repo did
+ * that the Log exists to record, so it is recorded — at `approval pending`,
+ * like the other two. The extension past the artboard's two rows is reported in
+ * docs/facelift-unapproved.md SL7.
+ *
  * DATES ARE DATA. ISO 8601 here; the "3 Sep 2026" form the artboard draws is a
  * presentation, formatted in Phase 9 from this value.
  *
@@ -32,11 +40,15 @@ import type { ContentOrigin, ContentStatus } from "@/lib/content-status";
 import type { StandingOrderId } from "./standing-orders";
 import { type BridgePosition, bridgePositions } from "./bridge";
 
-export type ShipsLogEntryId = "log-wys-website-first" | "log-planning-packet";
+export type ShipsLogEntryId =
+  | "log-wys-website-first"
+  | "log-planning-packet"
+  | "log-facelift-assimilation";
 
 export const SHIPS_LOG_ENTRY_IDS: readonly ShipsLogEntryId[] = [
   "log-wys-website-first",
-  "log-planning-packet"
+  "log-planning-packet",
+  "log-facelift-assimilation"
 ];
 
 export interface ShipsLogEntry {
@@ -77,6 +89,16 @@ export const shipsLogEntries = [
     body: "Master plan, voice constitution, transcript and raw voice corpus preserved in one packet for section-by-section approval. Corpus hash recorded.",
     orderTags: ["order-05", "order-08"],
     sourceIds: ["artboard-5d-ships-log", "packet-corpus"]
+  },
+  {
+    id: "log-facelift-assimilation",
+    status: "published",
+    origin: "IMPLEMENTATION_PLACEHOLDER",
+    date: "2026-09-04",
+    title: "Site rebuilt to the approved design; nothing removed",
+    body: "The approved artboards were recreated inside the existing site, and every live URL, link and line of copy was kept. The curriculum itself ships written, labelled and withheld — draft material renders as its provenance label, not as Ben's words, until it is stamped.",
+    orderTags: ["order-05", "order-08", "order-09"],
+    sourceIds: ["docs-facelift-unapproved", "packet-ships-log"]
   }
 ] as const satisfies readonly ShipsLogEntry[];
 

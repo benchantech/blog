@@ -523,6 +523,46 @@ test("the accessibility claims match what app/globals.css actually ships", () =>
   }
 });
 
+/*
+ * `min-height: 44px` appearing SOMEWHERE in the stylesheet was the whole of the
+ * old check, and the Phase 12 accessibility pass walked straight through it: the
+ * navigation links the sentence names measured 41-42.5px in a real browser while
+ * this test stayed green, because the 44px rules it found belonged to other
+ * controls. The claim is per-rule, so the check is now per-rule.
+ */
+function ruleBody(css: string, selector: string): string {
+  const at = css.indexOf(`${selector} {`);
+  assert.notEqual(at, -1, `the rule ${selector} no longer exists`);
+  const close = css.indexOf("}", at);
+  return css.slice(at, close);
+}
+
+test("every navigation rule the /accessibility sentence names declares its own 44px", () => {
+  const css = read("app/globals.css");
+  const header = read("components/SiteHeader.module.css");
+  const data = read("app/watch-your-step/(shell)/data/data.module.css");
+
+  // Header: the two navs and the brand.
+  assert.match(ruleBody(css, ".desktop-nav a"), /min-height: 44px/);
+  assert.match(ruleBody(header, ".shipNav a"), /min-height: 44px/);
+  assert.match(ruleBody(css, ".brand"), /min-height: 44px/);
+  assert.match(ruleBody(header, ".menuButton"), /min-height: 44px/);
+
+  // Footer: no min-height (the links are laid out as blocks in a grid), so the
+  // padding has to do it, and the arithmetic is asserted rather than commented.
+  const footer = ruleBody(css, ".site-footer a");
+  const pad = /padding-block:\s*(\d+)px/.exec(footer);
+  assert.ok(pad, "the footer link rule no longer sets padding-block");
+  const lineBox = 22.5; // 15px / 1.5, measured in the browser at the Phase 12 pass
+  assert.ok(
+    Number(pad![1]) * 2 + lineBox >= 44,
+    `.site-footer a is ${Number(pad![1]) * 2 + lineBox}px tall, and /accessibility says 44`
+  );
+
+  // The one course control that is a <summary> rather than a button.
+  assert.match(ruleBody(data, ".summary"), /min-height: 44px/);
+});
+
 test("/accessibility claims no transcript and no artifact alternative that has not shipped", () => {
   const media = resolveVariant(
     legalCopyRecords.find((record) => record.id === "legal-accessibility-media") as AnyCanonicalText,

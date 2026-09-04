@@ -61,6 +61,7 @@ import {
   stopCountWord,
   stopLetter,
   visitCount,
+  WYS_STOP_IDS,
   wysWeeks as wysWeeksConst
 } from "@/content/watch-your-step/weeks";
 import {
@@ -448,6 +449,24 @@ test("every ritual names what the app must not do", () => {
 /* -------------------------------------------------------------------------- */
 /* WYS §11 / plan §6.9 — the stop count is derived, never typed               */
 /* -------------------------------------------------------------------------- */
+
+/**
+ * `WYS_STOP_IDS` is written out rather than derived, because deriving it made
+ * `content/watch-your-step/domains.ts` reference the whole week bank and put
+ * every draft stop title into a client JavaScript chunk (Phase 12 audit; see
+ * `scripts/check-bundle-provenance.mjs`). A vocabulary of ids carries no
+ * provenance, so listing it is safe — but only while it cannot drift from the
+ * records it names. This is the check that makes that true: add a stop without
+ * adding its id and the suite fails rather than a serializer domain silently
+ * shrinking.
+ */
+test("the stop id vocabulary is exactly the stops, in order", () => {
+  assert.deepEqual(
+    [...WYS_STOP_IDS],
+    wysWeeks.map((week) => week.id),
+    "WYS_STOP_IDS has drifted from wysWeeks"
+  );
+});
 
 test("the stop count comes from the data", () => {
   assert.equal(stopCount(), wysWeeks.length);

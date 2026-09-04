@@ -10,6 +10,7 @@ import { StopStartTelemetry } from "@/components/wys/StopStartTelemetry";
 import { VisitCounter } from "@/components/wys/VisitCounter";
 import { CarryCard } from "./CarryCard";
 import { CurrentStopGate } from "./CurrentStopGate";
+import { todayStopShapes } from "./current-stop";
 import { OnboardingRedirect } from "./OnboardingRedirect";
 import { TimeBudgetNote } from "./TimeBudgetNote";
 import { WatchCard } from "./WatchCard";
@@ -83,6 +84,13 @@ function todayTitle(): string {
 export default function TodayPage() {
   const views = todayStopViews();
   const fallbackId = views[0]?.id;
+  /**
+   * The stops, projected to structure only, for the client gate (Phase 12
+   * audit). See `visitCountableStop()` and `CurrentStopGate` — a client
+   * component that IMPORTS the week records ships their draft titles in a
+   * JavaScript chunk, so the derivation gets its data as a prop instead.
+   */
+  const stopShapes = todayStopShapes();
 
   return (
     <>
@@ -90,14 +98,14 @@ export default function TodayPage() {
       <CourseScreen
         title={todayTitle()}
         meta={views.map((view) => (
-          <CurrentStopGate key={view.id} stopId={view.id} fallback={view.id === fallbackId}>
+          <CurrentStopGate key={view.id} stopId={view.id} stops={stopShapes} fallback={view.id === fallbackId}>
             <VisitCounter stop={view.visitStop} prefix={view.name} />
           </CurrentStopGate>
         ))}
         lead={
           <>
             {views.map((view) => (
-              <CurrentStopGate key={view.id} stopId={view.id} fallback={view.id === fallbackId}>
+              <CurrentStopGate key={view.id} stopId={view.id} stops={stopShapes} fallback={view.id === fallbackId}>
                 <GatedText content={view.title} />
               </CurrentStopGate>
             ))}
@@ -107,7 +115,7 @@ export default function TodayPage() {
       >
         <PhasePills active="Watch" />
         {views.map((view) => (
-          <CurrentStopGate key={view.id} stopId={view.id} fallback={view.id === fallbackId}>
+          <CurrentStopGate key={view.id} stopId={view.id} stops={stopShapes} fallback={view.id === fallbackId}>
             <StopStartTelemetry stop={view.visitStop} />
             <div className={styles.stack}>
               <WatchCard lead={view.watchLead} />

@@ -3,9 +3,12 @@
   "private": true,
   "version": "0.1.0",
   "type": "module",
+  "sideEffects": [
+    "*.css"
+  ],
   "scripts": {
     "dev": "next dev",
-    "build": "node scripts/guard-next-build.mjs && next build",
+    "build": "node scripts/guard-next-build.mjs && next build && node scripts/check-bundle-provenance.mjs",
     "start": "next start",
     "lint": "next lint",
     "test": "node --import tsx --test tests/*.test.ts"

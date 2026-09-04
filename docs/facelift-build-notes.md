@@ -3545,3 +3545,155 @@ approved infrastructure paragraph, and the struck-through `AI you can trust` pil
 on the home page, which carries `primitives_struck__*`. A cross-file duplicate
 sweep over every long string in `app/`, `components/` and `content/` returns
 zero, so no two components render the same sentence from different sources.
+
+---
+
+## 20. Phase 12 — hardening, audit, Captain's Round
+
+The gate's own register. Four documents were written and are not duplicated here:
+
+| Document | What it is |
+|---|---|
+| `docs/facelift-implementation-report.md` | The (WYS §38) seventeen-item report, with the §37 45-box acceptance record as Appendix A. |
+| `docs/facelift-captains-round.md` | The (WYS §39) seventeen questions, answered. The one "yes" is question 8. |
+| `docs/facelift-deferred.md` | Plan §14 — scheduled, not forgotten. |
+| `docs/facelift-unapproved.md` §Z + index | The gate's own three changes, plus a completeness index over the whole file. |
+
+Measurements went to `docs/facelift-qa.md` §7–§9 and `docs/facelift-baseline.md`
+§3c.
+
+### 20.1 The Phase 7 hazard, closed
+
+The hazard logged above — *"Draft curriculum prose is in the client JS bundle,
+and the gate did not fix it"* — is **closed**, and its own deadline ("before the
+Data page makes any claim about what the site serves") had already passed at
+Phase 8, so it is worth saying plainly that it ran three phases past its own
+stop date.
+
+Two module-graph edges did it: `content/watch-your-step/domains.ts` imported id
+lists from `scenarios.ts` and `weeks.ts`, and `WYS_DOMAINS` is what every course
+client component hands `useWysState`; and `CurrentStopGate` reached `weeks.ts`
+through `current-stop.ts`. A client component that **imports** a content module
+pulls that module into a client chunk whatever it reads from it, so
+`lib/wys/content-gate.ts` — which closes the *prop* path — could not have caught
+it. **The module's own header comment argued this exact hazard about `config.ts`
+and then committed it.**
+
+Correction to the hazard note's own numbers: "77 draft strings, two chunks" was
+measured on a **dirty** `.next`. On a clean build the leak was larger in prose
+and different in shape — the full scenario bank verbatim in one 19.8 kB chunk
+loaded on every page, 141 of 322 distinct blocked strings in client chunks.
+
+Fixed by `"sideEffects": ["*.css"]`, a literal `WYS_STOP_IDS`, and a
+`currentStopIdFrom(stops, …)` projection. Recorded in
+`docs/facelift-unapproved.md` Z3 and written up in
+`docs/facelift-captains-round.md` question 8.
+
+### 20.2 Two tests that were green while the thing they guard was false
+
+Worth a register entry of their own, because both failed the same way: **the
+assertion was true of the corpus and false of the case.**
+
+1. **`css.includes("min-height: 44px")`.** Green while four navigation rules sat
+   at 32–42.5px against a published 44px claim. Replaced with a per-rule check
+   that reads each named rule body individually and does the footer's padding
+   arithmetic inside the assertion. Negative-controlled.
+2. **`content-gate` as the provenance guarantee.** Green while the withheld
+   scenario bank shipped in a client chunk, because it guards props and the leak
+   was in the module graph. Backed by `scripts/check-bundle-provenance.mjs`,
+   which reads `.next/static` and fails the build on any blocked record's ≥5-word
+   strings appearing in a client bundle. Negative-controlled.
+
+**The pattern to carry forward:** a governance test that scans *a corpus* for the
+presence of a rule proves nothing about *the instances* the rule is supposed to
+govern. Both replacements enumerate the instances.
+
+### 20.3 The three executed gates, after Phase 12
+
+```sh
+scripts/check-no-deletions.sh          # deletion contract        — exit 0
+scripts/check-bundle-provenance.mjs    # provenance at the bundle — 583 / 54 / 0
+scripts/check-secrets.sh               # byte-frozen, inherited
+```
+
+The first two are shelled out to by `tests/preserved-surfaces.test.ts` and
+`tests/client-bundle-provenance.test.ts`, and the second also runs as the last
+step of `npm run build`, so neither can be satisfied by a comment.
+
+### 20.4 Ship's Log
+
+A third entry was added — the first one recording work this repo did — at
+`approval pending`, `origin: IMPLEMENTATION_PLACEHOLDER`, so it renders with the
+label saying it is not Ben's words. Artboard `5d` draws two rows; a log is
+append-only and the artboard is a snapshot. Reported as `docs/facelift-unapproved.md`
+Z4 / SL7.
+
+### 20.5 A Standing Order 07 breach the duplicate check could not see
+
+Found at the Phase 12 gate, by scanning for repeated literals at a lower word
+floor than the shipped check uses.
+
+**`claims["localStorage"].short` and `rulebookStorageText` both typed the same
+eight words** — *"Stored here only. Export as text any time."* — from the same
+source, `artboard-5b-rulebook-note`. One artboard sentence, two canonical nodes.
+Standing Order 07 is *"One idea, one canonical definition"*, and
+`/standing-orders` publishes it live, so this is a published claim the content
+model was quietly falsifying.
+
+**Why six phases of green tests missed it.** Both duplicate checks in
+`tests/canonical-text.test.ts` — the record-level one and the file-literal one —
+skipped anything under **twelve words**. The sentence is eight. The floor was
+never wrong in principle; it was set high enough to make the check decorative for
+exactly the kind of short, repeated artboard line this corpus is full of.
+
+**The fix, and what it did not do.** The `short` variant was removed from the
+`localStorage` claim and the Progress record left as the single owner, because
+the Progress record is the one that **renders**, on the screen artboard `5b`
+draws. Nothing that renders anywhere was removed: `/privacy` and `/cookies` read
+`full`, Lesson Zero reads `inline`, and no consumer asked for `short` at all. No
+line of preserved copy was touched — `content/claims.ts` does not exist on
+`main`. A caller asking for a shorter form now falls back to `full`, which is the
+direction `inline falls back only to longer forms` already guarantees.
+
+Both duplicate floors are now **six words**. The record-level check was
+negative-controlled by the defect itself: it failed on the real pair before the
+fix and passes after.
+
+**One exemption, named rather than absorbed.** Dropping the floor surfaced a
+second repeat that is not a duplicated claim:
+`prn-minimum-necessary.shortName` and `stop-b`'s `title` are the same (WYS §11)
+principle **name**, because the stop is named after the principle —
+`weeks.ts`'s own header records that the `5b` long forms were pinned *because*
+they match the §11 names. It is exempted singly, by hash, with its reason, and
+the test asserts the exemption is still a real repeat, so a stale entry fails
+rather than lingers. Raising the floor back to twelve would have hidden it, and
+raising the floor is what caused this defect in the first place.
+
+**For Ben, not for the build:** whether a stop title should *reference* its
+principle name (one definition, one editable place) or stay independently
+editable is a content decision. Either answer leaves the check honest; the
+exemption records that the question is open rather than settled.
+
+### 20.6 Gate results
+
+```
+npm test          →  523 / 523  (after the 20.5 fix; the record-level
+                     duplicate check fails on the pre-fix tree)
+npx tsc --noEmit  →  exit 0
+rm -rf .next && PORT=3999 npm run build
+                  →  exit 0 · 40 static pages · zero ƒ
+                  →  [bundle-provenance] OK — 583 withheld strings,
+                     none in 54 client bundles
+scripts/check-no-deletions.sh → exit 0
+```
+
+**Lint is not in this list, and that is Q14's ratified default rather than an
+oversight.** `npx next lint` drops into an interactive setup prompt and the repo
+has no eslint config to run.
+
+**One Phase 12 task was not executed:** the push that would produce a Vercel
+preview. The branch constraint (*never push*) outranks the task row (plan R6).
+Recorded at the head of `docs/facelift-unapproved.md`, in Z1, and in
+`docs/facelift-deferred.md` §7 — including the GA scoping check that must happen
+**before** anyone pushes, so preview traffic does not land in the production GA4
+stream user constraint 4 pins.
