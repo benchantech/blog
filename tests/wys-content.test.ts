@@ -807,8 +807,12 @@ test("the Captain's Quarters grid is six tiles and the Studio tile is unlinked",
 /* The collapsed-collision register (plan §6.8)                               */
 /* -------------------------------------------------------------------------- */
 
-test("the six canonical collisions are recorded and the labels are pinned", () => {
-  assert.equal(canonicalCollisions.length, 6);
+test("the canonical collisions are recorded and the labels are pinned", () => {
+  // 6 -> 7 in Phase 7 (shell): the Commit pill is punctuated two ways across
+  // 4a and 5b, and the JUDGE composite renders on four surfaces, so the string
+  // had to be pinned in content/watch-your-step/judge.ts rather than typed per
+  // screen. Update this number deliberately; that is what the assertion is for.
+  assert.equal(canonicalCollisions.length, 7);
   for (const collision of canonicalCollisions) {
     assert.ok(collision.conflict.length > 0);
     assert.ok(collision.resolution.length > 0);

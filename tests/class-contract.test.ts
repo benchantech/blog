@@ -283,7 +283,31 @@ test("mode 2: every styles.<key> resolves to a class in its sibling .module.css"
   // StatusPage each import their own module, and the two Watch Your Step route
   // groups — `(shell)/layout.tsx` and `(flow)/layout.tsx` — both import
   // `app/watch-your-step/wys-groups.module.css`.
-  assert.equal(modulesChecked, 31, "CSS Module imports across app/ and components/ — update deliberately");
+  //
+  // 31 -> 35 in Phase 7 (shell): four shared course primitives — CourseScreen,
+  // GatedText, ScenarioCard and JudgeCard — import
+  // `components/wys/wys-primitives.module.css`. The five course views built on
+  // top of them add their own imports and their own number.
+  //
+  // +4 in Phase 7 (Practice view): ReplayList, FromMemory, AppetiteCard and
+  // PracticeSection import `components/wys/practice.module.css`. The Practice
+  // page itself imports no stylesheet — its only structural class lives on
+  // PracticeSection, so the page stays a pure composition of primitives.
+  //
+  // NOTE FOR THE MERGE: the five Phase 7 view builders each add their own
+  // imports to this one number. It is a TOTAL, so a merge that takes one
+  // builder's figure and drops another's will fail here rather than silently
+  // lose a stylesheet from coverage. Re-measure at the gate; do not average.
+  // Phase 7 (Today view) adds FIVE: page.tsx, WatchCard, CarryCard, CarryMark
+  // and TimeBudgetNote each import app/watch-your-step/(shell)/today/today.module.css.
+  // Phase 7 (Plan view) adds TWO: page.tsx and PlanStops.tsx import
+  // app/watch-your-step/(shell)/plan/plan.module.css. Measured, not incremented
+  // from the previous figure — see the merge note above.
+  // Phase 7 (Progress view) adds ONE: ProgressView.tsx imports
+  // app/watch-your-step/(shell)/progress/progress.module.css. The page imports
+  // no stylesheet — every state-dependent mark on that screen is inside the one
+  // client component, so there is nothing for the server half to style.
+  assert.equal(modulesChecked, 48, "CSS Module imports across app/ and components/ — update deliberately");
 });
 
 /* -------------------------------------------------------------------------- */

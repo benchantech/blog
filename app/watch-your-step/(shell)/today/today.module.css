@@ -1,0 +1,142 @@
+/*
+ * Today (plan Phase 7; mockup 5b, dc.html:78-96).
+ *
+ * Only the three cards the artboard draws on this screen and nothing else.
+ * The header row, the phase pills, the scenario card, the choice rows, the
+ * Commit pill and the judgment card all come from the shared course primitives
+ * (components/wys/, components/ui/), so nothing here restates their geometry.
+ *
+ * GEOMETRY, from the artboard: the WATCH card is `--tint-grey` at radius 22
+ * with a 196px media slot and a 16px/1.45 caption at padding 16/18; the cards
+ * stack at gap 14; the CARRY card is `--tint-teal` at radius 22, padding 18,
+ * 15px/1.45. The one deliberate difference from `5b` is the screen's top
+ * padding, which `.screen` owns and which plan §5.6 already shifted for the
+ * root header (Q9).
+ */
+
+/* The 14px stack between the three cards (dc.html:86, :89, :95). */
+.stack {
+  display: grid;
+  gap: 14px;
+}
+
+/* "About 10 minutes." — the half of the lead line that is not the stop title. */
+.leadNote {
+  margin: 4px 0 0;
+  font: 400 15px / 1.45 var(--sans);
+  color: var(--body);
+}
+
+/* -------------------------------------------------------------------------- */
+/* WATCH                                                                      */
+/* -------------------------------------------------------------------------- */
+.watchCard {
+  overflow: hidden;
+  border-radius: var(--radius-card-lg);
+  background: var(--tint-grey);
+}
+
+.watchMedia {
+  position: relative;
+}
+
+/*
+ * The 56px ink disc the artboard draws inside the striped slot.
+ *
+ * It is DECORATIVE, not a control: no recording is selected, so a play button
+ * would be an affordance for something that does not exist. `PlayDisc` is
+ * `aria-hidden` and this overlay takes no pointer events, so the slot keeps its
+ * single accessible name — MediaSlot's `role="img"` label.
+ *
+ * The bottom padding lifts the disc clear of the caption below it.
+ */
+.watchDisc {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 30px;
+  pointer-events: none;
+}
+
+/*
+ * MediaSlot centres its mono caption in the flow, which is where the disc now
+ * sits, so the caption moves down to the position artboard 5b draws it in.
+ *
+ * An element selector scoped to this wrapper, deliberately: `MediaSlot` exposes
+ * no class hook and accepts no children by rule (§6.4 — a slot cannot be
+ * filled), and widening a frozen shared prop shape to move one line would be a
+ * worse trade than a wrapper rule that cannot escape this card.
+ */
+.watchMedia p {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  margin: 0;
+  padding-bottom: 56px;
+  text-align: center;
+}
+
+.watchCaption {
+  padding: 16px 18px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Transcript — an inline expandable block, not a second route                */
+/* -------------------------------------------------------------------------- */
+.transcript {
+  margin-top: 10px;
+}
+
+.transcriptSummary {
+  display: inline-block;
+  font: 500 16px / 1.45 var(--sans);
+  color: var(--accent-text-on-tint);
+  cursor: pointer;
+}
+
+.transcriptBody {
+  margin-top: 10px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* CARRY                                                                      */
+/* -------------------------------------------------------------------------- */
+.carryCard {
+  padding: 18px;
+  border-radius: var(--radius-card-lg);
+  background: var(--tint-teal);
+  font: 400 15px / 1.45 var(--sans);
+  color: var(--ink);
+}
+
+.carryHeading {
+  display: block;
+  margin-bottom: 2px;
+  font-weight: 600;
+  color: var(--accent-text-on-tint);
+}
+
+.carryLeave {
+  margin: 8px 0 0;
+  font: 400 15px / 1.45 var(--sans);
+  color: var(--ink);
+}
+
+.carryMark {
+  margin-top: 14px;
+}
+
+.carryHint {
+  margin: 8px 0 0;
+  font: 400 13px / 1.45 var(--sans);
+  color: var(--muted);
+}
+
+.carryMarked {
+  margin: 0;
+  font: 500 15px / 1.45 var(--sans);
+  color: var(--accent-text-on-tint);
+}

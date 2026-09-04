@@ -302,3 +302,184 @@
   font-size: 12px;
   color: var(--accent-on-dark);
 }
+
+/* ==========================================================================
+   Phase 7 (shell) — the shared course surfaces.
+
+   Everything below is composed by four screens that five different builders
+   own (Today, Plan, Progress, Practice, Data) plus the per-stop route, so the
+   geometry lives here once rather than in five page files.
+
+   THE ARTBOARD GEOMETRY, and where it deliberately differs. Mockup 5b/5c draw
+   a 390px phone with `padding: 70px 22px 110px` and NO site header or footer.
+   Plan §5.6 mounts the root header, footer and disclosure strip on every route,
+   which shifts every course screen's vertical geometry from its artboard —
+   already flagged NEW/unapproved (Q9). So `.screen` keeps the artboard's
+   horizontal gutter and its 110px bottom clearance (which the route group
+   supplies) and takes a smaller top pad, because the header is now above it.
+   ========================================================================== */
+
+.screen {
+  width: min(calc(100% - 2 * var(--gutter)), 720px);
+  margin-inline: auto;
+  padding-block: 48px 24px;
+}
+
+.screenHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 16px;
+  margin-bottom: 6px;
+}
+
+.screenTitle {
+  margin: 0;
+  font: 600 30px / 1.15 var(--sans);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+}
+
+.screenMeta {
+  font: 400 14px / 1.3 var(--sans);
+  color: var(--muted);
+  white-space: nowrap;
+}
+
+.screenLead {
+  margin: 0 0 18px;
+  font: 400 15px / 1.5 var(--sans);
+  color: var(--body);
+}
+
+/* -------------------------------------------------------------------------- */
+/* GatedText — prose that arrives with its policy (plan §6.2)                 */
+/* -------------------------------------------------------------------------- */
+.gatedBody {
+  margin: 0;
+  font: 400 16px / 1.45 var(--sans);
+  color: var(--ink);
+}
+
+.gatedBodyOnDark {
+  color: var(--white);
+}
+
+/* The withheld state. Not an error and not an empty element: the label says
+   whose words are missing, in the provenance voice, which is the honest form of
+   a blocked record while RENDER_MARKED_DRAFT is false (Q21). */
+.gatedBlocked {
+  margin: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* ScenarioCard — mockup 5b, the only bordered card on the screen             */
+/* -------------------------------------------------------------------------- */
+.scenario {
+  background: var(--white);
+  border: 1.5px solid var(--border-card);
+  border-radius: var(--radius-card-lg);
+  padding: 18px;
+}
+
+.scenarioPillRow {
+  margin: 0 0 12px;
+}
+
+.scenarioBody {
+  margin: 0;
+  font: 400 16px / 1.45 var(--sans);
+  color: var(--ink);
+}
+
+.scenarioDecision {
+  margin: 8px 0 0;
+  font: 600 16px / 1.45 var(--sans);
+  color: var(--ink);
+}
+
+.scenarioMarks {
+  margin-top: 12px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* JudgeCard — the commit composite                                          */
+/* -------------------------------------------------------------------------- */
+.judgeChoices {
+  margin-top: 14px;
+}
+
+.judgeCommit {
+  margin-top: 14px;
+}
+
+.judgeNote {
+  margin: 10px 0 0;
+  font: 400 13px / 1.45 var(--sans);
+  color: var(--muted);
+  text-align: center;
+}
+
+.judgeReveal {
+  margin-top: 16px;
+  display: grid;
+  gap: 12px;
+  animation: judgeReveal var(--reveal) ease-out both;
+}
+
+@keyframes judgeReveal {
+  from {
+    opacity: 0;
+    transform: translateY(4px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* The §4.6 pair. globals.css already neutralises animation-duration globally
+   under reduced motion; this states it locally too, because a reveal that
+   depends on a rule in another file is a reveal that breaks when that file is
+   refactored. Never remove one half without the other. */
+@media (prefers-reduced-motion: reduce) {
+  .judgeReveal {
+    animation: none;
+  }
+}
+
+.distributionCard {
+  padding: 16px 18px;
+  background: var(--tint-grey);
+  border-radius: var(--radius-card);
+}
+
+.distributionHead {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 10px;
+  font: 400 13px / 1.3 var(--sans);
+  color: var(--muted);
+}
+
+.judgeActions {
+  display: flex;
+  gap: 10px;
+  align-items: stretch;
+  flex-wrap: wrap;
+}
+
+.judgeActionMain {
+  flex: 1 1 200px;
+}
+
+@media (max-width: 700px) {
+  .screen {
+    padding-block: 28px 20px;
+  }
+
+  .screenTitle {
+    font-size: 26px;
+  }
+}

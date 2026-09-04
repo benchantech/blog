@@ -1,0 +1,216 @@
+/* ==========================================================================
+   Practice (plan Phase 7; mockup 5c, dc.html:152-175).
+
+   The Practice view's own stylesheet. It composes components/ui and
+   components/wys primitives — Pill, ActionPill, ChoiceRow, ScenarioCard,
+   JudgeCard, DashedSlot, ProvenanceMono — and adds only the three containers
+   the artboard draws and no primitive owns: the grey replay row, the ink
+   FROM MEMORY card, and the grey appetite card.
+
+   Measured off artboard 5c at 390px. Values carried verbatim where a token
+   exists for them, since §4.9 makes per-screen geometry part of fidelity:
+
+     replay row      padding 14px 16px · #F4F6F8 · radius 14 · 15px · gap 8
+     from memory     #16202B · radius 22 · padding 18 · prompt 17px/1.4
+     offer pill      flex:1 · padding 12 · rgba(255,255,255,.1) · radius 999
+     scratch box     min-height 70 · 1.5px dashed rgba(255,255,255,.3) · r14
+     scratch notice  12px · #7FC8D6 · margin 10px 0 12px
+     appetite card   #F4F6F8 · radius 22 · padding 18 · note 12px centred
+
+   TWO DESCENDANT RULES ON PURPOSE (`.fromMemoryPrompt p`, `.scratchNotice p`).
+   Both wrap a `GatedText`, which is the only sanctioned way to put a content
+   record's prose on screen — it carries the record's policy and renders the
+   provenance label instead of the words when the record is blocked. GatedText
+   sets one body type (16px/1.45); the artboard sets 17px on the dark card's
+   prompt and 12px teal-on-dark on the notice. Restyling the descendant keeps
+   the gate intact and keeps the artboard's typography (R1), where reaching for
+   a raw string would have dropped the gate to win a font size.
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------- */
+/* Sections                                                                   */
+/* -------------------------------------------------------------------------- */
+.section {
+  margin-bottom: 22px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* REPLAY (WYS §14)                                                           */
+/* -------------------------------------------------------------------------- */
+.replayRows {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.replayRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  width: 100%;
+  padding: 14px 16px;
+  min-height: 44px; /* §4.6 touch target */
+  background: var(--tint-grey);
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-row);
+  font: 400 15px / 1.35 var(--sans);
+  color: var(--ink);
+  text-align: left;
+}
+
+/* A row that can start a replay is a button; one whose scenario is withheld is
+   a plain div (below). Selection never reflows: the border is already there. */
+.replayRowLive {
+  cursor: pointer;
+}
+
+.replayRowLive:hover {
+  border-color: var(--border-row);
+}
+
+.replayRowOpen {
+  border-color: var(--ink);
+}
+
+.replayLabel {
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.replayTag {
+  flex: none;
+}
+
+/* The open replay sits directly under its row, inside the same section. */
+.replayBody {
+  margin-top: 10px;
+  display: grid;
+  gap: 12px;
+}
+
+.replayClose {
+  display: flex;
+}
+
+/* -------------------------------------------------------------------------- */
+/* FROM MEMORY (WYS §15.1)                                                    */
+/* -------------------------------------------------------------------------- */
+.fromMemory {
+  background: var(--ink);
+  color: var(--white);
+  border-radius: var(--radius-card-lg);
+  padding: 18px;
+}
+
+.fromMemoryPrompt {
+  margin-bottom: 14px;
+}
+
+.fromMemoryPrompt p {
+  font-size: 17px;
+  line-height: 1.4;
+}
+
+/* The two offers are OFFERS, not controls: "say it aloud" and "write it on
+   paper" happen away from the screen and nothing here can know that they did.
+   A button would promise a state change this card must not make. */
+.offers {
+  display: flex;
+  gap: 8px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.offer {
+  flex: 1 1 0;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.1);
+  border-radius: var(--radius-pill);
+  font: 400 14px / 1.2 var(--sans);
+  text-align: center;
+}
+
+.scratchField {
+  display: block;
+}
+
+.scratch {
+  display: block;
+  width: 100%;
+  min-height: 70px;
+  padding: 12px;
+  background: transparent;
+  border: var(--dash-scratch);
+  border-radius: var(--radius-row);
+  color: var(--white);
+  font: 400 14px / 1.45 var(--sans);
+  resize: vertical;
+}
+
+.scratch::placeholder {
+  color: var(--muted-on-dark);
+}
+
+.scratchNotice {
+  margin: 10px 0 12px;
+}
+
+.scratchNotice p {
+  font-size: 12px;
+  line-height: 1.4;
+  color: var(--accent-on-dark);
+}
+
+/* Not a reward: the same 12px provenance voice the rest of the card uses. */
+.didItDone {
+  margin: 10px 0 0;
+  text-align: center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Appetite filter (WYS §21)                                                  */
+/* -------------------------------------------------------------------------- */
+.appetite {
+  background: var(--tint-grey);
+  border-radius: var(--radius-card-lg);
+  padding: 18px;
+}
+
+.appetiteBody {
+  margin-bottom: 12px;
+}
+
+.appetiteBody p {
+  font-size: 15px;
+  line-height: 1.45;
+}
+
+.appetiteNote {
+  margin: 8px 0 0;
+  font: 400 12px / 1.4 var(--sans);
+  color: var(--muted);
+  text-align: center;
+}
+
+/* The recorded state. Centred like the note it replaces, and deliberately in
+   the muted provenance register rather than a success colour. */
+.appetiteRecorded {
+  margin-top: 8px;
+  text-align: center;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Desktop (§9 Phase 10 widens the reading column; the IA does not change)     */
+/* -------------------------------------------------------------------------- */
+@media (min-width: 701px) {
+  .replayRow {
+    font-size: 16px;
+  }
+
+  .fromMemory,
+  .appetite {
+    padding: 22px;
+  }
+}

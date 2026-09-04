@@ -1,0 +1,186 @@
+/*
+ * Plan (mockup 5b, dc.html:101-118).
+ *
+ * Scoped to the route, not added to `components/wys/wys-primitives.module.css`:
+ * the row states here are Plan's own, the shared stylesheet belongs to the five
+ * screens together, and `.stop*` in that file is already the `4a` path-strip
+ * card — a different object with the same word in its name (§4.1).
+ *
+ * The artboard's measurements, kept as measurements: rows `14px 18px` on
+ * `--tint-grey` at `--radius-row-lg` (16px); the current card `18px` on `--ink`
+ * at `--radius-cell` (18px); the terminal row white with `1.5px dashed
+ * --border-dashed`; 8px between rows. Everything colour-bearing is a token, so
+ * the screen restyles with the rest of the site rather than with a patch here.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* The row list                                                               */
+/* -------------------------------------------------------------------------- */
+.rowList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.rowItem {
+  display: block;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  min-height: 44px;
+  padding: 14px 18px;
+  border-radius: var(--radius-row-lg);
+  background: var(--tint-grey);
+  border: 1.5px solid transparent;
+  color: var(--ink);
+  font: 400 15px / 1.35 var(--sans);
+  text-decoration: none;
+}
+
+/* Done is muted, and muted is the WHOLE treatment: no strike-through, no tick
+ * badge, no colour reward. A completed stop is a fact, not a prize (WYS §13,
+ * "progress is evidence, not a score"). */
+.rowDone {
+  color: var(--muted);
+}
+
+/* Stop H. White with a dashed hairline — the end of a finite list, drawn as an
+ * open edge rather than a locked one. */
+.rowTerminal {
+  background: var(--white);
+  border: 1.5px dashed var(--border-dashed);
+}
+
+.rowLabel {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
+}
+
+/* The leading cell: "0", "A" ... "H". Derived from `order`, never typed. */
+.rowMark {
+  flex: none;
+  font-weight: 600;
+  color: var(--accent-text-on-tint);
+}
+
+.rowDone .rowMark {
+  color: var(--muted);
+}
+
+.rowTitle {
+  min-width: 0;
+}
+
+.rowTag {
+  flex: none;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  font: 500 13px / 1.3 var(--sans);
+  color: var(--muted);
+}
+
+.rowTagGlyph {
+  font-weight: 400;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The current stop — the one ink card on the screen                          */
+/* -------------------------------------------------------------------------- */
+.current {
+  display: block;
+  padding: 18px;
+  border-radius: var(--radius-cell);
+  background: var(--ink);
+  color: var(--white);
+  text-decoration: none;
+}
+
+.currentHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  margin-bottom: 6px;
+  font: 400 12px / 1.3 var(--sans);
+  color: var(--accent-on-dark);
+}
+
+/* The caps are CSS. "Stop A" is derived structure, so the copy holds the name
+ * the build computes and the artboard's upper case is presentation (§4.8). */
+.currentEyebrow {
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.currentMeta {
+  flex: none;
+  white-space: nowrap;
+}
+
+.currentTitle {
+  display: block;
+  font: 600 19px / 1.3 var(--sans);
+  letter-spacing: -0.01em;
+}
+
+.currentMarks {
+  margin-top: 8px;
+}
+
+.currentNext {
+  display: block;
+  margin-top: 4px;
+  font: 400 14px / 1.4 var(--sans);
+  color: var(--body-on-dark);
+}
+
+/* -------------------------------------------------------------------------- */
+/* The footnote, the optional practices, the pace control                     */
+/* -------------------------------------------------------------------------- */
+
+/* "Stop titles are a working scaffold; Ben is choosing the recordings."
+ * Centred, 13px, muted — the artboard's own treatment (dc.html:116). */
+.footnote {
+  margin: 16px 0 18px;
+  text-align: center;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.practices {
+  margin: 0 0 12px;
+}
+
+.practiceList {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0 0 10px;
+  padding: 0;
+  list-style: none;
+}
+
+.practiceItem {
+  font: 400 15px / 1.4 var(--sans);
+  color: var(--body);
+}
+
+.changePace {
+  margin-top: 12px;
+}
+
+@media (max-width: 700px) {
+  .currentTitle {
+    font-size: 18px;
+  }
+}

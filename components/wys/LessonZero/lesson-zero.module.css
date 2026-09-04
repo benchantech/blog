@@ -1,0 +1,337 @@
+/* ==========================================================================
+   Lesson Zero (plan Phase 7; WYS §9; mockup 5a).
+
+   The ONE stylesheet the onboarding flow owns. Everything reusable already
+   exists: `components/ui/primitives.module.css` supplies the pill, the choice
+   row, the action pill and the progress rail; `components/provenance/` supplies
+   the slot, the mono line and the draft mark; `components/wys/` supplies the
+   JUDGE composite. What is left here is the flow's own geometry and the four
+   compositions no shared primitive draws — the ink habit card, the 2x2 pace
+   grid, the BEFORE YOU START · DATA card and the step-10 takeaway.
+
+   MEASURED FROM `5a`, not invented. The artboard's three phones are
+   `padding:72px 22px 60px` on a 390px frame, with a 13px status pill row, a 6px
+   rail, a 32px/1.12 title at letter-spacing -.025em, 16px/1.5 body, rows at
+   radius 16 and 14, and the ink pill at padding 17 / radius 999.
+
+   TWO DELIBERATE DEPARTURES, both recorded in docs/facelift-unapproved.md:
+     1. TOP PADDING is 48px desktop / 28px mobile, not the artboard's 72px. §5.6
+        mounts the root header above every route, which the phone artboards do
+        not draw. Same Q9 shift the shared `CourseScreen` already takes.
+     2. THE FLOW IS CENTRED AND CAPPED at 520px. `5a` is a 390px phone and this
+        page is reachable at any width; a 32px title measured for 346px of
+        content becomes a banner at 1280px. The cap keeps the drawn measure.
+
+   Every colour is a token. No hex value appears below.
+   ========================================================================== */
+
+.flow {
+  max-width: 520px;
+  margin: 0 auto;
+  padding: 48px 22px 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Step chrome — the pill row, the counter and the rail                       */
+/* -------------------------------------------------------------------------- */
+
+.head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 10px;
+}
+
+.counter {
+  margin: 0;
+  color: var(--muted);
+  font: 400 13px / 1 var(--sans);
+}
+
+.railWrap {
+  margin-bottom: 30px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Step body                                                                  */
+/* -------------------------------------------------------------------------- */
+
+.title {
+  margin: 0 0 12px;
+  font: 600 32px / 1.12 var(--sans);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.lead {
+  margin: 0 0 26px;
+  color: var(--body);
+  font: 400 16px / 1.5 var(--sans);
+}
+
+/* The `5a` posture list is gap 10; the scenario list below it is gap 8. Two
+   different rhythms on one artboard, kept apart rather than averaged. */
+.postureList {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.footnote {
+  margin: 16px 0 28px;
+  color: var(--muted);
+  font: 400 13px / 1.4 var(--sans);
+  text-align: center;
+}
+
+.footnoteTight {
+  margin-bottom: 16px;
+}
+
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.section {
+  margin-bottom: 26px;
+}
+
+/* The provenance label and draft mark that follow an authored step's prose.
+   They sit under the body, not under each paragraph: one record, one line. */
+.marks {
+  margin: -14px 0 26px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The ink habit card — `5a` step 5's THE FIRST HABIT block (dc.html:38)      */
+/* -------------------------------------------------------------------------- */
+
+.habitCard {
+  margin-bottom: 22px;
+  padding: 20px;
+  border-radius: var(--radius-card-lg);
+  background: var(--ink);
+  color: var(--white);
+}
+
+.habitEyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-on-dark);
+  font: 600 12px / 1.2 var(--sans);
+  letter-spacing: 0.02em;
+}
+
+.habitLine {
+  margin: 0;
+  font: 500 20px / 1.35 var(--sans);
+  letter-spacing: -0.01em;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Step 5 — the exercise. NO BORDER, which is `5a`'s own treatment.           */
+/* -------------------------------------------------------------------------- */
+
+/* `components/wys/ScenarioCard.tsx` draws the 1.5px hairline the `5b` Today
+   screen carries, where a border means "the one live decision surface on this
+   screen". Lesson Zero step 5 IS the screen, and `5a` draws no border, so the
+   exercise is composed here instead. R1: where an approved artboard settles it,
+   the artboard wins. A `bordered` prop on the shared card is requested in
+   docs/facelift-build-notes.md so the two surfaces can share one component. */
+.exercisePill {
+  margin: 0 0 12px;
+}
+
+.scenarioBody {
+  margin: 0 0 14px;
+  font: 400 16px / 1.5 var(--sans);
+}
+
+.scenarioDecision {
+  margin: 0 0 10px;
+  font: 600 16px / 1.4 var(--sans);
+}
+
+.exerciseChoices {
+  margin-bottom: 20px;
+}
+
+.withheld {
+  margin-bottom: 20px;
+  padding: 18px;
+  border: var(--dash-ben);
+  border-radius: var(--radius-card-lg);
+  background: var(--tint-grey);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Steps 7-9 — the pace grid and the data card (dc.html:56-70)               */
+/* -------------------------------------------------------------------------- */
+
+.sectionHeading {
+  margin: 0 0 10px;
+  font: 600 17px / 1.3 var(--sans);
+}
+
+.paceGrid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
+  margin-bottom: 22px;
+}
+
+.paceGridTight {
+  margin-bottom: 8px;
+}
+
+/* Selection is a 2px INK ring on a pale-teal fill, never teal — and the extra
+   half pixel is an inset shadow rather than a wider border, so picking an
+   option does not move the three options beside it (§4.7.1, Q18). Same
+   normalisation `ChoiceRow` already applies to the artboard's rows. */
+.paceOption {
+  min-height: 44px;
+  padding: 14px;
+  border: 1.5px solid transparent;
+  border-radius: var(--radius-row);
+  background: var(--tint-grey);
+  color: var(--ink);
+  font: 400 15px / 1.3 var(--sans);
+  text-align: center;
+  cursor: pointer;
+  transition: background-color var(--reveal) ease-out, border-color var(--reveal) ease-out,
+    box-shadow var(--reveal) ease-out;
+}
+
+.paceOption:hover {
+  border-color: var(--border-pill-strong);
+}
+
+.paceOptionSelected {
+  background: var(--tint-teal);
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 0.5px var(--ink);
+  font-weight: 500;
+}
+
+.paceNote {
+  margin: 0 0 22px;
+  color: var(--muted);
+  font: 400 14px / 1.45 var(--sans);
+}
+
+.dataCard {
+  margin-bottom: 22px;
+  padding: 18px;
+  border-radius: var(--radius-card-lg);
+  background: var(--tint-grey);
+}
+
+.dataEyebrow {
+  margin: 0 0 10px;
+  color: var(--accent-text-on-tint);
+  font: 600 12px / 1.2 var(--sans);
+  letter-spacing: 0.02em;
+}
+
+.dataLines {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.dataLine {
+  margin: 0;
+  font: 400 15px / 1.4 var(--sans);
+}
+
+.dataLink {
+  display: inline-flex;
+  gap: 6px;
+  align-items: center;
+  margin-top: 12px;
+  color: var(--accent-text-on-tint);
+  font: 500 15px / 1.3 var(--sans);
+  text-decoration: none;
+}
+
+.dataLink:hover {
+  text-decoration: underline;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Step 10 — the plan preview                                                 */
+/* -------------------------------------------------------------------------- */
+
+.stopList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0 0 18px;
+  padding: 0;
+  list-style: none;
+}
+
+.stopRow {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 14px 18px;
+  border-radius: var(--radius-row-lg);
+  background: var(--tint-grey);
+  font: 400 15px / 1.4 var(--sans);
+}
+
+.stopRowTerminal {
+  border: 1.5px dashed var(--border-dashed);
+  background: none;
+}
+
+.stopTag {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+.takeaway {
+  margin-bottom: 22px;
+  padding: 20px;
+  border-radius: var(--radius-card-lg);
+  background: var(--ink);
+  color: var(--white);
+}
+
+.takeawayEyebrow {
+  margin: 0 0 8px;
+  color: var(--accent-on-dark);
+  font: 600 12px / 1.2 var(--sans);
+  letter-spacing: 0.02em;
+}
+
+.takeawayLine {
+  margin: 0;
+  font: 500 20px / 1.35 var(--sans);
+  letter-spacing: -0.01em;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Responsive — the artboard's own gutter below 700px                        */
+/* -------------------------------------------------------------------------- */
+
+@media (max-width: 700px) {
+  .flow {
+    padding: 28px 22px 0;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+}
+
+/* §4.6, and the pair that must never be split: every transition above is
+   `var(--reveal)`, so the reduced-motion half lives here beside them. */
+@media (prefers-reduced-motion: reduce) {
+  .paceOption {
+    transition: none;
+  }
+}

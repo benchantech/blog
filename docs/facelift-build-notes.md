@@ -1471,3 +1471,859 @@ The guard is stricter than before and §6.12 is satisfied. Nothing was escalated
 Result: 224 tests pass (222 before the gate, +2 new governance checks),
 `tsc --noEmit` clean, build green at 21 routes all `○`, deletion contract empty
 in both directions, `content/site-config.ts` byte-identical to `main`.
+
+---
+
+# Phase 7 (shell) — route group, per-stop route, shared course primitives
+
+**Scope:** the SHARED half of plan Phase 7 only. Today, Plan, Progress,
+Practice, Lesson Zero and Data are built by five other builders on top of what
+landed here; nothing in this phase renders one of those screens.
+
+## What shipped
+
+| Deliverable | Files |
+|---|---|
+| The five-item bottom nav, mounted once on the `(shell)` group | `components/wys/BottomNav.tsx`, `app/watch-your-step/(shell)/layout.tsx` |
+| The tab inventory, the no-active-item rule, the per-stop labels | `content/watch-your-step/tabs.ts` |
+| The per-stop route: `generateStaticParams()` + `dynamicParams = false` | `app/watch-your-step/(shell)/stop/[stopId]/page.tsx` |
+| The derived visit counter, pure and its client renderer | `lib/wys/visit.ts`, `components/wys/VisitCounter.tsx` |
+| The JUDGE state machine, pure | `lib/wys/judge-machine.ts` |
+| The JUDGE composite | `components/wys/JudgeCard.tsx` |
+| The scenario card, the course screen container, the provenance marks | `components/wys/ScenarioCard.tsx`, `CourseScreen.tsx`, `ProvenanceMarks.tsx`, `GatedText.tsx` |
+| The one way a screen turns a content record into renderable prose | `lib/wys/content-gate.ts` |
+| The JUDGE surface copy, defined once for four surfaces | `content/watch-your-step/judge.ts` |
+| `wys_source_period_start` at the point §19.4 names | `components/wys/StopStartTelemetry.tsx` |
+| The shell's own checks | `tests/wys-shell.test.ts` |
+
+254 tests pass; `npx tsc --noEmit` is clean; the build prerenders 30 static
+pages across 20 routes — 19 `○` and the stop route as `●` over nine ids, **zero
+`ƒ`**. The deletion contract is empty in both directions.
+
+## What the five view builders import (the shared surface, in one list)
+
+- `CourseScreen` — title, right-hand meta node, optional lead, children.
+- `GatedText` / `ProvenanceMarks` — prose that cannot render without its label.
+- `ScenarioCard` — the white 1.5px card, the fictional pill, one provenance line
+  for the setting and the decision moment together.
+- `JudgeCard` — choices, Commit, judgment, distribution, continue/reset. Give it
+  `judgeLabels.commit` and `judgeLabels.reset`; do not type either.
+- `VisitCounter` — "Stop A · visit 1 of 3", derived.
+- `StopStartTelemetry` — mount it on Today as well as the stop route.
+- `WysBottomNav` — already mounted in the layout; do not mount a second one.
+- `gateProse` / `gatedCanonicalText` — **the only sanctioned way** to get text
+  out of a content record and onto a screen.
+- `courseTabs`, `activeCourseTab`, `stopDisplayName`, `stopRouteLabels`,
+  `visitId`, `visitPositionFor`, `visitLabel`.
+
+## Decisions this phase made, with reasons
+
+- **The state machine is a pure module, not `useState` inside the card.** The
+  product's whole claim is "nothing is revealed before commit", and this suite
+  has no DOM and no renderer (Q15). Keeping the four transitions in
+  `lib/wys/judge-machine.ts` makes the invariant a unit test over every reachable
+  state instead of a promise about a component. `JudgeCard` is the plain
+  `useState` shell WYS §10 asks for.
+- **The judgment is a conditional render, not hidden markup.** No CSS
+  visibility, no `<details>`: pre-commit the judgment is not in the DOM at all,
+  which is what a crawler, a no-JS visitor and the first paint receive.
+- **The tab inventory lives in `content/watch-your-step/`, not `content/nav.ts`.**
+  `tests/preserved-surfaces.test.ts` reads every internal href in `nav.ts` and
+  fails if one has no page file — the right rule for site chrome, and the wrong
+  one for a shell whose five screens land with five other builders. The tabs are
+  asserted against `WYS_ROUTES` instead, which is the same list the URL-privacy
+  test and the serializer's `ui.lastRoute` domain use.
+- **The tab bar is a client component for exactly one reason:** `usePathname`,
+  to know which item is current. The hrefs are constant in server HTML (§5.4),
+  the bar works with JavaScript off, and the active item is a font weight.
+- **One bar, mounted on the `(shell)` layout.** It must not remount between
+  tabs, and putting it in the layout makes "no active item on the landing" a
+  property of the route rather than of six page files agreeing.
+- **The visit id is qualified by its stop** (`stop-a:day-human-source`). See
+  `docs/facelift-unapproved.md` I2 — the bare day-plan id repeats across stops
+  and would advance the wrong counter. No new field; the shape stays verbatim.
+- **`JudgeCard` persists the pick itself.** Q20 ships `PERSIST_LOCAL_JUDGMENTS`
+  ON because `5b` Progress draws "C → B · revised", which needs the earlier
+  choice to still exist. A server page cannot pass a callback to a client
+  component, so putting the write inside the card is what keeps every JUDGE
+  surface consistent without five wrapper components. A second commit writes
+  `revisedChoiceKey` and leaves `choiceKey` alone; `persist={false}` is there for
+  a replay that must not overwrite the kept judgment (WYS §14).
+- **The commit fires `sendAggregate`, never `trackWys`.** `wys_scenario_choice`
+  is aggregate-only (WYS §19.4) and `trackWys` refuses it by name. In v0 the
+  adapter is disabled and has no endpoint, so the call sends nothing — it is
+  wired so the firing point is recorded rather than invented later.
+- **`wys_source_period_start` is guarded by a module-level `Set`, not
+  `sessionStorage`.** A session key would be more precise across reloads and
+  would also be a third browser key that `lib/wys/browser-keys.ts` and the Data
+  page would both have to declare. A small overcount is a diagnostic
+  imprecision; an undeclared key is a broken promise about what this site
+  stores.
+- **`DistributionBars` gained a required `heading` prop and lost its hardcoded
+  one.** It used to type "How others answered" into the strip layout while `4a`
+  drew the same words plus "totals only · no one is tracked" beside them — one
+  label with two definitions, below the ≥12-word duplicate check's threshold.
+  Both strings now come from `content/watch-your-step/judge.ts`. Nothing was
+  dropped; the strip still reads the same words, from one definition.
+- **The blocked state is a first-class rendering.** `GatedText` renders the
+  provenance label *in place of* the prose when a record is blocked, so a screen
+  built against Q21's default is honest rather than empty.
+
+## Hazards this phase creates for later phases
+
+- **The public course renders labels, not prose.** Under Q21's default every
+  scenario, judgment and stop title resolves to `blocked`. Build screens against
+  that. Do **not** "fix" a blank-looking screen by editing a `status` field —
+  one constant in `lib/content-status.ts` flips the whole course when Ben rules.
+- **`tests/class-contract.test.ts`'s CSS-module import count is now 35.** Every
+  new primitive or screen that imports a `.module.css` updates that number
+  deliberately. That is what the assertion is for.
+- **`canonicalCollisions` is now seven rows** and `tests/wys-content.test.ts`
+  asserts the count. Adding a collapsed collision means updating it.
+- **A new module under `content/watch-your-step/` must be registered** in
+  `./index.ts` — in `wysRegistry`, in `wysCanonicalRecords`, or in
+  `WYS_NON_RECORD_MODULES`. `judge.ts` and `tabs.ts` took the last two routes.
+- **The five tab destinations do not exist yet.** `/today`, `/plan`,
+  `/progress`, `/practice` and `/data` are linked by the bar and land with the
+  five view builders. Until they do, the bar links to routes that 404 — which is
+  why the tab hrefs are asserted against `WYS_ROUTES` rather than against page
+  files, and why the *next* phase to touch `tests/preserved-surfaces.test.ts`
+  should add them to the served-URL assertions once they exist.
+- **`/watch-your-step/today` owns the one state-dependent redirect** (§5.4). The
+  tabs must never grow a second one; `/data` never redirects.
+- **`JudgeCard` pulls `content/watch-your-step/domains.ts` into the client
+  bundle** (through `useWysState`), and with it the scenario, stop and posture
+  id arrays. That is the intended path for every state-reading component, but it
+  is the reason the course bundle is larger than the ship pages'.
+
+---
+
+# Phase 7 (Plan view) — the finite horizon
+
+**Scope:** `/watch-your-step/plan` only (artboard `5b` Plan, WYS §12). Built on
+the Phase 7 shell; nothing shared was edited except the two registries a new
+module and a new stylesheet are required to update.
+
+## What shipped
+
+| Deliverable | Files |
+|---|---|
+| The Plan screen: pace pill, intro, nine rows, footnote, optional practices, "Change pace or time" | `app/watch-your-step/(shell)/plan/page.tsx` |
+| The three row states, pure and unit-tested | `app/watch-your-step/(shell)/plan/plan-model.ts` |
+| The content half — gating, derived marks, day-plan summaries | `app/watch-your-step/(shell)/plan/plan-content.ts` |
+| The two state-dependent slots | `app/watch-your-step/(shell)/plan/PlanStops.tsx` |
+| The route's own stylesheet | `app/watch-your-step/(shell)/plan/plan.module.css` |
+| The pace vocabulary and the Plan row labels | `content/watch-your-step/plan.ts` |
+| 27 checks, including the negative ones | `tests/wys-plan.test.ts` |
+
+`/watch-your-step/plan` builds `○` (Static). `npx tsc --noEmit` is clean and
+`scripts/check-no-deletions.sh` is empty in both directions.
+
+## Decisions this phase made, with reasons
+
+- **Three row states, and the model has no clock.** (WYS §12)'s prohibitions —
+  no artificial "behind", no guilt for missed days, no punishment for using the
+  site less — are enforced by the shape of `planRows()`, which takes no
+  timestamp and computes no ratio, not by careful copy (R8). A learner who
+  disappears for a year gets byte-identical rows to one who was here this
+  morning, and `tests/wys-plan.test.ts` asserts exactly that with two states
+  differing only in `lastOpenedAt`.
+- **Current is the FIRST INCOMPLETE stop, not the furthest reached.** A
+  "furthest" model has to call the stops behind it something, and every word for
+  that is a word (WYS §12) forbids. Finishing stop D out of order marks D done
+  and leaves the learner at Lesson Zero, with nothing marked skipped.
+- **Unread state renders the whole plan with nothing marked.** §7.3 forbids
+  reading `wys:v1` during render, so the server HTML, the first client render
+  and a no-JS visitor all get §5.4's honest zero state — every row a live link,
+  no dark card, no numerals. The alternative (guess a current stop, then correct
+  it) is wrong for exactly the people with the most state.
+- **The page is a server component; two small client components read state.**
+  `PlanStops` (row states) and `PlanPacePill` (the "3 days · ~10 min" pill).
+  Splitting the content half into `plan-content.ts` keeps the gating on the
+  server, where it cannot be skipped, and — because that module imports no CSS
+  and no JSX — makes the whole screen testable without a renderer (Q15).
+- **Every row links to the per-stop route, including the done ones.** §5.3 calls
+  `/stop/[stopId]` "the deep-linkable form used by Plan rows", and this is the
+  first surface that links to it. A finished stop stays reachable: replay
+  (WYS §14) and From Memory (WYS §15.1) both depend on going back.
+- **One provenance line for nine withheld titles** (see
+  `docs/facelift-unapproved.md` P5), computed from the distinct labels rather
+  than assumed to be one.
+- **The pace vocabulary lives in `content/watch-your-step/plan.ts` with both of
+  its approved presentations**, so Lesson Zero and Plan cannot describe one
+  choice two ways. See P3 — **Lesson Zero must import it.**
+
+## Requests for the gate (shared files this phase did NOT change)
+
+- **`components/wys/CourseScreen.tsx` renders `<p>{meta}</p>` whenever `meta` is
+  passed**, so a client `meta` that returns `null` before hydration leaves an
+  empty paragraph in the header row. It is harmless (zero-width, no gap
+  collapse) and was left alone rather than edited. If a later phase touches the
+  shell, rendering the `<p>` only when the node produces output would be the
+  tidier form.
+- **Nothing else shared was needed.** `CourseScreen`, `GatedText`,
+  `ProvenanceMarks`, `LinkRow`, `Pill`, `SectionEyebrow`, `ProvenanceMono`,
+  `gateProse`, `gatedCanonicalText`, `visitPositionFor`, `visitLabel`,
+  `visitId`, `stopDisplayName`, `stopLetter` and `wysLabels` were all imported
+  as they stand.
+
+## Hazards this phase creates for later phases
+
+- **`content/watch-your-step/plan.ts` is the single home of the pace labels.**
+  Lesson Zero's "How often? / How long each time?" step imports
+  `wysCadenceOptions` / `wysTimeBudgetOptions` and renders `optionLabel`. Typing
+  those strings again would pass every test and silently break the Plan pill.
+- **"Change pace or time" targets `/watch-your-step/start`.** Lesson Zero has to
+  cope with an entry from a learner who has already completed onboarding (P2).
+- **`WysWeek.optionalPracticeIds` is now rendered, not just declared.** A stop
+  that lists a ritual id renders a row for it on Plan; a ritual removed from
+  `rituals.ts` while still referenced fails `wysRitualById` at build time, which
+  is the intended direction.
+- **The forbidden-vocabulary check in `tests/wys-plan.test.ts` strips comments
+  before scanning.** It is deliberately scoped to the Plan route and
+  `content/watch-your-step/plan.ts`. A sitewide version of the same check is
+  worth having at the Phase 12 audit; do not narrow this one to make a new
+  screen pass.
+- **The CSS-module import total is 47.** The Plan view adds two (page.tsx and
+  PlanStops.tsx). It was re-measured, not incremented, per the merge note in
+  `tests/class-contract.test.ts`.
+
+
+# Phase 7 (Today view) — the WATCH → TRY → JUDGE → CARRY loop
+
+**Scope:** the Today surface only (artboard `5b`, dc.html:78-96; WYS §10). The
+shared course shell, the JUDGE composite, the visit derivation and the content
+gate already existed and were imported, not rebuilt.
+
+## What shipped
+
+| Deliverable | Files |
+|---|---|
+| The route, static, with the metadata convention | `app/watch-your-step/(shell)/today/page.tsx` |
+| Which stop Today shows — pure, and unit-tested | `app/watch-your-step/(shell)/today/current-stop.ts` |
+| The per-stop view model, gated, with the blocked-prose redaction | `app/watch-your-step/(shell)/today/view.ts` |
+| WATCH — 196px slot, overlay pill, decorative disc, caption, transcript disclosure | `app/watch-your-step/(shell)/today/WatchCard.tsx` |
+| CARRY — teal card, the "then leave" sentence, the mark | `app/watch-your-step/(shell)/today/CarryCard.tsx`, `CarryMark.tsx` |
+| One stop shown out of eight rendered | `app/watch-your-step/(shell)/today/CurrentStopGate.tsx` |
+| §5.4's one state-dependent redirect | `app/watch-your-step/(shell)/today/OnboardingRedirect.tsx` |
+| "About 10 minutes." | `app/watch-your-step/(shell)/today/TimeBudgetNote.tsx` |
+| The screen's geometry | `app/watch-your-step/(shell)/today/today.module.css` |
+| The WATCH caption, the transcript slot, the control labels, the scenario pin | `content/watch-your-step/today.ts` |
+| 26 checks | `tests/wys-today.test.ts` |
+
+TRY/JUDGE has no file of its own: it is `ScenarioCard` wrapping `JudgeCard`,
+both from `components/wys/`, with content passed in. That is what the shell was
+for.
+
+`npx tsc --noEmit` is clean, `PORT=3999 npm run build` prerenders
+`/watch-your-step/today` as `○` with zero `ƒ`, and
+`scripts/check-no-deletions.sh` is clean in both directions.
+
+## Decisions this phase made, with reasons
+
+- **The loop is server-rendered once per stop and gated client-side.** Today is
+  one static URL that has to show a different stop to different learners, from
+  state §7.3 forbids reading during render. The two alternatives both fail: a
+  server component cannot know the stop, and a client component that BUILT the
+  loop would have to receive every stop's prose as props — which would put
+  withheld draft text into the flight payload, the one place `GatedText`'s
+  blocked branch exists to keep it out of. `CurrentStopGate` receives
+  `children`, never content.
+- **Blocked prose is redacted before it crosses a client boundary.**
+  `JudgeCard` is a client component, so `judgment.content` is serialized whether
+  or not it renders. `view.ts`'s `withheld()` empties the text of a blocked
+  record on the way out. It is a redaction and not a constructor — it spreads an
+  existing gated object, so the branded `ProvenanceLabel` and the policy stay
+  the ones `gateProse` computed.
+- **The stop, not the visit, is what the gate compares.** The visit position is
+  already derived by `lib/wys/visit.ts`; Today needed one more derivation and no
+  more, so `current-stop.ts` is forty lines over that same function and is
+  covered by unit tests at each position a learner can be in.
+- **`wys_carry_reached` fires on render, `wys_source_period_complete` on the
+  mark.** That split is `lib/wys/telemetry.ts`'s own decision table, not a
+  choice made here: "fire on RENDER, not on 'marked done' — a self-marked
+  completion would be a weaker fact dressed as a stronger one." The mark fires
+  the completion event only when it finishes the stop's whole cadence path.
+- **The reached-event guard is a module-level `Set`,** the same trade
+  `StopStartTelemetry` documents: a small overcount is a diagnostic imprecision,
+  an undeclared browser key is a broken promise about what this site stores.
+- **Client components receive a stop PROJECTION, never the week record.**
+  `{ id, offSite, cadencePaths }` is everything `visitPositionFor` needs;
+  passing the whole `WysWeek` would serialize its draft title and purpose into
+  the payload for no gain.
+- **The screen's title comes off `courseTabs`.** "Today" is the tab label and
+  the screen name — one node, two presentations (§6.8) — so the page reads it
+  rather than becoming a third place the word is written.
+
+## Requests for shared files — NOT made here, for the gate
+
+Each of these needs a change to a file this phase does not own. Today ships
+correctly without them; each is a sharpening, and the first two are the two most
+worth doing.
+
+1. **`components/wys/JudgeCard.tsx` should write
+   `progress.completedScenarioIds` on commit.** (WYS §13): "a scenario counts on
+   the required judgment." `JudgeCard` already persists `localJudgments` for
+   Q20, so it is the only component that knows a commit happened, and it exposes
+   no callback a screen could hang the write on. Today therefore records the
+   carry and the visit but not the scenario, and `tests/wys-completion.test.ts`
+   (plan Phase 7) will want the scenario half.
+2. **`components/wys/useWysState.ts` should share one subscription.** Every
+   instance holds its own snapshot, so a write in `CarryMark` does not reach the
+   `VisitCounter` or the `CurrentStopGate` on the same screen — the counter
+   advances on the next visit rather than under the learner's hand (recorded as
+   T12; it reads acceptably, but it is a fact about the hook rather than a
+   design). A module-level store with `useSyncExternalStore` would fix it for
+   every course screen at once, and would also collapse ~30 redundant
+   `localStorage` reads on Today's mount into one.
+3. **`lib/wys/content-gate.ts` should export the `withheld()` redaction.** Today
+   carries a local copy in `view.ts`. Every screen that hands gated content to a
+   client component needs the same three lines, and a screen that forgets them
+   silently ships blocked prose in its payload — exactly the failure mode a
+   shared gate exists to make impossible.
+4. **`components/wys/GatedText.tsx` could take a body size.** `5b` draws the
+   CARRY body at 15px and the WATCH caption at 16px; `GatedText` sets 16px, so
+   the carry card is a pixel out (T11). A `size` prop is the honest fix; a
+   wrapper rule reaching into the component's `<p>` is not.
+5. **`tests/preserved-surfaces.test.ts` should add the course tabs to its
+   served-URL assertions** once all five exist. The shell's hazard note asks the
+   *next* phase to do it; Today alone cannot, because the assertion has to name
+   all five and Today is one of them.
+
+## Hazards this phase creates for later phases
+
+- **`tests/class-contract.test.ts`'s CSS-module import count moved to 46.**
+  Today adds five imports of one module (`page.tsx`, `WatchCard`, `CarryCard`,
+  `CarryMark`, `TimeBudgetNote`). The baseline moved twice while this phase was
+  in flight, because four other course views were landing at the same time — the
+  number is asserted exactly on purpose, so whoever lands last re-runs the test
+  and sets it.
+- **`content/watch-your-step/today.ts` is registered in TWO places.** It carries
+  a canonical record (`todayCopyRecords`) and a governed object
+  (`todayBenSlots`), so it appears in `wysCanonicalRecords` AND in `wysRegistry`
+  — and therefore NOT in `WYS_NON_RECORD_MODULES`. A module with both kinds of
+  record needs both entries or half of it escapes the governance checks.
+- **Today assumes the Lesson Zero flow writes `onboarding.completed`.** It is
+  the only thing that stops the redirect at `/watch-your-step/start`, and a flow
+  that completes without setting it would bounce every learner back into
+  onboarding. It does NOT assume the flow writes a Lesson Zero visit id: the
+  current-stop derivation skips `stop-zero` entirely for that reason.
+- **The carry mark is the only writer of a visit id.** If a later surface wants
+  to complete a visit some other way, it must use `visitId(stopId, dayPlanId)`
+  from `lib/wys/visit.ts` — a bare day-plan id repeats across stops and would
+  advance the wrong counter.
+- **Stop F renders WATCH and CARRY with no TRY/JUDGE.** It declares no scenario
+  bank because it happens off-site (WYS §15.2). The detox surface the plan
+  schedules for it is a different component and is not built here; until it
+  lands, Stop F's Today is the loop minus the exercise, which is truthful but is
+  not the detox screen §15.2 describes.
+
+---
+
+# Phase 7 (Practice view) — replay, From Memory, appetite
+
+**Scope:** the Practice view only (artboard `5c` phone 1; WYS §14, §15.1, §21).
+Built on the Phase 7 shell — `CourseScreen`, `GatedText`, `ScenarioCard`,
+`JudgeCard`, `gateProse`/`gatedCanonicalText`, `WysBottomNav`. Nothing shared
+was rebuilt and no shared component was edited.
+
+## What shipped
+
+| Deliverable | Files |
+|---|---|
+| The route: three sections in the artboard's order, all server-rendered | `app/watch-your-step/(shell)/practice/page.tsx` |
+| Practice's four canonical records, its pinned labels, and the two §14 replay modes with the invariant rule enforced at the point of use | `content/watch-your-step/practice.ts` |
+| REPLAY rows — mode tags, the withheld state, the empty state, `wys_replay`, `progress.replayCounts` | `components/wys/ReplayList.tsx` |
+| FROM MEMORY — the ink card, the never-persisted scratch box, "I did it" | `components/wys/FromMemory.tsx` |
+| The appetite filter — one outlined pill, local record, `wys_depth_interest` | `components/wys/AppetiteCard.tsx` |
+| The eyebrow-and-landmark pairing, once | `components/wys/PracticeSection.tsx` |
+| The view's own stylesheet | `components/wys/practice.module.css` |
+| 31 checks, including the (WYS §29.2) `DO_NOT_SEND_WYS_TEST_9f31` canary | `tests/wys-practice.test.ts` |
+
+`/watch-your-step/practice` builds as `○ (Static)`. No draft scenario prose
+appears anywhere in the generated HTML — verified by grepping the built page for
+seven distinct scenario strings, all zero.
+
+## Decisions this phase made, with reasons
+
+- **A blocked record's words are stripped before they cross into a client
+  component.** `GatedContent` carries `text` even when `policy.kind ===
+  "blocked"`. In a server component that is harmless — nothing prints it — but
+  a blocked string passed to a client component travels in the RSC payload and
+  lands in the document. "The words are not in the DOM" has to mean the payload
+  too, so `redactIfBlocked()` empties it at the boundary and a scenario that may
+  not render is serialized with **no exercise object at all**. See the gate
+  request below: this belongs in the substrate, not in one view.
+- **The replay list is learner state, so it is client state.** A replay is a
+  re-run of an exercise the learner has already judged; listing the whole bank
+  would turn Practice into a browsable answer key and would show a stateless
+  visitor material they have not reached. The filter is `localJudgments` ∪
+  `progress.completedScenarioIds`, which means server HTML shows the empty
+  state and the rows arrive on hydration (§7.3). That is why the empty state is
+  a designed state here rather than a fallback.
+- **A `BEN_AUTHORED_VARIATION` origin is the only thing the "Ben variant" tag
+  can bind to.** The one shipped variant is `AI_ADAPTATION`, which is neither of
+  §14's two modes; tagging it "Ben variant" would attribute machine-drafted
+  prose to Ben (R9's unsafe direction). So v0 renders "as authored" rows only,
+  exactly as plan Phase 7 allows and as `tests/wys-content.test.ts` already
+  asserts of the bank.
+- **The §14 invariant rule is checked twice, at authoring and at use.**
+  `assertReplayInvariant()` throws if a variant's invariant has drifted from its
+  parent's or its `judgmentMapping` no longer covers every parent choice key. It
+  runs in a server component at build time, so drift fails `next build` instead
+  of shipping a "replay" that quietly asks a different question.
+- **`wys_replay` and `wys_depth_interest` are both fired bare.** Their own
+  decision rows in `lib/wys/telemetry.ts` set the exposure at "the event name"
+  — not the scenario, the choice, the revision or a reason. `trackWys` refuses
+  to send without granted consent, so a visitor who declined analytics produces
+  no request from either component.
+- **The appetite card writes locally BEFORE it fires.** If analytics is blocked,
+  declined or unconfigured, the learner's own record is still made; the
+  browser-local half of the feature does not depend on the telemetry half.
+- **The pill disables itself once recorded.** A second click would inflate the
+  one number (WYS §2.1) says Ben will read, and §21 forbids treating it as a KPI
+  to maximise. The recorded state is 11px mono in the muted provenance voice —
+  §37's "not visually rewarded", made literal.
+- **From Memory has no write path at all.** No `useWysState`, no `update`, no
+  `localStorage`, no `fetch`, no `trackWys` — read the import list. The scratch
+  value is one `useState` referenced in exactly two expressions (the binding and
+  the textarea's `value`), and `tests/wys-practice.test.ts` counts them.
+- **"Say it aloud" and "Write it on paper" are list items, not buttons.**
+  Nothing on this site can know whether someone said something aloud, and a
+  button implies a record.
+- **The scratch box cannot render without §15.1's label.** `notice` is a
+  required prop and the textarea is gated on `isShowable(notice)`. There is no
+  code path that draws an unlabelled scratch box — the difference between the
+  promise being kept and the promise being printed.
+- **Practice renders no distribution.** The 18/61/21 split is illustrative data
+  belonging to the `4a` hero and shipped only with its caption (§6.5, Q11). A
+  practice surface has no counts to show and an uncaptioned bar here would be
+  the §6.5 failure exactly. Asserted.
+
+## Shared files this phase DID change, and why it had no choice
+
+- `content/watch-your-step/index.ts` — `practice.ts` is registered in
+  `wysCanonicalRecords` and in `WYS_NON_RECORD_MODULES`. §7.5's rule is that an
+  unregistered content module escapes every governance check silently, and the
+  registry's own header says "Add a content module, add it here, in the same
+  commit." Additive only: one import, one spread, one list entry.
+- `tests/class-contract.test.ts` — the CSS-module import count. Four new
+  imports of `components/wys/practice.module.css`. **The number is a TOTAL that
+  all five Phase 7 view builders contribute to**; a merge that keeps one
+  builder's figure and drops another's fails the assertion rather than silently
+  losing a stylesheet from coverage. Re-measure at the gate.
+
+## Requests for the gate (shared files this phase did NOT change)
+
+1. **`lib/wys/content-gate.ts` should empty `text` on a blocked policy.** Every
+   view that hands gated content to a client component has the payload problem
+   described above, and every one of them will have to remember to redact. One
+   line in `gateProse`/`gateCanonical` would make it structural, the way the
+   rest of that module is. Practice redacts locally in the meantime.
+2. **`lib/wys/local-state.ts`: the four completed-id arrays are shape-checked,
+   not vocabulary-checked.** `completedLessonIds`, `completedScenarioIds`,
+   `completedCarryIds` and `transferCheckIds` accept any id token, so a
+   whitespace-free free string could be persisted there by a careless caller.
+   Not a defect for this view — From Memory has no write path — but the
+   `domains` argument already exists and could carry these lists too. Recorded
+   with a test that pins the current behaviour both ways.
+3. **`tests/preserved-surfaces.test.ts` should gain the five course routes**
+   once all five views have landed. The shell phase flagged this; Practice does
+   not take it unilaterally because the assertion is a count over all of them.
+4. **§7.1 holds no field for a ritual completion.** If Ben wants From Memory's
+   "I did it" recorded rather than acknowledged in-page, that is a schema
+   decision about a verbatim spec shape, not a component change. See
+   docs/facelift-unapproved.md R4.
+
+## Hazards this phase creates for later phases
+
+- **The Progress "replay used" tile reads `progress.replayCounts`, which this
+  view is the only writer of.** Opening a replay row increments it once. If the
+  Progress builder derives that tile from anything else, the two will disagree.
+- **Under Q21's default no replay is runnable**, so `wys_replay` cannot fire in
+  v0 and the JUDGE composite inside a replay row has never rendered on a real
+  screen. The machinery is built, unit-tested and wired; the first time it draws
+  will be the first time the constant is flipped, and it should be looked at
+  then rather than assumed.
+- **When Q21 flips, the whole scenario bank's prose enters the RSC payload of
+  this route** — the exercise objects are built server-side for every scenario
+  and filtered client-side. That is fictional practice material rather than
+  learner data, but it is a curriculum-forward leak and a later phase may want
+  to key replay rows to a route segment instead.
+- **`ReplayList` and `AppetiteCard` both mount `useWysState`,** which pulls
+  `content/watch-your-step/domains.ts` into the client bundle. That is the
+  intended path for a state-reading component and is why this route's first-load
+  JS sits with Today's and Progress's rather than with the ship pages'.
+
+---
+
+# Phase 7 (Progress view) — evidence, not a score
+
+**Scope:** `/watch-your-step/progress` only (plan Phase 7, the Progress row;
+mockup `5b` Progress, dc.html:121-145; WYS §13). Built on the Phase 7 shell;
+nothing shared was edited.
+
+## What shipped
+
+| Deliverable | Files |
+|---|---|
+| The route: static, no redirect, no dynamic segment | `app/watch-your-step/(shell)/progress/page.tsx` |
+| The whole state-dependent screen — tiles, judgment rows, rulebook | `app/watch-your-step/(shell)/progress/ProgressView.tsx` |
+| Its geometry | `app/watch-your-step/(shell)/progress/progress.module.css` |
+| Two canonical records, the pinned labels, the four tiles, the pure derivations | `content/watch-your-step/progress.ts` |
+| Registration | `content/watch-your-step/index.ts` (`wysCanonicalRecords` + `WYS_NON_RECORD_MODULES`) |
+| 22 checks | `tests/wys-progress.test.ts` |
+
+`/watch-your-step/progress` builds `○` (Static). `npx tsc --noEmit` is clean for
+these files.
+
+## Decisions this phase made, with reasons
+
+- **§13's do-not-show list is held as an ABSENCE, not as a rule a component
+  remembers.** Nothing in `content/watch-your-step/progress.ts` divides one count
+  by another, and `tests/wys-progress.test.ts` asserts that there is no division
+  operator left in the module once comments, import paths and string literals are
+  removed. A percentage cannot be rendered by a screen whose data layer cannot
+  compute one. The same test scans the view and the stylesheet for `%`, "streak",
+  "XP", "badge", "ranking", "behind", "overdue" and "on track".
+- **"stops completed" reuses `visitPositionFor`.** The alternative,
+  `completedLessonIds.length`, counts visits: a half-finished two-day stop would
+  have read as a completed stop, and Today's "visit 2 of 3" would have disagreed
+  with Progress on the same browser.
+- **"judgments committed" is a union, so the tile is true whichever writer ran.**
+  §13's completion semantics make the committed judgment the thing that completes
+  a scenario, so `completedScenarioIds` and the keys of `localJudgments` describe
+  one fact. See the gate request below — `JudgeCard` writes only the second.
+- **The whole body is one client component.** Every mark on the screen except the
+  title and the denominators comes from `wys:v1`. Splitting it would have meant
+  three components each calling `useWysState`, three reads, and three chances to
+  disagree about `loaded`.
+- **A blocked record's prose is stripped before it crosses the client boundary.**
+  `withheldTextRemoved` in `page.tsx`. Props of a client component are serialised
+  into the RSC payload, which ships inside the HTML and is public page source —
+  so "`GatedText` never renders it" and "it is not published" are different
+  promises. Verified on the built page: `progress.html` contains none of the
+  twelve draft scenario titles and twelve provenance labels in their place.
+- **The learner's rulebook goes through the same gate as everything else,**
+  constructed at `published` + `LEARNER_OWNED` (`learnerRuleProvenance`). Q21's
+  flag is about *Ben's* unapproved prose; blanking a learner's own rules with it
+  would be absurd, and `published` is literally true — nobody is waiting to
+  approve them.
+- **Both Q20 flags gate their own section.** With `PERSIST_LOCAL_JUDGMENTS` false
+  nothing can ever write a judgment row, so the section does not render; with
+  `SHIP_LEARNER_RULEBOOK` false the rulebook, its footnote and its export do not
+  render. Both default ON, matching the artboard. Config edits, not component
+  edits (WYS §35).
+- **Delete is two-step.** One tap next to Edit on a 44px target would otherwise
+  destroy something the learner wrote and cannot recover. `Delete` →
+  `Confirm delete` / `Cancel`.
+- **The export is client-side and is the learner's lines only** — no header, no
+  ids, no timestamps, no branding. `rulebookAsText` decides that, so the shape of
+  the file is a unit test rather than a browser check.
+- **Progress fires no telemetry.** No allowlisted event names this screen as its
+  firing point (WYS §19.4), and (WYS §16) forbids sending the rulebook to
+  analytics at all. Asserted by test: the view and the page contain no
+  `trackWys`, no `sendAggregate`, no `fetch(` and no `sendBeacon`.
+
+## Requests for the gate — shared files this phase did NOT edit
+
+1. **`GatedText` needs a size/tone variant.** It renders one fixed body (16px
+   `--ink`); the `5b` Progress lead is 15px `--body` and its rulebook footnote is
+   13px `--muted`. This screen composes `ProvenanceMarks` + `ProvenanceMono`
+   directly instead (see `GatedLine` in `ProgressView.tsx`, and R9). With a
+   variant prop it would use the shared component and delete its helper.
+2. **`KvRow` cannot hold a block-level provenance line.** It renders its label
+   inside a `<span>`, and a withheld title renders as `ProvenanceMono`, which is
+   a `<p>`. Progress restates `KvRow`'s geometry to the pixel rather than ship
+   invalid nesting. A node-tolerant container (or a `block` variant) would let
+   this screen and the Data page use the shared row.
+3. **`JudgeCard` does not record scenario completion.** It writes
+   `localJudgments[scenarioId]` but not `progress.completedScenarioIds`, while
+   (WYS §13)'s completion semantics make the committed judgment the thing that
+   completes a scenario. Progress takes the union of the two so its tile is true
+   today; the completion record still belongs at the point of commit.
+4. **`canonicalCollisions` should gain the "Inspect local data" row** (see R3):
+   the Data page is named a fifth way on `5b` Progress, and this screen collapses
+   it to the Q6-pinned link label. The register and its asserted count are in
+   `content/watch-your-step/copy.ts` and `tests/wys-content.test.ts`.
+5. **`tests/preserved-surfaces.test.ts` should add `/watch-your-step/progress`**
+   to the served-URL assertions now that the route exists — the shell recorded
+   this for whichever phase touches that file.
+6. **The RSC-payload exposure is general.** Any server page handing a blocked
+   `GatedContent` to a client component publishes the withheld prose in the page
+   source; `JudgeCard`'s `judgment.content` prop has the same shape. Consider
+   moving the strip into `lib/wys/content-gate.ts` so it cannot be forgotten.
+
+## Hazards this phase creates for later phases
+
+- **The CSS-module import count is a shared TOTAL.** This view adds ONE:
+  `ProgressView.tsx`. Re-measure at the gate; do not average the figures the five
+  view builders each wrote.
+- **The Data page (Phase 8) and Progress both render the rulebook's existence.**
+  Progress owns the rows and the controls; the Data page should render the COUNT
+  from `WYS_DATA_PAGE_ROWS` and link here, not grow a second editor (§5.1).
+- **`content/watch-your-step/progress.ts` is imported by a client component.** It
+  deliberately does not import `./weeks.ts` — the stops arrive as a projection
+  from the server page — so that the curriculum, with its draft prose, stays out
+  of the browser bundle. Keep it that way.
+
+---
+
+# Phase 7 (Lesson Zero) — the ten-step onboarding flow
+
+Surface owned: `/watch-your-step/start` only. Everything shared was imported,
+not rebuilt: `CourseScreen` is deliberately **not** used (Lesson Zero has its
+own chrome — the pill, the counter and the rail — and no title/meta header),
+but `JudgeCard`, `ProvenanceMarks`, `ChoiceRow`, `ActionPill`, `Pill`,
+`ProgressRail`, `BenSlot`, `DraftMark`, `ProvenanceMono`, `useWysState`,
+`lib/wys/content-gate.ts` and `lib/wys/telemetry.ts` all are.
+
+## What shipped
+
+- `content/watch-your-step/lesson-zero.ts` — the ten steps and the eight screens
+  as data, eleven canonical records, one Ben slot, the pinned labels, and the
+  two scenario/judgment id pins. Registered in `./index.ts` in `wysRegistry`
+  (the slot) and in `wysCanonicalRecords` (the copy), in the same commit, per
+  §7.5.
+- `components/wys/LessonZero/LessonZeroFlow.tsx` — the whole flow as one client
+  component: the step index, the three selections, the JUDGE mount and the two
+  telemetry firing points.
+- `components/wys/LessonZero/lesson-zero.module.css` — the flow's own geometry
+  and the four compositions no shared primitive draws (the ink habit card, the
+  2×2 pace grid, the BEFORE YOU START · DATA card, the step-10 takeaway).
+- `app/watch-your-step/(flow)/start/page.tsx` — the server half. Gates every
+  string at build time and hands the client `GatedContent` objects.
+- `tests/wys-lesson-zero.test.ts` — 23 checks: the §9.1 sequence, the screen
+  cover, the artboard's three rail widths and its counter strings, the whole
+  §9.2 prohibition list as regexes over the flow's three source files, "no
+  `<input>` / `<textarea>` / `contentEditable` / `<form>` anywhere", the §9.3
+  takeaway resolving to `canon`, the habit line character for character,
+  provenance and registration for every record, R10 (no first person), the slot
+  being unfillable, the pace vocabulary being imported rather than retyped, the
+  consent-bound data line, the two allowlisted events and nothing else, and the
+  absence of streak/XP/badge/behind/overdue vocabulary.
+
+Measured at the gate: `npx tsc --noEmit` clean · `npm test` 385/385 ·
+`PORT=3999 npm run build` green, **`/watch-your-step/start` builds `○ (Static)`**
+at 3.65 kB / 127 kB first load, zero `ƒ` in the whole route table ·
+`scripts/check-no-deletions.sh` clean · no `tsconfig.tsbuildinfo`.
+
+## Decisions this phase made, with reasons
+
+All fourteen are in `docs/facelift-unapproved.md` under "Phase 7 (Lesson
+Zero)". The four that other phases need to know about:
+
+1. **Step 4 is its own screen** (LZ2). The sequence is ten and the artboard
+   counts "5 of 10" on the exercise; the habit renders twice, from one record.
+2. **Ten steps, eight screens** (LZ3), because `5a`'s third phone is a
+   composite. Steps and screens are declared separately and the test asserts
+   the cover.
+3. **The exercise renders borderless** (LZ4), because `5a` draws no border. This
+   is the one place Lesson Zero re-implements something a shared component
+   nearly does — see the change request below.
+4. **The "Sent: coarse counts" line is selected from the consent state** (LZ9),
+   not asserted flatly. Phase 8 owns the same sentence on Data card 2 and should
+   use the same two records rather than adding a third.
+
+## Change requests for the gate — NOT made here
+
+This phase edited no shared component and no shared test. Two changes would be
+improvements and both belong to whoever owns the shared surface:
+
+- **`components/wys/ScenarioCard.tsx` wants a `bordered` prop** (default
+  `true`). `5b` Today draws the hairline; `5a` step 5 does not. With the prop,
+  Lesson Zero drops `.scenarioBody` / `.scenarioDecision` / `.exercisePill` from
+  its own module and both surfaces render from one component. Without it, two
+  files describe the same card.
+- **`tests/class-contract.test.ts`'s CSS-module import count.** Lesson Zero
+  contributes **exactly one** import — `components/wys/LessonZero/LessonZeroFlow.tsx`
+  importing `./lesson-zero.module.css`. The page file imports no module. At the
+  time of writing the assertion reads 48 and the measured count is 48, so the
+  number is already correct with this surface in it; if a later merge changes
+  it, Lesson Zero's contribution is 1.
+
+## Hazards this phase creates for later phases
+
+- **`/watch-your-step/today` is now a real destination.** Step 10's terminal
+  control links there and `onboarding.completed` is true by the time it is
+  pressed, so the §5.4 "stateless visitor redirects to `/start`" branch must not
+  bounce a learner who has just finished. Today owns that check; Lesson Zero
+  only guarantees the flag is written first.
+- **`Change pace or time` on Plan points back here** (`planLabels.changePaceHref`).
+  The flow always opens at step 1 (LZ12), so a learner sent from Plan re-walks
+  the ten steps. If that becomes unacceptable it is a Plan-side decision about a
+  different destination, not a new `wys:v1` field.
+- **Two more `wys:*` writers exist.** Lesson Zero writes `startedAt`,
+  `lastOpenedAt`, `onboarding.postureChoice`, `onboarding.cadence`,
+  `onboarding.timeBudget` and `onboarding.completed`. The Data page renders all
+  six from `WYS_TOP_LEVEL_FIELDS`; nothing new needs listing.
+- **`wys_start` and `wys_onboarding_complete` are now wired** and are the only
+  two events this surface fires. The §19.4 decision table's "wired but unfired"
+  set is unchanged (`wys_view`, `wys_transfer_check_complete`).
+- **Eleven new canonical records** are in `wysCanonicalRecords`, five of them at
+  `IMPLEMENTATION_PLACEHOLDER`. Anything that counts records, or that asserts
+  "every canon record names its variant sources", sees them.
+
+---
+
+# Phase 7 — gate
+
+The gate re-ran everything, verified each Exit criterion against build artifacts
+rather than against the implementers' reports, and fixed four things. The
+implementers' six reports are above and remain accurate except where this
+section corrects them.
+
+## What was verified, and with what evidence
+
+| Exit criterion | Evidence |
+|---|---|
+| A new learner completes onboarding and one full WATCH → TRY → JUDGE → CARRY session | Verified as capability by building with `RENDER_MARKED_DRAFT = true` and reading the prerendered `today.html`: **3 choice buttons, 1 Commit pill, the CARRY card, and no judgment and no distribution in the pre-commit HTML.** The constant was restored to `false` immediately. Under the ratified Q21 default the TRY/JUDGE half is withheld on every surface — see "The one criterion that is narrowed" below. |
+| Analytics blocked, **zero** API calls beyond static assets | `grep -rnE "fetch\(|XMLHttpRequest|sendBeacon|WebSocket|EventSource|axios" app components lib content` → **no matches**. The only chunks containing `fetch(` are `main-*.js` and the shared framework chunk — Next.js's own router prefetching `.rsc` files, which are static. `sendAggregate` returns `{sent:false,reason:"disabled"}` and there is no endpoint; `app/api/` does not exist. |
+| No account, free text, upload, microphone or chat interface | Rendered-DOM scan of all 33 prerendered pages for `<input> <form> contenteditable type="file" <audio> <video> getUserMedia MediaRecorder` → **one hit: the `<textarea>` on `/watch-your-step/practice`**, which is (WYS §15.1)'s mandated scratch box. `components/wys/FromMemory.tsx` holds one `useState` and a `usePathname` clear — no `useWysState`, no `localStorage`, no `trackWys`, no network. The Progress rulebook `<textarea>` is (WYS §16)'s single declared learner-authored field, capped at 240 chars, local-only. No sign-in, sign-up, password, email or account string anywhere on a course surface. |
+| The judgment is unreachable before commit | `judgeReveal(state).judgment === state.committed`, unit-tested over every reachable state; `JudgeCard` renders the whole revealed block conditionally, not with CSS. Confirmed in the served HTML with Q21 flipped: choices and Commit present, `BEN'S JUDGMENT` and `How others answered` **absent**. |
+| No streak / XP / score / percentage / "behind" / guilt copy | Rendered-DOM regex over all 33 pages for `streak\|xp\|badge\|leaderboard\|ranking\|level N\|behind\|overdue\|missed\|trust score\|privacy score\|\d+%`. Two hits, both benign and checked in context: Progress's approved **denial** "No score, no streak, no percentage.", and an inline `style="width:10%"` on Lesson Zero's progress rail (a CSS value, not copy). |
+| The scratch canary appears in no analytics call, no request and no `wys:*` key | `tests/wys-practice.test.ts` drives `DO_NOT_SEND_WYS_TEST_9f31` through the **real** `validateWysEvent` and the **real** `sanitizeWysState`: rejected under every allowlisted property key, rejected as an event name, and stripped from `postureChoice`, `replayCounts`, `localJudgments`, `lastRoute` and `dismissedNotices`. It survives only in `rulebook[].text`, which is correct — that is the one declared learner-authored field. |
+| Every course route is `○` or `●`, zero `ƒ` | 35 static pages, 25 routes: 24 `○`, 1 `●` over 9 stop ids, **zero `ƒ`**. No `export const dynamic`, no `force-dynamic`, no `revalidate` anywhere in `app/`. |
+| Deletion contract | `scripts/check-no-deletions.sh` clean; `git diff --name-only --diff-filter=D main...HEAD` and `--diff-filter=R` both empty, working tree included. |
+
+## What the gate fixed
+
+**1 · Withheld prose was published in the page source (three surfaces).**
+Every course screen is a server component that hands `GatedContent` to a client
+component, and React serialises every client prop into the RSC flight payload
+that Next.js inlines into the prerendered `.html`. Three of the six Phase 7
+surfaces wrote a local `redactIfBlocked` / `withheldTextRemoved` for this; the
+three that did not shipped the leak. Found by grepping the built HTML, not by
+review:
+
+- `plan.html` — all nine draft stop titles, in full, in the payload;
+- `start.html` — the leaking-pipe scenario's setting, decision moment and four
+  choice labels;
+- `stop/*.html` — the **whole `WysStop` record**, title and purpose included,
+  because `VisitCountableStop` is structurally typed and a wide object satisfies
+  it without complaint.
+
+Fixed at the chokepoint rather than a fourth time locally: `gateProse` and
+`gateCanonical` now empty `text` when `policy.kind === "blocked"`
+(`withoutBlockedProse` in `lib/wys/content-gate.ts`). `label`, `origin`,
+`surfaceKind` and `policy.reason` all survive, so the withheld state still says
+whose words are missing. The `"preview"` surface (§6.11) still resolves `marked`
+and still sees the prose, so the draft preview tooling is unaffected, and
+flipping Q21 restores the words with no component change. The three local
+helpers were removed — one canonical definition (§5.1 applied to code) — and
+`lib/wys/visit.ts` gained `visitCountableStop()`, a named projection that
+`/stop/[stopId]`, Today and Progress all pass their stops through.
+
+**2 · Today rendered four bare draft choice labels under a provenance line
+saying the words were missing.** The §6.2 failure exactly, and visible on
+screen, not just in the payload. Today gated `setting` and `decisionMoment` but
+`WysScenario.choices[].label` is a bare string on its way to `ChoiceRow`, so it
+went through ungated. A scenario cannot be half-withheld: the honest states are
+the whole exercise or none of it. `allShowable()` now states that rule in the
+gate; `TodayJudgeView` gained an `exercise: {...} | null` field with the same
+shape Practice already serialises; the TRY card still renders and says what it
+is waiting for. Lesson Zero already applied this rule and its own comment gives
+the reason — "four lettered options with no text is not a decision surface" —
+so all three surfaces now agree.
+
+**3 · The Stop H terminal surface did not exist.** `/watch-your-step/end` is a
+declared route in §5.2 and in `WYS_ROUTES`, it is a Phase 7 task row, and
+`lib/wys/telemetry.ts`'s decision table declares `wys_course_complete` as
+`firedInV0: true` with "Stop H terminal surface reaches its completed state" as
+its firing point. Shipping the table without the surface left the build claiming
+a measurement it could not take — an R8 problem, fixed in architecture. Built:
+`content/watch-your-step/end.ts` (one Ben slot, five pinned names, **no
+prose**), `app/watch-your-step/(flow)/end/page.tsx` (static, `(flow)` group so
+no tab bar) and `CourseCompleteMark.tsx`. The event fires on the terminal stop's
+**derived completed state**, never on arrival — opening is not completion. The
+route was unreachable, so the terminal stop's own page now carries the one door
+into it (`week.terminal ? <LinkRow href="/watch-your-step/end">`).
+
+**4 · The rulebook export had one definition and needed two surfaces.**
+`downloadRulebook` moved out of `ProgressView` into
+`components/wys/RulebookExport.tsx`; Progress and the terminal surface now share
+it, so the two screens cannot export two different shapes of the same file.
+
+Test count 385 → 395. `tests/wys-shell.test.ts` gained the gate invariants (a
+blocked record carries no prose; the preview surface still does; no surface
+keeps a second redaction helper; a stop crosses as a projection) and the
+terminal-surface suite. `tests/wys-today.test.ts`, `tests/wys-practice.test.ts`
+and `tests/wys-progress.test.ts` had their boundary tests rewritten from
+"grep this file for a local helper" to behavioural assertions against the real
+gate and the real content. `tests/wys-plan.test.ts`'s optional-practice dedup
+test now compares ids rather than rendered text, which is what it always meant.
+
+## The one criterion that is narrowed, and why
+
+**"A new learner completes … one full WATCH → TRY → JUDGE → CARRY session" is
+not true of the shipped default, and cannot be made true without answering
+Q21.** Every scenario, choice label and judgment body in
+`content/watch-your-step/` is `draft` + `IMPLEMENTATION_PLACEHOLDER` (handoff
+README bucket 3 requires that), and Q21 ships `RENDER_MARKED_DRAFT = false` —
+the spec's literal whitelist, ratified. So WATCH and CARRY render, and TRY/JUDGE
+renders as a labelled withheld card on Today, Lesson Zero and Practice alike.
+
+This is not fixed with copy and it is not fixed by editing a `status` field. The
+machine is built, unit-tested over every reachable state, and **verified working
+end to end** by the temporary flip recorded in the table above. One constant in
+`lib/content-status.ts` turns the course on. **Shipping the public course with
+draft scenario prose requires Ben's answer to Q21** — restated here because it
+is now the only thing between this build and a runnable loop.
+
+## Hazards this gate hands to the next phase
+
+**1 · Draft curriculum prose is in the client JS bundle, and the gate did not
+fix it.** The rendered DOM and every RSC payload are clean (verified above), but
+two shared client chunks carry **77 draft strings** — every stop title and
+purpose, every scenario setting, and every choice label. Reproduce with:
+
+```
+rm -rf .next && PORT=3999 npm run build
+grep -c "Task Before Prompt" .next/static/chunks/*.js      # weeks.ts prose
+grep -c "Declining a client meeting" .next/static/chunks/*.js  # scenarios.ts prose
+```
+
+The cause is four import edges from client-reachable content modules into the
+two modules that hold the prose:
+
+| Edge | Reaches the client through |
+|---|---|
+| `domains.ts` → `scenarios.ts`, `weeks.ts` | `WYS_DOMAINS`, imported by ~10 client components |
+| `copy.ts` → `weeks.ts` (`stopCount`, `countWord`) | `today.ts` / `progress.ts` → `CarryMark`, `TimeBudgetNote`, `ProgressView` |
+| `tabs.ts` → `weeks.ts` (`stopLetter`) | `BottomNav` |
+| `variants.ts` → `scenarios.ts` | `practice.ts` → `ReplayList`, `AppetiteCard`, `FromMemory` |
+
+`domains.ts`'s own header comment already argues this exact point about
+`config.ts` and then does the same thing itself. The fix is a prose-free
+`content/watch-your-step/ids.ts` that `weeks.ts` and `scenarios.ts` import
+**from** (so the derived-count rule of §6.9 still holds and drift is a build
+failure), with `domains.ts`, `copy.ts`, `tabs.ts` and `variants.ts` pointed at
+it. That is a deliberate refactor of committed Phase 6 substrate across eight
+modules; the gate measured it, scoped it and left it rather than half-doing it
+on a green tree. **It is not an exit criterion and it falsifies no public
+claim today** — the strings are labelled placeholder curriculum, not Ben's
+words and not learner data — but Q21's stated posture is that draft material
+"simply is not public", and a JS chunk served to every visitor is public. Do
+this before the Data page makes any claim about what the site serves.
+
+**2 · The judgment body will be in the RSC payload before commit once Q21
+flips.** `JudgeCard` must hold the judgment client-side to reveal it with no
+network call, so when `RENDER_MARKED_DRAFT` becomes `true` the body ships in the
+payload while the on-screen invariant still holds. "Not in the DOM before
+commit" stays true; "not in the page source" does not. Architecturally
+unavoidable without a request, which the zero-API-calls criterion forbids.
+State it; do not discover it.
+
+**3 · `/watch-your-step/data` is still a dead tab.** The five-item bottom nav
+ships as the plan requires and the Data tab 404s until Phase 8 lands
+`app/watch-your-step/(shell)/data/page.tsx`. Add all five tab URLs to
+`preserved-surfaces.test.ts`'s served-URL assertions in that phase.
+
+**4 · `/watch-your-step/end` is reachable only from `/stop/stop-h`.** No
+artboard draws a door into it — `5b`'s dashed "the end" row has nothing behind
+it. If Plan should link the terminal row instead, that is a one-line change in
+`PlanStops.tsx` and a Ben question about the row's behaviour.
+
+**5 · Five strings on the terminal surface are authored** and are on the
+Final-copy list (`docs/facelift-unapproved.md` §G). The screen makes no outcome
+claim, tested for.

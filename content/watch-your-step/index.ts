@@ -18,11 +18,17 @@ import { artifactCanonicalRecords, wysFictionalArtifacts } from "./artifacts";
 import { wysBoundaries } from "./boundaries";
 import { wysCarries } from "./carries";
 import { wysCopyRecords } from "./copy";
+import { endBenSlots } from "./end";
+import { judgeCopyRecords } from "./judge";
 import { wysJudgments } from "./judgments";
+import { lessonZeroBenSlots, lessonZeroCopyRecords } from "./lesson-zero";
+import { practiceCopyRecords } from "./practice";
 import { wysPrinciples } from "./principles";
+import { progressCopyRecords } from "./progress";
 import { wysRituals } from "./rituals";
 import { wysScenarios } from "./scenarios";
 import { wysBenSlots, wysSources } from "./sources";
+import { todayBenSlots, todayCopyRecords } from "./today";
 import { wysVariants } from "./variants";
 import { wysWeeks } from "./weeks";
 
@@ -61,6 +67,9 @@ export const wysRegistry: readonly WysRegistryGroup[] = [
   { module: "content/watch-your-step/artifacts.ts", records: wysFictionalArtifacts },
   { module: "content/watch-your-step/rituals.ts", records: wysRituals },
   { module: "content/watch-your-step/carries.ts", records: wysCarries },
+  { module: "content/watch-your-step/today.ts (Ben slot)", records: todayBenSlots },
+  { module: "content/watch-your-step/end.ts (Ben slot)", records: endBenSlots },
+  { module: "content/watch-your-step/lesson-zero.ts (Ben slot)", records: lessonZeroBenSlots },
   { module: "content/watch-your-step/weeks.ts", records: wysWeeks }
 ];
 
@@ -72,6 +81,11 @@ export const wysContentObjects: readonly WysGovernedObject[] = wysRegistry.flatM
 /** Every canonical text record the WYS content modules define. */
 export const wysCanonicalRecords: readonly AnyCanonicalText[] = [
   ...wysCopyRecords,
+  ...judgeCopyRecords,
+  ...lessonZeroCopyRecords,
+  ...practiceCopyRecords,
+  ...progressCopyRecords,
+  ...todayCopyRecords,
   ...artifactCanonicalRecords
 ];
 
@@ -89,6 +103,29 @@ export const WYS_NON_RECORD_MODULES: readonly string[] = [
   "day-plans.ts",
   "domains.ts",
   "index.ts",
+  // Phase 7 (shell). `judge.ts` carries a canonical record and no governed
+  // object, so it is registered in `wysCanonicalRecords` above rather than in
+  // `wysRegistry`; `tabs.ts` carries route labels, like `content/nav.ts`, and
+  // no records at all.
+  "judge.ts",
+  // Phase 7 (Plan view). `plan.ts` carries the pace vocabulary and the Plan
+  // row labels — no records, on the same reasoning `tabs.ts` and `judge.ts`'s
+  // `judgeLabels` use: a control name of four words or fewer is a label, not a
+  // claim. Its two presentations of one node are what stop Lesson Zero and Plan
+  // describing the same pace two ways (§6.8).
+  "plan.ts",
+  // Phase 7 (Practice view). `practice.ts` carries four canonical records —
+  // registered in `wysCanonicalRecords` above — plus the Practice labels and
+  // `replayOptionsFor()`, which derives (WYS §14)'s two deterministic modes
+  // from the scenario bank and enforces the invariant rule at the point of
+  // use. No governed object of its own, so it takes `judge.ts`'s route.
+  "practice.ts",
+  // Phase 7 (Progress view). `progress.ts` carries two canonical records —
+  // registered in `wysCanonicalRecords` above — plus the tile labels and the
+  // pure count derivations, and no governed object, so it takes the same route
+  // `judge.ts` does rather than a `wysRegistry` group.
+  "progress.ts",
+  "tabs.ts",
   "types.ts",
   "version.ts"
 ];

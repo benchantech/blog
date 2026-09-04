@@ -318,7 +318,7 @@ export interface CanonicalCollision {
 /**
  * The list §6.8 requires this phase to record. It is data rather than a
  * paragraph in a doc so the §38 report and the unapproved register can both
- * render the same six rows from one place.
+ * render the same rows from one place.
  */
 export const canonicalCollisions = [
   {
@@ -355,6 +355,14 @@ export const canonicalCollisions = [
     concept: "The Ship's Log node",
     conflict: "The 4a nav says Ship's Log; the governance chip row says Log.",
     resolution: "Ship's Log everywhere; the chip row change is a copy amendment to Final copy.",
+    escalated: true
+  },
+  {
+    id: "collision-commit-label",
+    concept: "The JUDGE Commit pill",
+    conflict: "4a punctuates it \"Commit — then see Ben's take\"; 5b Today punctuates it \"Commit, then see Ben's take\".",
+    resolution:
+      "The 5b form is pinned in ./judge.ts, because a course string follows the course artboard; the 4a hero renders it, which amends Final copy.",
     escalated: true
   },
   {
