@@ -200,11 +200,60 @@ the first module that lands is noticed.
 
 ---
 
+## 3b. Phase 4 re-measure — the identity swap
+
+Measured at the Phase 4 gate, same commands, same machine. Recorded here so the
+Phase 0 floor and the post-restyle numbers sit side by side rather than in two
+documents.
+
+| | Phase 0 baseline | Phase 4 |
+|---|---|---|
+| `npm test` | 31 tests, 0 fail | **169 tests, 0 fail** |
+| "Generating static pages (n/n)" | 14 | **14** |
+| Route rows printed by `next build` | 12 | **12** |
+| Markers | all `○`, zero `ƒ`, zero `●` | **all `○`, zero `ƒ`, zero `●`** |
+| Shared First Load JS | 102 kB | **102 kB** |
+| `/` route size / First Load JS | 2.77 kB / 109 kB | **2.77 kB / 109 kB** |
+| Every other route | 147 B / 103 kB | **147 B / 103 kB** |
+| `scripts/check-no-deletions.sh` | exit 0 | **exit 0** |
+
+**No route was added and none was removed.** In particular there is **no
+`/dev/primitives` route**: the primitives preview is `scripts/preview-primitives.mjs`,
+a script dump, per §6.11's build-now default. A page that returns `null` still
+yields a prerendered, publicly reachable URL and still inflates this very
+regression floor, so the preview was kept out of `app/` entirely and this table
+needs no dev-route exception.
+
+**First Load JS is unchanged, not merely "at or below".** The 26 primitives built
+in this phase are not imported by any route yet, so they contribute nothing to the
+bundle. The number to watch is what happens as Phases 5–10 mount them.
+
+### 3b.1 Stylesheet, after
+
+| | Phase 0 | Phase 4 |
+|---|---|---|
+| `app/globals.css` | 933 lines | **1176 lines** (largely the token and rule comments §4.2 requires beside each token) |
+| Render-blocking `@import` | line 1 | **none — removed, the build's one intentional line-level removal** |
+| Font loading | CSS `@import` (Spectral + IBM Plex Mono) | `next/font/google`: IBM Plex Sans 400/500/600 + italic, IBM Plex Mono 400/500/600/700 |
+| CSS Modules | 0 | **3 stylesheets, 25 import statements** (`modulesChecked === 25`, asserted exactly) |
+| Retired class families | — | `.dimension-line`, `.plan-foyer`, `.scale-line`, `.scale-bar` — markup and every selector, together (`grep -c` returns 0 for each) |
+
+`.hero-principle`, `.card-eyebrow`, `hero-foyer` and `secondary` are **still
+registered** in their two registers and were deliberately not resolved here.
+Phase 10 empties both.
+
+**One new build-loop fact:** `next build` now fetches the font files from Google
+on a cold cache and prints `Retrying 1/3...` while it does. A build with no
+network will fail differently than it did before this phase; the files are cached
+under `.next` after the first successful build.
+
+---
+
 ## 4. How to re-measure
 
 ```sh
 cd /Users/benchan/yy/benchantech
-npm test                      # 31 tests at the end of Phase 0
+npm test                      # 31 tests at the end of Phase 0; 169 at the end of Phase 4
 PORT=3999 npm run build       # never `npm run dev` — it blocks
 scripts/check-no-deletions.sh # exits 0; both --diff-filter=D and =R print nothing
 ```

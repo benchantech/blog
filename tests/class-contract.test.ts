@@ -266,9 +266,19 @@ test("mode 2: every styles.<key> resolves to a class in its sibling .module.css"
   }
 
   assert.deepEqual(failures, [], "unresolved CSS Module class references");
-  // Today this repo has no CSS Modules; the check is live for the surfaces the
-  // later phases add, and this records that the zero is measured, not assumed.
-  assert.equal(modulesChecked, 0, "no .module.css files exist yet — update this count when they do");
+  // Phase 4 established the CSS Modules boundary (plan §4.1): every NEW surface
+  // and primitive is scoped, because `.hero`, `.eyebrow`, `.brand`,
+  // `.detail-page`, `.section-heading`, `.option-grid`, `.primary`, `.secondary`
+  // and `.compact` are already taken globally and a new component using one of
+  // those names would silently inherit blueprint geometry with no compile error.
+  //
+  // The count is asserted EXACTLY, not as a floor. It is the number of
+  // `.module.css` IMPORT STATEMENTS across app/ and components/ — three shared
+  // stylesheets (components/ui, components/wys, components/provenance) imported
+  // by 25 primitives. A later phase that adds a primitive updates this number
+  // deliberately; that is the point of the assertion, and it is what stops a
+  // module quietly falling out of coverage.
+  assert.equal(modulesChecked, 25, "CSS Module imports across app/ and components/ — update deliberately");
 });
 
 /* -------------------------------------------------------------------------- */

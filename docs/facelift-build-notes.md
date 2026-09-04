@@ -793,3 +793,302 @@ the same 14 static pages, `/` at 2.77 kB / 109 kB, shared 102 kB, every route
 `scripts/check-secrets.sh` and `scripts/guard-next-build.mjs`;
 `components/ConsentBanner.tsx` differs from `main` only by the Phase 2
 `try/catch` blocks and the removed `declare global` block.
+
+---
+
+## 10. Phase 4 — design system
+
+The identity swap. This is the phase the whole restyle turns on: after it, all
+eleven preserved routes render in the new register with **zero** copy, href or
+metadata change.
+
+### 10.1 What landed
+
+| Area | Files |
+|---|---|
+| Fonts via `next/font/google`; the `@import` at `app/globals.css:1` removed | `app/layout.tsx`, `app/globals.css` |
+| Facelift token set + usage-rule comments + the legacy alias block | `app/globals.css` |
+| Blueprint geometry replaced; STRUCTURAL section fenced; interaction layer authored | `app/globals.css` |
+| Blueprint scaffolding retired — markup and every selector in each family, together | `app/page.tsx`, `app/globals.css`, `tests/class-contract.test.ts` |
+| Provenance components whose types Phase 1 fixed | `components/provenance/*` |
+| The §4.8 primitive inventory | `components/ui/*`, `components/wys/*` |
+| Primitives preview at 1280 and 390, as a script dump, not a route | `scripts/preview-primitives.mjs`, `scripts/css-module-hooks.mjs` |
+| Every NEW/unapproved visual decision, in one list for Ben | `docs/facelift-unapproved.md` (new) |
+
+### 10.2 The one intentional line-level removal, executed
+
+`app/globals.css:1` was:
+
+```
+@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:…&family=Spectral:…");
+```
+
+It is gone, and `app/layout.tsx` now loads both families through
+`next/font/google`. That is **the single intentional line-level removal in the
+whole build** (plan §3.0). A CSS `@import` serialises a second round trip before
+first paint, and it must be the first at-rule in a sheet — so it had to go before
+any new at-rule could be added.
+
+**The weight set is decided by the preserved stylesheet, not by the artboards.**
+Sans **400/500/600 with `style: ["normal","italic"]`**, Mono **400/500/600/700**.
+The artboards need less than that. The preserved rules do not: the aliasing in
+§4.4 points `--mono` and `--serif` at these same two faces, and loading fewer
+weights would produce browser-synthesised faux-bold and faux-italic on every
+preserved page — with no compile error, no type error and no test failure. That
+regression is invisible to every test in this plan, which is why the decision is
+written down rather than inferred.
+
+**Build-loop consequence, recorded because it is new:** `next build` now fetches
+the font files from Google on a cold cache. The build output shows
+`Retrying 1/3...` lines while it does. A build on a machine with no network will
+fail differently from before this phase. The files are cached in `.next` after
+the first successful build.
+
+### 10.3 Token aliasing — why figure and ground did not collapse
+
+Every legacy token NAME is kept and re-pointed. The trap the plan flags is real:
+`body` is painted `var(--paper)` and 19 rules paint sections, cards, result
+panels and detail callouts with `var(--sheet)`. Mapping **both** onto `--white`
+would have rendered the hero, the router card, the result panels and the detail
+callouts white-on-white and structurally invisible after the aliasing step alone.
+
+What shipped preserves the three-step ground → card → accent ramp the legacy
+rules assume:
+
+```
+--paper       -> var(--white)       body ground
+--sheet       -> var(--tint-grey)   card / section fill  (NOT white)
+--plan        -> var(--tint-teal)   accented block fill
+--ink-soft    -> var(--body)
+--dimension   -> var(--muted)
+--blueprint   -> var(--accent)
+--line        -> var(--border-row)
+--line-strong -> var(--border-pill-strong)
+--focus       -> var(--accent)      replaced, never removed
+--serif       -> var(--sans)        Spectral retired, name kept
+--ink         -> #16202B            redefined, name kept (was #1b2430)
+--max         -> 1280px             was 1120px
+```
+
+**Aliasing alone yields a legible intermediate, not the finished restyle.** The
+second, budgeted task did the rest: the radii, the two shadows, the inset-slab
+rhythm, the removal of the graph-paper hatch and the 2px architectural rules, and
+the replacement of the inverted hover treatment.
+
+### 10.4 The STRUCTURAL fence, and its three notes
+
+Fenced and commented in `app/globals.css`. Only the token VALUES inside those
+rules changed.
+
+1. **`:focus-visible` kept at 3px/3px.** The handoff README's 2px is its own word
+   "suggested", so this is a choice, not an authority conflict. The existing
+   geometry already ships and `/accessibility` publishes a claim measured against
+   it. Only `--focus` changed. Reported in `docs/facelift-unapproved.md` §B4.
+2. **`main { overflow: hidden }` moved OUT of the fence** and became
+   `overflow-x: clip`. It clipped both axes on the element wrapping every page,
+   which would cut `--shadow-demo`'s 80px blur and the demo card's deliberate
+   overhang. The page still cannot scroll sideways.
+3. **`html { scroll-behavior: smooth }` stayed INSIDE the fence, paired with its
+   `prefers-reduced-motion` override.** Both halves carry a comment naming the
+   other. Dropping either one alone turns a published accessibility behaviour
+   into a silent no-op.
+
+The shared container rule kept its single-rule **mechanism** and changed its
+**value**: `width: min(100%, var(--max)); margin-inline: auto;
+padding-inline: var(--gutter)`, with `--gutter` at 56px desktop and 22px mobile.
+Consequence, intended and reported: the reading measure of every preserved legal
+page widens.
+
+### 10.5 Retiring the blueprint scaffolding
+
+`.dimension-line`, `.plan-foyer`, `.scale-line` / `.scale-bar` — **markup and
+every selector in each family, in one change**, with the class-contract
+expectations updated alongside.
+
+Verified the way §4.4 demands, by family and not by line range:
+
+```sh
+for f in dimension-line plan-foyer scale-line scale-bar; do
+  grep -rc "$f" app components   # 0 everywhere
+done
+```
+
+A line range would have stranded each family's `@media (max-width: 700px)`
+member, and the className→rule scan visits only one direction, so nothing in the
+suite would have flagged the orphans.
+
+All three blocks are decorative and `aria-hidden="true"`, carry no copy a reader
+reaches, no `href` and no metadata, so no route, redirect, link or title is
+touched. It is still a visible change to the approved-as-live home page, and it
+is named in `docs/facelift-unapproved.md` §C.
+
+### 10.6 The CSS Modules boundary
+
+Established, per §4.1. `app/globals.css` keeps the tokens, the structural rules
+and the legacy class layer that styles the 11 preserved routes; **every new
+surface and primitive uses `*.module.css`**.
+
+This is forced, not stylistic: `.hero` (defined twice historically), `.eyebrow`,
+`.brand`, `.detail-page`, `.section-heading`, `.option-grid`, `.primary`,
+`.secondary` and `.compact` are already taken globally, and a new component using
+one of those names would silently inherit blueprint geometry with no compile
+error.
+
+Three shared stylesheets, one per directory — `components/ui/primitives.module.css`,
+`components/wys/wys-primitives.module.css`,
+`components/provenance/provenance.module.css` — imported by 25 primitives.
+`tests/class-contract.test.ts` mode 2 now asserts `modulesChecked === 25`; the
+count is exact on purpose, so a later phase updates it deliberately rather than
+letting a module fall out of coverage.
+
+**A rule every later phase must follow:** never write a template literal in a
+`className` attribute, and never leave a variant comparison inside one. Mode 1
+treats every string literal inside `className={…}` as a class token and every
+`${` as a dynamic class needing registration, so
+`` className={`${a} ${b}`} `` and `className={cx(x, tone === "dark" && y)}` are
+both hard test failures **by design**. Compose the class string in a `const`
+above the JSX and pass the identifier. `components/provenance/cx.ts` exists for
+this and carries the reason in its own doc comment.
+
+### 10.7 The contrast audit, run rather than assumed
+
+Full measured table in `docs/facelift-unapproved.md` §B1, including one
+correction to the plan's own figures (`--accent` on white measures **4.98:1**,
+not the 4.74:1 the plan records — the finding is unchanged either way).
+
+Shipped: **`--accent-text-on-tint: #1A6B7B`** for text on a tint, Q23's ratified
+default (a). `--accent` `#1F7A8C` is untouched for fills, bars, the rail, the
+dashed Ben-slot border and the focus ring. Re-measure and re-record every pair in
+Phase 12.
+
+### 10.8 Escalations recorded from Phase 4
+
+Each was implemented at its ratified build-now default and each needs Ben.
+
+| # | Escalation | Default implemented | Where it is written up |
+|---|---|---|---|
+| **E1** | **Q23** — two approved colour pairs miss WCAG AA for normal text, and `/accessibility` publishes a contrast claim. | Second token `--accent-text-on-tint` `#1A6B7B` for text on a tint. | `docs/facelift-unapproved.md` §B1 |
+| **E2** | **Q17** — Commit is teal on `5b` and ink everywhere else; two approved artboards disagree. | Ink enabled, `rgba(22,32,43,.25)` disabled. Today's Commit is recoloured. | §B2 |
+| **E3** | **Q18** — `5a`'s selection rows grow 4px; `4a`'s do not. | Normalised to the non-reflowing `4a` pattern. 2px visual delta on Lesson Zero. | §B3 |
+| **E4** | The **entire interaction-state layer** is new work no artboard contains, required by a live `/accessibility` claim. | Authored from the token set under the five rules in §A1. | §A1 |
+| **E5** | Retiring the three `aria-hidden` blueprint-scaffolding blocks is a visible change to the approved-as-live home page. | Retired, markup and rules together. | §C |
+| **E6** | The disabled Commit **label** ships in `--muted`, not the artboard's white, which measures 1.69:1 and is unreadable. The fill is unchanged. | `--muted` (3.23:1). | §B1 |
+
+### 10.9 Deviations reported from Phase 4
+
+| # | Deviation | Reason |
+|---|---|---|
+| **D4** | The caps micro-label group moved from Mono to Sans, against §4.3's "load the faces, do not rewrite the legacy rules". | §4.3's decision is about **font loading** — it exists so nothing renders faux-bold. §4.4 separately requires the geometry task to replace "the uppercase mono micro-labels", and §4.2 sets caps labels in Sans 12/600. Both are honoured: the labels are restyled **and** all four Mono weights plus the Sans italic axis still load, so restoring any declaration needs no font change and nothing synthesises a face. |
+| **D5** | `docs/facelift-unapproved.md` is a **new** file the plan names but Phase 0 did not create. | §4.2, §4.4, §4.5 and §4.6 all say "record it in `docs/facelift-unapproved.md`", and Phase 4 is the first phase with anything to put in it. Additive; nothing was moved out of the build notes. |
+| **D6** | The primitives preview needs a Node hook to load `.module.css` (`scripts/css-module-hooks.mjs`). | The alternative was hand-copying each primitive's markup into the preview, which drifts from the components the first time one changes. The hook is **not** registered by `npm test` — Phase 0's decision 4.1 stands unchanged — and it is used by exactly one dev script. Zero new dependencies: `node:module`'s `registerHooks` is built in. |
+| **D7** | The preview script sets `globalThis.React` before importing components. | `tsconfig.json` is byte-frozen at `"jsx": "preserve"`, so `tsx` transforms the components with the classic runtime and their output references a bare `React`. Next supplies the automatic runtime in a real build; a dev script has to supply it itself. Process-local, affects nothing that ships. |
+
+### 10.10 Measured at the Phase 4 gate
+
+| | Baseline (Phase 0) | Phase 4 |
+|---|---|---|
+| `npm test` | 31 tests, 0 fail | **169 tests, 0 fail** |
+| Prerendered routes | 14, all `○` | **14, all `○`, zero `ƒ`** |
+| Shared First Load JS | 102 kB | **102 kB** |
+| `/` First Load JS | 109 kB | **109 kB** |
+| `scripts/check-no-deletions.sh` | exit 0 | **exit 0** |
+
+The primitives are not imported by any route yet, so they add nothing to the
+bundle — which is the correct reading of "First Load JS at or below the measured
+baseline" at this phase, and the number to watch as Phases 5–10 mount them.
+
+### 10.11 Hazards this phase creates for later phases
+
+- **The class-contract rule in §10.6 is the one that will bite.** It is a hard
+  failure, not a warning, and the fix is always to hoist the class string — never
+  to weaken the extractor.
+- **`modulesChecked` is asserted exactly (25).** Adding a primitive without
+  updating it fails the suite. That is the design.
+- **`.hero-principle` and `.card-eyebrow` are still registered orphans**, and
+  `hero-foyer` and `secondary` are still registered unresolved class names. Phase
+  4 deliberately resolved **none** of them — that is Phase 10's job, and both
+  registers are asserted exactly, so an early fix without a matching
+  de-registration fails the suite.
+- **`--accent` vs `--accent-text-on-tint` is a real distinction, not a synonym.**
+  Text on a tint takes the second; fills, bars, rails, dashes and the focus ring
+  take the first. Using `--accent` for a 14px label on `--tint-teal` reintroduces
+  the 4.45:1 miss with nothing to catch it.
+- **Light-only is a decision, not an omission.** No `prefers-color-scheme` block,
+  no `data-theme`, no inverted palette. All sixteen approved screens are
+  light-mode and the ink slabs are a compositional device on white.
+
+### 10.12 Fixed at the Phase 4 gate
+
+The gate re-ran every Exit criterion against evidence rather than the
+implementer's report. Everything the report claimed was reproduced: `npm test`
+169/169, `PORT=3999 npm run build` 14/14 static with zero `ƒ` and zero `●`,
+shared First Load JS 102 kB and `/` at 2.77 kB / 109 kB — identical to the Phase
+0 floor, not merely at or below it — `scripts/check-no-deletions.sh` exit 0, and
+both `--diff-filter=D` and `--diff-filter=R` empty against `main...HEAD` and
+against the working tree.
+
+Three things were checked that the report asserted rather than showed, and all
+three held:
+
+- **Zero legacy token names dropped.** Comparing the `--name:` declaration sets
+  of `git show HEAD:app/globals.css` and the new file, the difference is
+  additive only: 38 new names, **none removed**.
+- **Zero class selectors dropped beyond the four authorised families.**
+  Comparing selector sets the same way, the only losses are `.dimension-line`,
+  `.plan-foyer`, `.scale-line`, `.scale-bar` — plus `.com` and `.googleapis`,
+  which were never selectors, only fragments of the deleted line-1 `@import`
+  URL. That is the one intentional line-level removal, visible as its own
+  artefact in the selector diff.
+- **The contrast figures were re-derived, not trusted.** `--accent` on `--white`
+  **4.975:1**, on `--tint-teal` **4.447:1**, on `--tint-grey` **4.593:1**;
+  `--accent-text-on-tint` `#1A6B7B` on `--tint-teal` **5.467:1**, on `--white`
+  **6.117:1**; white on the disabled fill over white **1.694:1**, `--muted` on
+  it **3.229:1**. Every number in §10.7 and `docs/facelift-unapproved.md` §B1 is
+  correct, including the correction to the plan's own 4.74:1.
+
+Two corrections were made at the gate:
+
+1. **`.option-grid button[aria-pressed="true"]` reflowed, and its comment said
+   it could not.** It set `border: var(--border-selected)` — a 1.5px → 2px
+   border swap, which grows the row by 1px — under a comment asserting the
+   opposite. It now uses the same technique `.choiceSelected` uses in
+   `components/ui/primitives.module.css`: the border width stays 1.5px and the
+   missing half pixel is drawn as `inset 0 0 0 0.5px`, so §4.7.1's normalisation
+   is true of the legacy layer as well as the modules. The comment now also
+   records that the preserved `IntentRouter` never sets `aria-pressed` —
+   choosing an option advances the step — so this rule states the normalisation
+   for the legacy layer rather than driving a live state. Consequence worth
+   naming: `--border-selected` is now referenced by no rule. It stays defined,
+   because §4.2 fixes the token set verbatim and §4.7.1 explicitly allows the
+   inset ring as the way to render it.
+2. **`docs/facelift-baseline.md` §3b.1 under-counted `app/globals.css`.** It
+   recorded 1161 lines against an actual 1176. On a page whose title is
+   "measured, not asserted", a stale count is the one defect that matters.
+   Corrected.
+
+**Measured and left alone, recorded so Phase 12 has the number.** The preserved
+`IntentRouter` Back button in its disabled state (`history.length === 0`) draws
+its label in `--commit-disabled`, **1.694:1** on white. The baseline treatment
+(`--ink` at `opacity: .35` on the old `#d6dbe2` paper) was in the same range, so
+this is not a regression, and disabled controls are exempt from WCAG AA. It was
+deliberately **not** raised to `--muted` — the ActionPill's disabled label sits
+on a grey fill and reads at 3.229:1, but the same colour on bare white reads at
+5.47:1 and would make a disabled control look enabled, which is a worse defect
+than the one it fixes. The state stays distinguishable by two channels, colour
+and the dropped underline.
+
+**Font faces, checked against their own justification.** §4.3 loads Mono
+600/700 because the preserved sheet declared them. After D4 moved the caps
+micro-labels to Sans, `var(--mono)` survives in exactly three rules, all at 400.
+The extra Mono weights are therefore loaded and currently unused. They stay:
+§4.3 ratifies the load, flattening the ramp is its own recorded sweep, and the
+build emits **6 preloaded woff2 files** against a baseline that fetched Spectral
+plus four Mono weights over a render-blocking cross-origin `@import`. The Sans
+italic axis is **not** idle — `globals.css:375` still uses it.
+
+**What the gate could not verify.** The primitives preview was generated and its
+markup inspected (`node scripts/preview-primitives.mjs` exits 0 and emits both
+the 1280px and the 390px column with every primitive rendered through its real
+component and its real module classes), but **nobody looked at it in a browser**.
+Pixel fidelity against the five PNGs at 1280 and 390 remains manual QA under
+Phase 0's Q15 decision, and is Phase 12's side-by-side check.

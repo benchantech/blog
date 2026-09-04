@@ -31,11 +31,6 @@ export default function Home() {
       </section>
 
       <section className="destinations-section" aria-labelledby="destinations-heading">
-        <div className="dimension-line" aria-hidden="true">
-          <span />
-          <strong>Four Stable Doors</strong>
-          <span />
-        </div>
         <h2 className="sr-only" id="destinations-heading">
           The ecosystem has four stable doors.
         </h2>
@@ -48,16 +43,6 @@ export default function Home() {
               <em>{item.url.replace("https://", "")} -&gt;</em>
             </a>
           ))}
-          <div className="plan-foyer" aria-hidden="true">
-            <span>Foyer</span>
-            <strong>deterministic routing</strong>
-            <i>N</i>
-          </div>
-        </div>
-        <div className="scale-line" aria-hidden="true">
-          <span className="scale-bar" />
-          <span>Scale - intent to room</span>
-          <span>DWG. BenChanTech LLC · A-01</span>
         </div>
       </section>
 

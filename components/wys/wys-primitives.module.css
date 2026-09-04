@@ -1,0 +1,304 @@
+/*
+ * Watch Your Step composite primitives (plan §4.8).
+ *
+ * These sit on top of components/ui: they compose Pill, ChoiceRow, CardShell
+ * and the provenance components rather than restating their geometry.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* PhasePills — Watch / Try / Judge / Carry                                   */
+/* -------------------------------------------------------------------------- */
+.phaseRow {
+  display: flex;
+  gap: 6px;
+  margin: 0 0 20px;
+  padding: 0;
+  list-style: none;
+  font: 500 13px / 1 var(--sans);
+}
+
+.phase {
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
+  background: var(--tint-grey);
+  color: var(--muted);
+}
+
+.phaseActive {
+  background: var(--ink);
+  color: var(--white);
+}
+
+/* -------------------------------------------------------------------------- */
+/* StopCard — four state fills                                                */
+/* -------------------------------------------------------------------------- */
+.stopStrip {
+  display: grid;
+  grid-template-columns: repeat(9, minmax(0, 1fr));
+  gap: 8px;
+}
+
+.stopPeek {
+  display: flex;
+  gap: 8px;
+  overflow-x: auto;
+  grid-template-columns: none;
+}
+
+.stop {
+  padding: 18px 14px;
+  border-radius: var(--radius-cell);
+  background: var(--tint-grey);
+  border: 1.5px solid transparent;
+  color: inherit;
+  text-decoration: none;
+  text-align: left;
+  display: block;
+}
+
+.stopPeek .stop {
+  flex: none;
+  width: 140px;
+  padding: 14px;
+  border-radius: var(--radius-row-lg);
+}
+
+.stopLesson {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.stopCurrent {
+  background: var(--tint-teal);
+}
+
+.stopTerminal {
+  background: var(--white);
+  border: 1.5px dashed var(--border-dashed);
+}
+
+.stopMeta {
+  display: block;
+  font-size: 12px;
+  margin-bottom: 6px;
+  color: var(--muted);
+}
+
+.stopLesson .stopMeta {
+  color: var(--accent-on-dark);
+}
+
+.stopCurrent .stopMeta {
+  color: var(--accent-text-on-tint);
+}
+
+.stopTitle {
+  display: block;
+  font: 600 15px / 1.3 var(--sans);
+}
+
+/* -------------------------------------------------------------------------- */
+/* NumberedOrderCard — 01 ink, 02-09 tint-grey                                */
+/* -------------------------------------------------------------------------- */
+.orderList {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.order {
+  padding: 16px 18px;
+  border-radius: var(--radius-cell);
+  background: var(--tint-grey);
+}
+
+.orderLead {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.orderNumber {
+  font: 600 12px / 1.3 var(--sans);
+  letter-spacing: 0.04em;
+  color: var(--accent-text-on-tint);
+  margin-bottom: 4px;
+}
+
+.orderLead .orderNumber {
+  color: var(--accent-on-dark);
+}
+
+.orderTitle {
+  font: 600 16px / 1.35 var(--sans);
+}
+
+/* The gloss is an optional DATA field, not a style rule. */
+.orderGloss {
+  font-size: 14px;
+  color: var(--muted);
+  margin-top: 2px;
+}
+
+.orderLead .orderGloss {
+  color: var(--body-on-dark);
+}
+
+/* -------------------------------------------------------------------------- */
+/* LogEntryCard                                                               */
+/* -------------------------------------------------------------------------- */
+.logEntry {
+  padding: 18px;
+  border-radius: var(--radius-card-lg);
+  background: var(--tint-grey);
+}
+
+.logMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.logTitle {
+  margin: 0 0 6px;
+  font: 600 17px / 1.3 var(--sans);
+  letter-spacing: -0.01em;
+}
+
+.logBody {
+  margin: 0;
+  font-size: 14px;
+  line-height: 1.45;
+  color: var(--body);
+}
+
+.logTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 10px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* DistributionBars — numbers and caption are ONE INSEPARABLE UNIT            */
+/* -------------------------------------------------------------------------- */
+.distribution {
+  display: grid;
+  grid-template-columns: 18px 1fr 40px;
+  gap: 8px 10px;
+  align-items: center;
+  font-size: 14px;
+}
+
+.distributionLetter {
+  color: var(--accent-text-on-tint);
+  font-weight: 600;
+}
+
+.distributionTrack {
+  height: 10px;
+  border-radius: var(--radius-pill);
+  background: var(--border-nav);
+  overflow: hidden;
+}
+
+.distributionFill {
+  height: 100%;
+  border-radius: var(--radius-pill);
+  background: var(--accent);
+}
+
+.distributionValue {
+  text-align: right;
+}
+
+.distributionCaption {
+  margin: 8px 0 0;
+  font-size: 12px;
+  color: var(--muted);
+}
+
+.distributionStrip {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.distributionStripValue {
+  color: var(--ink);
+  font-weight: 600;
+}
+
+/* -------------------------------------------------------------------------- */
+/* JudgmentCard                                                               */
+/* -------------------------------------------------------------------------- */
+.judgment {
+  padding: 20px 22px;
+  border-radius: var(--radius-card);
+  background: var(--ink);
+  color: var(--white);
+}
+
+.judgmentMobile {
+  padding: 16px;
+  border-radius: var(--radius-cell);
+}
+
+.judgmentHeader {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 12px;
+  color: var(--accent-on-dark);
+}
+
+.judgmentBody {
+  margin: 0;
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.judgmentBlocked {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.5;
+  color: var(--body-on-dark);
+}
+
+/* -------------------------------------------------------------------------- */
+/* AudioSlotPill — asymmetric padding, two lines                              */
+/* -------------------------------------------------------------------------- */
+.audioPill {
+  display: inline-flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 20px 10px 10px;
+  border-radius: var(--radius-pill);
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--white);
+  text-decoration: none;
+}
+
+.audioPillOnLight {
+  background: var(--ink);
+}
+
+.audioTitle {
+  display: block;
+  font: 500 15px / 1.3 var(--sans);
+}
+
+.audioSub {
+  display: block;
+  font-size: 12px;
+  color: var(--accent-on-dark);
+}

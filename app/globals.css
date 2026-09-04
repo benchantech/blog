@@ -1,48 +1,183 @@
-@import url("https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600;700&family=Spectral:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400&display=swap");
+/* ==========================================================================
+   BenChanTech — identity stylesheet.
+
+   Plan: docs/bct-facelift-assimilation-plan.md §4 (Phase 4, "Design system").
+
+   How this file is organised, and why:
+
+   1. TOKENS      — the facelift palette (§4.2) followed by the LEGACY ALIAS
+                    block (§4.4). Every legacy token NAME is kept and re-pointed
+                    at a new value. Never delete a legacy token name: all of the
+                    preserved routes are styled by the rules below, which
+                    reference tokens by name, so re-pointing a value is what
+                    restyles /studio, /neon, /system, /contact and the six legal
+                    pages with ZERO markup edits.
+   2. STRUCTURAL  — fenced and commented (§4.5). Only the token VALUES inside
+                    those rules change. Do not restyle, reorder, or drop half of
+                    a pair.
+   3. BASE        — element defaults and the single container rule.
+   4. LEGACY LAYER— the class rules that style the 11 preserved routes. These
+                    class names are the PUBLIC API of this stylesheet
+                    (§4.1). Every NEW surface uses CSS Modules instead.
+   5. INTERACTION — hover / active / disabled / reduced-motion (§4.6). NEW and
+                    unapproved; see docs/facelift-unapproved.md.
+   6. RESPONSIVE  — 900px and 700px, then the reduced-motion pair.
+
+   Light-only, deliberately (§4.2). All sixteen approved screens are light-mode
+   and the ink slabs are a compositional device on white, not a theme. Add no
+   `prefers-color-scheme` block, no `data-theme`, no inverted palette.
+
+   The Google Fonts `@import` that used to be line 1 of this file is gone. It is
+   the single intentional line-level removal in the whole build (§3.0). Both
+   families now load through `next/font/google` in `app/layout.tsx`, which
+   removes a render-blocking round trip before first paint.
+   ========================================================================== */
 
 :root {
-  --paper: #d6dbe2;
-  --sheet: #eceef1;
-  --plan: #e7eaee;
-  --ink: #1b2430;
-  --ink-soft: #4a5261;
-  --dimension: #8a8f99;
-  --blueprint: #33406b;
-  --line: rgba(27, 36, 48, 0.18);
-  --line-strong: rgba(27, 36, 48, 0.68);
-  --focus: #a06b24;
-  --max: 1120px;
-  --serif: "Spectral", Georgia, "Times New Roman", serif;
-  --mono: "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
-  --sans: "Spectral", Georgia, "Times New Roman", serif;
+  /* ---------------------------------------------------------------------- */
+  /* 1a. Facelift palette (§4.2, verbatim from the handoff Design Tokens)    */
+  /*                                                                        */
+  /* Usage rules are comments here on purpose, so later work cannot drift:  */
+  /*   · --accent NEVER carries body text and NEVER draws a selection ring.  */
+  /*   · --accent-on-dark appears ONLY inside ink slabs.                     */
+  /*   · --tint-teal is the "current / next / selected" fill.                */
+  /*   · Selection is a 2px INK ring on a pale-teal fill — never teal.       */
+  /*   · There is no icon set. The only glyphs are the literal text          */
+  /*     characters  ▶ → ↓ ✓ ≠ ·                                            */
+  /* ---------------------------------------------------------------------- */
+
+  /* body text, dark slabs, primary CTA, selected ring, active nav.
+     LEGACY NAME KEPT, VALUE REDEFINED: was #1b2430. */
+  --ink: #16202b;
+  /* paragraph / secondary text, desktop nav links */
+  --body: #3a4856;
+  /* meta, footnotes, values, inactive nav, mono provenance on light */
+  --muted: #5c6b7a;
+  /* option letters, caps eyebrows, links, nav CTA fill, progress-rail fill,
+     dashed Ben-slot border, focus ring */
+  --accent: #1f7a8c;
+  /* Q23, ratified at its build-now default. #1F7A8C on --tint-teal measures
+     4.45:1 and misses WCAG AA for normal text; this darker value measures
+     5.47:1 on --tint-teal and 6.12:1 on white. It is for TEXT ON A TINT ONLY.
+     Fills, bars and the focus ring keep --accent. Deviation from the approved
+     artboards — see docs/facelift-unapproved.md. */
+  --accent-text-on-tint: #1a6b7b;
+  /* eyebrows + secondary text INSIDE ink slabs ONLY */
+  --accent-on-dark: #7fc8d6;
+  /* status badges, "current/next" fills, selected-row fill, CARRY card */
+  --tint-teal: #eaf4f6;
+  /* neutral rows, cards, stat cards, progress track, stops B-G */
+  --tint-grey: #f4f6f8;
+  --white: #ffffff;
+
+  /* --- borders --- */
+  --border-card: rgba(22, 32, 43, 0.1); /* 1.5px - demo card, Today TRY card */
+  --border-row: rgba(22, 32, 43, 0.12); /* 1.5px - unselected choice row */
+  --border-pill: rgba(22, 32, 43, 0.15); /* 1.5px - outlined / struck pill */
+  --border-pill-strong: rgba(22, 32, 43, 0.2); /* 1.5px pill; 1px pending chip */
+  --border-dashed: rgba(22, 32, 43, 0.25); /* 1.5px dashed - terminal stop */
+  --border-nav: rgba(22, 32, 43, 0.08); /* 1px - bottom-nav top hairline */
+  --border-selected: 2px solid #16202b; /* SELECTED state - never teal */
+  --dash-ben: 1.5px dashed #1f7a8c; /* awaiting-Ben slot */
+  --dash-scratch: 1.5px dashed rgba(255, 255, 255, 0.3); /* scratch box on ink */
+  --commit-disabled: rgba(22, 32, 43, 0.25);
+  --body-on-dark: rgba(255, 255, 255, 0.75);
+  --muted-on-dark: rgba(255, 255, 255, 0.55);
+
+  /* --- radii: TWO families, deliberately not normalised to one ramp ------ */
+  /* mobile:  rows 14 · posture/plan rows/property tiles 16 · order cards 18  */
+  /*          · section + dark cards + media 22 · portrait 26 · pills 999     */
+  /* desktop: choice rows 16 · stop cells 18 · judgment/stat/four-move 20     */
+  /*          · portrait 24 · demo card + disclosure strip 28                 */
+  /*          · large tinted + dark blocks 32 · pills 999                     */
+  --radius-row: 14px;
+  --radius-row-lg: 16px;
+  --radius-cell: 18px;
+  --radius-card: 20px;
+  --radius-card-lg: 22px;
+  --radius-portrait: 24px;
+  --radius-portrait-lg: 26px;
+  --radius-block: 28px;
+  --radius-block-lg: 32px;
+  --radius-pill: 999px;
+
+  /* --- shadows: only two exist ------------------------------------------ */
+  --shadow-demo: 0 30px 80px -40px rgba(22, 32, 43, 0.35);
+  --shadow-demo-mobile: 0 20px 50px -30px rgba(22, 32, 43, 0.35);
+
+  /* --- media placeholders: never an image (§4.2, handoff "Assets") ------- */
+  --media-dark: repeating-linear-gradient(135deg, #243444 0 8px, #1e2c3a 8px 16px);
+  --media-dark-disc: repeating-linear-gradient(135deg, #243444 0 6px, #1e2c3a 6px 12px);
+  --media-light: repeating-linear-gradient(135deg, #e6ecf0 0 8px, #dde5ea 8px 16px);
+
+  /* --- spacing / layout -------------------------------------------------- */
+  --gutter: 56px; /* desktop; 22px at <=700px, see the responsive block */
+  --section-gap: 96px;
+  --reveal: 200ms; /* §4.6 reveal duration, ease-out, reduced-motion honoured */
+
+  /* --- type -------------------------------------------------------------- */
+  /* IBM Plex Sans 400/500/600 - everything.                                  */
+  /* IBM Plex Mono 400/500 - ONLY provenance / state lines at 11-12px.        */
+  /* Both families are supplied by next/font/google (app/layout.tsx), which    */
+  /* sets --font-plex-sans / --font-plex-mono on <html>. The fallbacks below   */
+  /* keep the page legible if that variable is ever missing.                  */
+  --sans: var(--font-plex-sans), "IBM Plex Sans", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --mono: var(--font-plex-mono), "IBM Plex Mono", "SFMono-Regular", Consolas, monospace;
+
+  /* ---------------------------------------------------------------------- */
+  /* 1b. LEGACY TOKEN ALIASES (§4.4)                                        */
+  /*                                                                        */
+  /* These names are the reason the preserved routes restyle with zero       */
+  /* markup edits. NEVER DELETE A LEGACY TOKEN NAME.                         */
+  /*                                                                        */
+  /* Figure and ground must not collapse: `body` is painted --paper and 19   */
+  /* rules paint sections, cards, result panels and detail callouts with     */
+  /* --sheet. Mapping both onto --white would render the hero, the router    */
+  /* card, the result panels and the detail callouts white-on-white. The map  */
+  /* below therefore preserves the three-step ground -> card -> accent ramp   */
+  /* the legacy rules assume.                                                */
+  /* ---------------------------------------------------------------------- */
+  --paper: var(--white); /* body ground */
+  --sheet: var(--tint-grey); /* card / section fill - NOT white */
+  --plan: var(--tint-teal); /* accented block fill */
+  --ink-soft: var(--body);
+  --dimension: var(--muted);
+  --blueprint: var(--accent);
+  --line: var(--border-row);
+  --line-strong: var(--border-pill-strong);
+  --focus: var(--accent); /* replaced, never removed - /accessibility claims it */
+  --max: 1280px; /* was 1120px; widens every preserved page's measure */
+  --serif: var(--sans); /* the blueprint's Spectral is retired; name kept */
 }
+
+/* ==========================================================================
+   2. STRUCTURAL — preserved (§4.5). Only the token VALUES inside these rules
+   change. Three notes are load-bearing:
+
+   note 1  `:focus-visible` geometry is a DECISION, not a preservation. The
+           handoff README's 2px/2px is its own word "suggested"; the 3px/3px
+           below already ships and /accessibility publishes a claim measured
+           against it. Kept at 3px/3px; only --focus changed (blue -> teal).
+   note 2  `main { overflow: hidden }` is NOT in this fence. It clipped both
+           axes on the element wrapping every page, which would cut the demo
+           card's 80px shadow and its deliberate overhang. It lives in the BASE
+           section below as `overflow-x: clip`.
+   note 3  `html { scroll-behavior: smooth }` stays INSIDE the fence, PAIRED
+           with the `prefers-reduced-motion` override at the foot of this file.
+           Never move one half without the other: dropping this line makes that
+           reduced-motion rule a silent no-op against a published a11y claim.
+   ========================================================================== */
 
 * {
   box-sizing: border-box;
 }
 
 html {
-  scroll-behavior: smooth;
-}
-
-body {
-  margin: 0;
-  background: var(--paper);
-  color: var(--ink);
-  font-family: var(--sans);
-  line-height: 1.48;
-}
-
-a {
-  color: inherit;
-}
-
-button {
-  font: inherit;
+  scroll-behavior: smooth; /* note 3 - paired with the reduced-motion block */
 }
 
 :focus-visible {
-  outline: 3px solid var(--focus);
+  outline: 3px solid var(--focus); /* note 1 - geometry kept, colour re-pointed */
   outline-offset: 3px;
 }
 
@@ -52,8 +187,11 @@ button {
   top: -5rem;
   z-index: 99;
   background: var(--ink);
-  color: var(--sheet);
+  color: var(--white);
   padding: 0.75rem 1rem;
+  border-radius: var(--radius-pill);
+  text-decoration: none;
+  font: 500 15px / 1 var(--sans);
 }
 
 .skip-link:focus {
@@ -72,6 +210,40 @@ button {
   border: 0;
 }
 
+/* ===== end STRUCTURAL ==================================================== */
+
+/* ==========================================================================
+   3. BASE
+   ========================================================================== */
+
+body {
+  margin: 0;
+  background: var(--paper);
+  color: var(--ink);
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+a {
+  color: inherit;
+}
+
+button {
+  font: inherit;
+}
+
+/* §4.5 note 2. Horizontal-overflow suppression only, so the vertical half of
+   --shadow-demo (an 80px blur) and any deliberate overhang still render. */
+main {
+  overflow-x: clip;
+}
+
+/* The single container rule — the only thing centring every page. The
+   MECHANISM is preserved; the VALUE is now token-driven (§4.5, "one deliberate
+   exception"): 56px desktop gutters, 22px mobile, and --max at 1280. */
 .site-header,
 .site-footer,
 .hero,
@@ -79,20 +251,27 @@ button {
 .destinations-section,
 .stakeholder-section,
 .detail-page {
-  width: min(calc(100% - 2rem), var(--max));
+  width: min(100%, var(--max));
   margin-inline: auto;
+  padding-inline: var(--gutter);
 }
 
+/* ==========================================================================
+   4. LEGACY LAYER — the 11 preserved routes.
+   These class names are the public API of this stylesheet. Do not rename one.
+   ========================================================================== */
+
+/* --- header ------------------------------------------------------------- */
+/* §4.9: no divider rule under the nav. The only chrome border in the entire
+   approved set is the mobile tab bar's top hairline. */
 .site-header {
   min-height: 76px;
-  margin-top: 2rem;
-  padding: 0 52px;
+  padding-block: 22px;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1.5rem;
-  background: var(--sheet);
-  border-bottom: 1px solid var(--line);
+  gap: 32px;
+  background: var(--paper);
 }
 
 .brand {
@@ -100,15 +279,17 @@ button {
   align-items: center;
   gap: 0.75rem;
   text-decoration: none;
-  font: 500 1.15rem / 1 var(--serif);
+  font: 600 19px / 1 var(--sans);
+  letter-spacing: -0.01em;
 }
 
 .brand-mark {
   display: grid;
   place-items: center;
-  width: 44px;
-  height: 44px;
+  width: 40px;
+  height: 40px;
   overflow: hidden;
+  border-radius: var(--radius-row);
 }
 
 .brand-mark img {
@@ -120,326 +301,241 @@ button {
 
 .desktop-nav {
   display: flex;
-  gap: 1.35rem;
+  gap: 32px;
   align-items: center;
-  font-family: var(--mono);
-  font-size: 0.74rem;
-  font-weight: 600;
-  letter-spacing: 0;
-  text-transform: uppercase;
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 400;
+  color: var(--body);
 }
 
 .desktop-nav a {
   text-decoration: none;
+  padding-block: 10px; /* §4.6: touch targets >= 44px */
 }
 
-.desktop-nav a:hover {
-  text-decoration: underline;
-  text-underline-offset: 0.3em;
-}
-
-main {
-  overflow: hidden;
-}
-
+/* --- hero --------------------------------------------------------------- */
 .hero {
-  min-height: 530px;
-  padding: 56px 52px 42px;
+  padding-block: 56px 72px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 214px;
-  align-items: end;
-  gap: 36px;
-  background: var(--sheet);
+  grid-template-columns: minmax(0, 1fr) 380px;
+  align-items: center;
+  gap: 64px;
+  background: var(--paper);
 }
 
 .hero-copy-block {
-  max-width: 715px;
+  max-width: 760px;
 }
 
+/* The caps micro-label group. The blueprint set these in uppercase IBM Plex
+   Mono; the approved register sets caps labels in Sans 12/600 at --accent, and
+   reserves Mono for 11-12px provenance and state lines only. */
 .welcome-label,
 .eyebrow,
 .question-label,
 .card-eyebrow,
 .room-number {
   margin: 0;
-  color: var(--ink-soft);
-  font: 700 0.72rem / 1.2 var(--mono);
-  letter-spacing: 0;
+  color: var(--accent-text-on-tint);
+  font: 600 12px / 1.3 var(--sans);
+  letter-spacing: 0.06em;
   text-transform: uppercase;
 }
 
 .hero h1 {
-  max-width: 16ch;
-  margin: 0.8rem 0 1.1rem;
-  font: 400 clamp(3rem, 5.2vw, 4.95rem) / 0.98 var(--serif);
-  letter-spacing: 0;
+  max-width: 18ch;
+  margin: 22px 0;
+  font: 600 clamp(2.375rem, 5vw, 4.125rem) / 1.02 var(--sans);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
 }
 
+/* Orphan rule — no className references it. Registered in ORPHAN_RULES and
+   scheduled for Phase 10, which empties that register. Not resolved here. */
 .hero-principle {
   max-width: 760px;
   margin: 0;
-  font: 500 clamp(1.15rem, 2.2vw, 1.55rem) / 1.35 var(--serif);
+  font: 500 clamp(1.15rem, 2.2vw, 1.55rem) / 1.35 var(--sans);
 }
 
 .hero-copy {
-  max-width: 640px;
+  max-width: 540px;
   margin: 0;
-  color: var(--ink-soft);
-  font-size: clamp(1.1rem, 1.9vw, 1.32rem);
+  color: var(--body);
+  font-size: 21px;
+  line-height: 1.5;
+  text-wrap: pretty;
 }
 
 .signature-note {
-  max-width: 590px;
+  max-width: 540px;
   margin: 1.6rem 0 0;
-  color: var(--blueprint);
-  font: italic 1.2rem / 1.45 var(--serif);
+  color: var(--body);
+  font: italic 400 19px / 1.5 var(--sans);
 }
 
 .signature-note span {
-  font: 600 0.82rem / 1 var(--mono);
+  color: var(--accent-text-on-tint);
+  font: 500 13px / 1 var(--sans);
+  font-style: normal;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
 .audience-actions {
   display: grid;
   gap: 12px;
-  align-self: stretch;
-  align-content: end;
+  align-self: center;
+  align-content: center;
 }
 
+/* CardShell "white with a hairline border" — a live decision surface. */
 .audience-button {
   min-height: 94px;
-  padding: 1rem;
+  padding: 20px 22px;
   display: flex;
   flex-direction: column;
   justify-content: center;
+  gap: 6px;
   text-decoration: none;
-  border: 1.5px solid var(--ink);
-  background: var(--sheet);
+  border: 1.5px solid var(--border-card);
+  border-radius: var(--radius-card);
+  background: var(--white);
   color: var(--ink);
-}
-
-.audience-button:hover,
-.audience-button:focus-visible {
-  background: var(--ink);
-  color: var(--sheet);
+  box-shadow: var(--shadow-demo);
 }
 
 .audience-button.primary {
   background: var(--ink);
-  color: var(--sheet);
-}
-
-.audience-button.primary:hover,
-.audience-button.primary:focus-visible {
-  background: var(--blueprint);
+  color: var(--white);
+  border-color: var(--ink);
 }
 
 .audience-button span {
-  font: 700 0.78rem / 1.2 var(--mono);
-  text-transform: uppercase;
+  font: 600 17px / 1.25 var(--sans);
+  letter-spacing: -0.01em;
 }
 
 .audience-button small {
-  margin-top: 0.45rem;
-  font: 400 0.95rem / 1.25 var(--serif);
+  color: var(--muted);
+  font: 400 15px / 1.4 var(--sans);
 }
 
+.audience-button.primary small {
+  color: var(--accent-on-dark);
+}
+
+/* --- sections ----------------------------------------------------------- */
 .destinations-section,
 .router-section,
 .stakeholder-section,
 .detail-page {
-  background: var(--sheet);
-  border-top: 1px solid var(--line);
+  background: var(--paper);
 }
 
-.dimension-line {
-  padding: 0 52px 18px;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  gap: 18px;
-  color: var(--dimension);
-  font: 600 0.72rem / 1 var(--mono);
-  text-transform: uppercase;
+.destinations-section,
+.stakeholder-section {
+  padding-block: var(--section-gap) 0;
 }
 
-.dimension-line span {
-  height: 1px;
-  background: var(--line-strong);
-}
-
-.dimension-line strong {
-  font: inherit;
-  color: var(--dimension);
-}
-
+/* The four stable doors. The blueprint drew this as a 2px-ruled architectural
+   floor plan with a graph-paper foyer in the middle column; the approved
+   register has no rules and no hatch, so it is now a card grid. */
 .floor-plan {
-  margin: 0 52px;
-  min-height: 418px;
   display: grid;
-  grid-template-columns: 1fr 0.74fr 1fr;
-  grid-template-rows: repeat(2, minmax(196px, 1fr));
-  border: 2px solid var(--ink);
-  background: var(--plan);
-}
-
-.plan-room,
-.plan-foyer {
-  min-width: 0;
-  padding: 22px;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .plan-room {
+  min-width: 0;
+  padding: 24px;
+  min-height: 180px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  gap: 1rem;
+  gap: 14px;
   text-decoration: none;
   color: var(--ink);
-  transition: background 160ms ease, color 160ms ease;
+  background: var(--tint-grey);
+  border-radius: var(--radius-card);
 }
 
-.plan-room:hover,
-.plan-room:focus-visible {
-  background: var(--ink);
-  color: var(--sheet);
-}
-
-.plan-room:hover .room-number,
-.plan-room:focus-visible .room-number,
-.plan-room:hover small,
-.plan-room:focus-visible small {
-  color: rgba(236, 238, 241, 0.78);
-}
-
+/* Reading order is preserved from the blueprint: doors 1 and 2 stack in the
+   left column, 3 and 4 in the right. Every selector in this family is defined
+   here and re-declared in the <=700px block; never strand one of them. */
 .plan-room-1 {
-  grid-column: 1;
-  grid-row: 1;
-  border-right: 2px solid var(--ink);
-  border-bottom: 2px solid var(--ink);
+  grid-area: 1 / 1;
 }
 
 .plan-room-2 {
-  grid-column: 1;
-  grid-row: 2;
-  border-right: 2px solid var(--ink);
+  grid-area: 2 / 1;
 }
 
 .plan-room-3 {
-  grid-column: 3;
-  grid-row: 1;
-  border-bottom: 2px solid var(--ink);
+  grid-area: 1 / 2;
 }
 
 .plan-room-4 {
-  grid-column: 3;
-  grid-row: 2;
+  grid-area: 2 / 2;
 }
 
 .plan-room strong {
-  font: 400 clamp(1.55rem, 3vw, 2.05rem) / 1.02 var(--serif);
+  font: 600 clamp(1.5rem, 2.6vw, 1.875rem) / 1.15 var(--sans);
+  letter-spacing: -0.02em;
 }
 
 .plan-room small {
-  color: var(--ink-soft);
-  font-size: 0.98rem;
-  line-height: 1.35;
+  color: var(--body);
+  font-size: 16px;
+  line-height: 1.5;
 }
 
+/* A provenance-shaped micro-line (the literal URL), so it keeps Mono. */
 .plan-room em {
-  color: inherit;
-  font: 600 0.72rem / 1.3 var(--mono);
+  color: var(--muted);
+  font: 400 11px / 1.4 var(--mono);
   font-style: normal;
   overflow-wrap: anywhere;
-  text-transform: uppercase;
-}
-
-.plan-foyer {
-  grid-column: 2;
-  grid-row: 1 / span 2;
-  border-right: 2px solid var(--ink);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.45rem;
-  text-align: center;
-  background:
-    linear-gradient(rgba(27, 36, 48, 0.055) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(27, 36, 48, 0.055) 1px, transparent 1px),
-    rgba(51, 64, 107, 0.06);
-  background-size: 22px 22px;
-}
-
-.plan-foyer span {
-  font: 600 0.78rem / 1 var(--mono);
-  text-transform: uppercase;
-}
-
-.plan-foyer strong {
-  max-width: 11ch;
-  font: 400 1.85rem / 1.05 var(--serif);
-}
-
-.plan-foyer i {
-  margin-top: 0.6rem;
-  width: 34px;
-  height: 34px;
-  display: grid;
-  place-items: center;
-  border: 1.5px solid var(--ink);
-  border-radius: 50%;
-  font: 700 0.72rem / 1 var(--mono);
-  font-style: normal;
-}
-
-.scale-line {
-  padding: 20px 52px 46px;
-  display: grid;
-  grid-template-columns: 148px 1fr auto;
-  align-items: center;
-  gap: 1rem;
-  color: var(--dimension);
-  font: 600 0.68rem / 1.2 var(--mono);
-  text-transform: uppercase;
-}
-
-.scale-bar {
-  height: 10px;
-  border: 1px solid var(--ink);
-  background: repeating-linear-gradient(90deg, var(--ink) 0 18px, transparent 18px 36px);
 }
 
 .section-heading {
   max-width: 760px;
-  margin: 0 0 1.7rem;
+  margin: 0 0 32px;
 }
 
 .router-section,
 .stakeholder-section,
 .detail-page {
-  padding: 46px 52px;
+  padding-block: 56px;
 }
 
 .section-heading h2,
 .detail-page h1 {
-  margin: 0.35rem 0 0.65rem;
-  font: 400 clamp(2.15rem, 4vw, 3.7rem) / 1.02 var(--serif);
-  letter-spacing: 0;
+  margin: 10px 0 14px;
+  font: 600 clamp(1.875rem, 3.4vw, 2.75rem) / 1.08 var(--sans);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 
 .section-heading p,
 .detail-page p {
-  color: var(--ink-soft);
+  color: var(--body);
 }
 
 .section-heading.compact h2 {
-  font-size: clamp(1.85rem, 3vw, 2.6rem);
+  font-size: clamp(1.625rem, 2.6vw, 1.875rem);
+  letter-spacing: -0.02em;
 }
 
+/* An inset tinted slab (§4.9): never full-bleed, always inside the gutter. */
 .router-section {
-  background: var(--plan);
+  margin-block: var(--section-gap);
+  padding: 48px;
+  background: var(--tint-teal);
+  border-radius: var(--radius-block-lg);
+  width: min(calc(100% - 2 * var(--gutter)), calc(var(--max) - 2 * var(--gutter)));
 }
 
 .router-card {
@@ -447,379 +543,497 @@ main {
 }
 
 .stepper {
-  margin: 0 0 1.2rem;
+  margin: 0 0 14px;
   padding: 0;
   list-style: none;
   display: grid;
   grid-template-columns: repeat(4, 1fr);
-  border: 1.5px solid var(--ink);
-  background: var(--sheet);
+  gap: 8px;
 }
 
 .stepper li {
   min-height: 84px;
-  padding: 0.9rem;
+  padding: 16px 18px;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  color: var(--ink-soft);
-  border-right: 1.5px solid var(--ink);
-  font: 600 0.72rem / 1.25 var(--mono);
-  text-transform: uppercase;
-}
-
-.stepper li:last-child {
-  border-right: 0;
+  gap: 8px;
+  color: var(--muted);
+  background: var(--white);
+  border-radius: var(--radius-cell);
+  font: 500 15px / 1.3 var(--sans);
 }
 
 .stepper span {
   width: max-content;
   min-width: 2ch;
-  color: var(--ink);
-  font-weight: 700;
+  color: var(--accent-text-on-tint);
+  font-weight: 600;
+  font-size: 12px;
+  letter-spacing: 0.06em;
 }
 
 .stepper .active {
   background: var(--ink);
-  color: var(--sheet);
+  color: var(--white);
 }
 
 .stepper .active span {
-  color: var(--sheet);
+  color: var(--accent-on-dark);
 }
 
 .stepper .complete {
-  background: rgba(51, 64, 107, 0.1);
+  background: var(--white);
+  color: var(--body);
 }
 
+/* CardShell "white with a hairline border" — the live decision surface. */
 .question-panel,
 .result-panel {
   min-height: 300px;
-  padding: clamp(1.2rem, 3vw, 2.25rem);
-  border: 1.5px solid var(--ink);
-  background: var(--sheet);
+  padding: clamp(20px, 3vw, 28px);
+  border: 1.5px solid var(--border-card);
+  border-radius: var(--radius-block);
+  background: var(--white);
+  box-shadow: var(--shadow-demo);
 }
 
 .question-panel h3,
 .result-panel h3 {
-  margin: 0.35rem 0 1.25rem;
-  font: 400 clamp(1.6rem, 3vw, 2.45rem) / 1.08 var(--serif);
+  margin: 10px 0 18px;
+  font: 600 clamp(1.375rem, 2.6vw, 1.875rem) / 1.15 var(--sans);
+  letter-spacing: -0.02em;
+  text-wrap: balance;
 }
 
 .option-grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 0.7rem;
+  gap: 8px;
 }
 
+/* ChoiceRow, normalised per §4.7.1: a 1.5px hairline border exists in EVERY
+   state, so selecting or hovering a row never reflows the rows beneath it. */
 .option-grid button {
   min-height: 64px;
-  padding: 0.95rem;
-  border: 1.5px solid var(--ink);
-  background: transparent;
+  padding: 15px 18px;
+  border: 1.5px solid var(--border-row);
+  border-radius: var(--radius-row-lg);
+  background: var(--white);
   color: var(--ink);
   cursor: pointer;
   text-align: left;
-  font: 600 0.76rem / 1.3 var(--mono);
-  text-transform: uppercase;
+  font: 400 16px / 1.4 var(--sans);
 }
 
-.option-grid button:hover,
-.option-grid button:focus-visible {
-  background: var(--ink);
-  color: var(--sheet);
-}
-
+/* Mono is reserved for provenance and state lines — this is one. */
 .router-note,
 .timestamp-note {
-  color: var(--ink-soft);
-  font: 400 0.86rem / 1.45 var(--mono);
+  color: var(--muted);
+  font: 400 12px / 1.6 var(--mono);
 }
 
 .router-controls {
   display: flex;
   justify-content: space-between;
   gap: 1rem;
-  margin-top: 1rem;
+  margin-top: 16px;
 }
 
 .text-button {
+  min-height: 44px;
   border: 0;
   background: transparent;
-  color: var(--ink);
+  color: var(--accent-text-on-tint);
   cursor: pointer;
   padding: 0.4rem 0;
-  font: 600 0.72rem / 1 var(--mono);
+  font: 500 15px / 1 var(--sans);
   text-decoration: underline;
-  text-transform: uppercase;
-}
-
-.text-button:disabled {
-  opacity: 0.35;
-  cursor: default;
+  text-underline-offset: 0.3em;
 }
 
 .result-primary {
-  margin: 1rem 0;
-  padding: 1rem 1.2rem;
-  border-left: 4px solid var(--ink);
-  background: rgba(51, 64, 107, 0.08);
+  margin: 16px 0;
+  padding: 20px 22px;
+  border-radius: var(--radius-card);
+  background: var(--tint-teal);
 }
 
 .result-primary h4 {
   margin: 0;
-  font: 500 1.35rem / 1.15 var(--serif);
+  font: 600 21px / 1.2 var(--sans);
+  letter-spacing: -0.01em;
 }
 
 .result-primary p {
-  margin: 0.3rem 0 0.7rem;
+  margin: 6px 0 12px;
+  color: var(--body);
 }
 
 .result-primary a {
-  font: 700 0.76rem / 1 var(--mono);
-  text-transform: uppercase;
+  color: var(--accent-text-on-tint);
+  font: 500 15px / 1 var(--sans);
 }
 
 .secondary-results {
   display: flex;
   flex-wrap: wrap;
-  gap: 0.7rem;
+  gap: 10px;
   align-items: center;
 }
 
 .secondary-results p {
   width: 100%;
   margin-bottom: 0;
+  color: var(--body);
 }
 
 .secondary-results a {
-  border: 1.5px solid var(--line-strong);
-  padding: 0.45rem 0.7rem;
+  min-height: 44px;
+  display: inline-flex;
+  align-items: center;
+  border: 1.5px solid var(--border-pill-strong);
+  border-radius: var(--radius-pill);
+  padding: 10px 18px;
   text-decoration: none;
-  font: 600 0.72rem / 1 var(--mono);
-  text-transform: uppercase;
+  font: 500 15px / 1 var(--sans);
 }
 
 .stakeholder-grid,
 .detail-grid {
   display: grid;
   grid-template-columns: repeat(2, 1fr);
-  gap: 1rem;
+  gap: 12px;
 }
 
 .stakeholder-card,
 .detail-grid article {
-  border: 1.5px solid var(--ink);
-  background: var(--plan);
+  background: var(--tint-grey);
+  border-radius: var(--radius-card);
 }
 
 .stakeholder-card {
   min-height: 136px;
-  padding: 1.2rem;
+  padding: 24px;
   display: flex;
   justify-content: space-between;
   align-items: center;
   gap: 1rem;
   text-decoration: none;
-}
-
-.stakeholder-card:hover,
-.stakeholder-card:focus-visible {
-  background: var(--ink);
-  color: var(--sheet);
+  color: var(--ink);
 }
 
 .stakeholder-card span:first-child {
   display: flex;
   flex-direction: column;
+  gap: 6px;
+}
+
+/* The trailing `->` is a literal text glyph (there is no icon set), so it has to
+   be told not to wrap between the hyphen and the bracket in a narrow flex box. */
+.stakeholder-card span:last-child {
+  flex: none;
+  color: var(--muted);
+  white-space: nowrap;
 }
 
 .stakeholder-card strong {
-  font: 400 1.55rem / 1.1 var(--serif);
+  font: 600 21px / 1.2 var(--sans);
+  letter-spacing: -0.02em;
 }
 
 .stakeholder-card small {
-  color: var(--ink-soft);
-  margin-top: 0.35rem;
+  color: var(--body);
+  font-size: 16px;
+  line-height: 1.45;
 }
 
-.stakeholder-card:hover small,
-.stakeholder-card:focus-visible small {
-  color: rgba(236, 238, 241, 0.78);
-}
-
+/* --- detail + legal pages ----------------------------------------------- */
 .detail-page {
   min-height: 55vh;
 }
 
 .detail-page > p {
   max-width: 760px;
-  font-size: 1.08rem;
+  font-size: 18px;
+  line-height: 1.55;
 }
 
 .detail-grid {
-  margin-top: 2rem;
+  margin-top: 32px;
 }
 
 .detail-grid article {
-  padding: 1.25rem;
+  padding: 24px;
 }
 
 .detail-grid h2 {
-  margin-top: 0;
-  font: 400 1.65rem / 1.1 var(--serif);
+  margin: 0 0 8px;
+  font: 600 21px / 1.2 var(--sans);
+  letter-spacing: -0.01em;
 }
 
 .detail-callout {
-  margin: 2rem 0;
-  padding: 1.35rem;
-  border: 1.5px solid var(--ink);
-  background: var(--plan);
+  margin: 32px 0;
+  padding: 40px 44px;
+  border-radius: var(--radius-block-lg);
+  background: var(--tint-teal);
 }
 
 .detail-callout h2 {
   max-width: none;
-  margin: 0.35rem 0 0.65rem;
-  font: 400 clamp(1.65rem, 3vw, 2.4rem) / 1.05 var(--serif);
+  margin: 10px 0 12px;
+  font: 600 clamp(1.625rem, 2.8vw, 2.5rem) / 1.1 var(--sans);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
 }
 
 .detail-callout p {
   max-width: 700px;
+  color: var(--body);
 }
 
 .detail-link {
   display: inline-flex;
+  min-height: 44px;
+  align-items: center;
   margin-top: 0.5rem;
-  font: 700 0.76rem / 1 var(--mono);
-  text-transform: uppercase;
+  color: var(--accent-text-on-tint);
+  font: 500 17px / 1 var(--sans);
 }
 
+.legal-page {
+  padding-block: 56px;
+}
+
+.legal-page h1 {
+  max-width: 20ch;
+  margin: 12px 0 20px;
+  font: 600 clamp(2rem, 4.4vw, 3.25rem) / 1.05 var(--sans);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.legal-page h2 {
+  margin: 40px 0 8px;
+  font: 600 21px / 1.2 var(--sans);
+  letter-spacing: -0.01em;
+}
+
+.legal-page p {
+  max-width: 760px;
+  color: var(--body);
+  font-size: 17px;
+  line-height: 1.55;
+}
+
+/* --- footer -------------------------------------------------------------- */
+/* An inset ink slab (§4.9), not a full-bleed band, and no rule above it. */
 .site-footer {
-  margin-bottom: 2rem;
-  padding: 28px 52px 34px;
+  margin-block: var(--section-gap) 40px;
+  padding: 36px 40px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   align-items: start;
-  gap: 1rem;
+  gap: 32px;
   background: var(--ink);
-  color: rgba(236, 238, 241, 0.72);
-  font: 500 0.72rem / 1.4 var(--mono);
-  text-transform: uppercase;
+  color: var(--body-on-dark);
+  border-radius: var(--radius-block);
+  font: 400 15px / 1.5 var(--sans);
+  width: min(calc(100% - 2 * var(--gutter)), calc(var(--max) - 2 * var(--gutter)));
 }
 
 .site-footer div {
   display: grid;
-  gap: 0.4rem;
+  gap: 8px;
 }
 
 .site-footer span {
-  color: var(--sheet);
-  font: italic 1.15rem / 1.35 var(--serif);
-  text-transform: none;
+  color: var(--white);
+  font: 600 19px / 1.3 var(--sans);
+  letter-spacing: -0.01em;
 }
 
 .site-footer small {
-  color: rgba(236, 238, 241, 0.72);
-  font: 500 0.72rem / 1.4 var(--mono);
-  text-transform: uppercase;
+  color: var(--body-on-dark);
+  font: 400 15px / 1.5 var(--sans);
 }
 
 .site-footer nav {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 0.7rem 1rem;
+  gap: 8px 20px;
   max-width: 560px;
 }
 
 .site-footer a {
-  color: rgba(236, 238, 241, 0.82);
+  color: var(--accent-on-dark);
   text-decoration: none;
+  padding-block: 10px;
 }
 
-.site-footer a:hover {
-  color: var(--sheet);
-  text-decoration: underline;
-  text-underline-offset: 0.28em;
-}
-
-.legal-page {
-  padding: 56px 52px;
-}
-
-.legal-page h1 {
-  max-width: 14ch;
-  margin: 0.8rem 0 1.2rem;
-  font: 400 clamp(2.6rem, 5vw, 4.4rem) / 0.98 var(--serif);
-}
-
-.legal-page h2 {
-  margin: 2rem 0 0.6rem;
-  font: 400 1.45rem / 1.1 var(--serif);
-}
-
-.legal-page p {
-  max-width: 760px;
-  color: var(--ink-soft);
-  font-size: 1.08rem;
-}
-
+/* --- consent banner (visual only; the state machine is frozen) ----------- */
 .consent-banner {
   position: fixed;
   right: 20px;
   bottom: 20px;
   z-index: 80;
   display: grid;
-  gap: 1rem;
+  gap: 16px;
   width: min(430px, calc(100% - 40px));
-  padding: 18px;
-  background: var(--sheet);
-  border: 1.5px solid var(--ink);
-  box-shadow: 0 20px 48px rgba(27, 36, 48, 0.22);
+  padding: 22px;
+  background: var(--white);
+  color: var(--ink);
+  border: 1.5px solid var(--border-card);
+  border-radius: var(--radius-card-lg);
+  box-shadow: var(--shadow-demo);
+  font-size: 15px;
 }
 
 .consent-banner p {
   margin: 0;
-  color: var(--ink-soft);
+  color: var(--body);
+  line-height: 1.5;
 }
 
 .consent-banner div {
   display: flex;
   flex-wrap: wrap;
   justify-content: flex-end;
-  gap: 0.7rem;
+  gap: 8px;
 }
 
 .consent-banner button {
-  min-height: 42px;
-  padding: 0.65rem 0.9rem;
-  border: 1.5px solid var(--ink);
-  background: var(--sheet);
+  min-height: 44px;
+  padding: 13px 20px;
+  border: 1.5px solid var(--border-pill-strong);
+  border-radius: var(--radius-pill);
+  background: var(--white);
   color: var(--ink);
   cursor: pointer;
-  font: 700 0.72rem / 1 var(--mono);
-  text-transform: uppercase;
+  font: 500 15px / 1 var(--sans);
 }
 
 .consent-banner button:last-child {
   background: var(--ink);
-  color: var(--sheet);
+  border-color: var(--ink);
+  color: var(--white);
 }
 
+/* ==========================================================================
+   5. INTERACTION STATES — NEW and UNAPPROVED (§4.6).
+
+   The approved markup contains no :hover, :focus, :active, transition, error,
+   empty or loading state; the only state variation anywhere is the bound
+   selection swap and the disabled Commit fill. But /accessibility already
+   publishes "semantic HTML, keyboard-focusable links and controls, visible
+   focus styles, skip navigation, and responsive layouts", so this layer has to
+   be authored. It is listed in docs/facelift-unapproved.md for Ben's stamp.
+
+   Rules this layer follows:
+     · No hover-only functionality — hover never reveals content or controls.
+     · Touch targets >= 44px (declared on the interactive rules above).
+     · Nothing here changes a border WIDTH, so no state reflows its siblings.
+     · ~200ms ease-out, honoured against prefers-reduced-motion at the foot.
+   ========================================================================== */
+
+.desktop-nav a,
+.site-footer a,
+.audience-button,
+.plan-room,
+.stakeholder-card,
+.option-grid button,
+.secondary-results a,
+.consent-banner button,
+.text-button,
+.detail-link {
+  transition: background-color var(--reveal) ease-out, border-color var(--reveal) ease-out,
+    color var(--reveal) ease-out, box-shadow var(--reveal) ease-out;
+}
+
+.desktop-nav a:hover,
+.site-footer a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.audience-button:hover {
+  border-color: var(--border-pill-strong);
+  box-shadow: var(--shadow-demo-mobile);
+}
+
+.audience-button.primary:hover {
+  background: #101922;
+  border-color: #101922;
+}
+
+.audience-button:active,
+.option-grid button:active,
+.consent-banner button:active,
+.secondary-results a:active {
+  box-shadow: none;
+}
+
+.plan-room:hover,
+.stakeholder-card:hover {
+  background: var(--tint-teal);
+}
+
+.option-grid button:hover {
+  background: var(--tint-grey);
+  border-color: var(--border-pill-strong);
+}
+
+/* Selection is a 2px INK ring on a pale-teal fill — never teal (§4.2). The base
+   border above stays 1.5px and the missing half pixel is drawn as an inset
+   shadow, so a selected row cannot reflow the rows below it (§4.7.1, the `4a`
+   pattern; `--border-selected` is the token this ring reproduces). Note that the
+   preserved IntentRouter never sets aria-pressed — choosing an option advances
+   the step — so today this rule is the legacy layer's statement of the
+   normalisation, not a live state. The live one is `.choiceSelected` in
+   `components/ui/primitives.module.css`, which uses the same technique. */
+.option-grid button[aria-pressed="true"] {
+  background: var(--tint-teal);
+  border-color: var(--ink);
+  box-shadow: inset 0 0 0 0.5px var(--ink);
+}
+
+.secondary-results a:hover {
+  background: var(--tint-grey);
+}
+
+.text-button:hover {
+  color: var(--ink);
+}
+
+.text-button:disabled {
+  color: var(--commit-disabled);
+  text-decoration: none;
+  cursor: default;
+}
+
+.consent-banner button:hover {
+  background: var(--tint-grey);
+}
+
+.consent-banner button:last-child:hover {
+  background: #101922;
+}
+
+/* ==========================================================================
+   6. RESPONSIVE
+   ========================================================================== */
+
 @media (max-width: 900px) {
-  .site-header,
-  .hero,
-  .router-section,
-  .stakeholder-section,
-  .detail-page,
-  .site-footer {
-    padding-inline: 28px;
+  :root {
+    --gutter: 32px;
+    --section-gap: 64px;
   }
 
   .hero {
     grid-template-columns: 1fr;
-    min-height: auto;
-    gap: 2rem;
+    gap: 32px;
   }
 
   .audience-actions {
@@ -827,22 +1041,24 @@ main {
     align-self: auto;
   }
 
-  .dimension-line,
-  .scale-line {
-    padding-inline: 28px;
-  }
-
-  .floor-plan {
-    margin-inline: 28px;
-    grid-template-columns: 1fr 0.65fr 1fr;
+  .router-section {
+    padding: 32px;
   }
 }
 
 @media (max-width: 700px) {
+  :root {
+    --gutter: 22px;
+    --section-gap: 48px;
+  }
+
+  body {
+    font-size: 17px;
+  }
+
   .site-header {
     min-height: 66px;
-    margin-top: 1rem;
-    padding-inline: 20px;
+    padding-block: 14px;
   }
 
   .desktop-nav {
@@ -850,22 +1066,32 @@ main {
   }
 
   .brand-mark {
-    width: 30px;
-    height: 30px;
+    width: 32px;
+    height: 32px;
   }
 
-  .hero,
-  .router-section,
-  .stakeholder-section,
-  .detail-page,
-  .site-footer {
-    padding: 34px 20px;
+  .hero {
+    padding-block: 34px 40px;
   }
 
   .hero h1 {
-    font-size: clamp(3rem, 14vw, 4.35rem);
+    max-width: none;
+    font-size: clamp(2rem, 9.5vw, 2.375rem);
+    line-height: 1.05;
   }
 
+  .hero-copy {
+    font-size: 17px;
+  }
+
+  .router-section,
+  .stakeholder-section,
+  .detail-page,
+  .legal-page {
+    padding-block: 34px;
+  }
+
+  .floor-plan,
   .audience-actions,
   .option-grid,
   .stakeholder-grid,
@@ -873,51 +1099,68 @@ main {
     grid-template-columns: 1fr;
   }
 
-  .dimension-line {
-    padding: 4px 20px 14px;
-  }
-
-  .floor-plan {
-    margin-inline: 20px;
-    min-height: auto;
-    display: flex;
-    flex-direction: column;
-  }
-
-  .plan-room,
-  .plan-foyer {
-    min-height: 180px;
-    border-right: 0;
-    border-bottom: 2px solid var(--ink);
-  }
-
+  /* The mobile counterpart of the .plan-room-N family. Retiring or restyling
+     this family means every selector in it, on both breakpoints — a line range
+     strands this rule and nothing in the suite would notice. */
+  .plan-room-1,
+  .plan-room-2,
+  .plan-room-3,
   .plan-room-4 {
-    border-bottom: 0;
+    grid-area: auto;
   }
 
-  .plan-foyer {
-    order: -1;
-  }
-
-  .scale-line {
-    padding: 18px 20px 34px;
-    grid-template-columns: 1fr;
+  .plan-room {
+    min-height: 0;
+    padding: 20px;
   }
 
   .stepper {
-    overflow-x: auto;
     grid-template-columns: repeat(4, minmax(110px, 1fr));
+    overflow-x: auto;
+  }
+
+  .stepper li {
+    min-height: 72px;
+    padding: 12px 14px;
+    font-size: 14px;
+  }
+
+  .question-panel,
+  .result-panel {
+    min-height: 0;
+    border-radius: var(--radius-card-lg);
+    box-shadow: var(--shadow-demo-mobile);
+  }
+
+  .audience-button {
+    box-shadow: none;
+  }
+
+  .detail-callout {
+    padding: 22px;
+    border-radius: var(--radius-card-lg);
   }
 
   .site-footer {
     grid-template-columns: 1fr;
+    padding: 24px;
+    border-radius: var(--radius-card-lg);
   }
 
   .site-footer nav {
     justify-content: flex-start;
   }
+
+  .consent-banner {
+    right: 12px;
+    left: 12px;
+    bottom: 12px;
+    width: auto;
+  }
 }
 
+/* The other half of the §4.5 note-3 pair. This block exists ONLY to undo
+   `html { scroll-behavior: smooth }` above; never keep one without the other. */
 @media (prefers-reduced-motion: reduce) {
   html {
     scroll-behavior: auto;

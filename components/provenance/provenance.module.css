@@ -1,0 +1,121 @@
+/*
+ * Provenance primitives (plan Phase 4, §4.8, §6.3, §6.4).
+ *
+ * CSS Modules, not globals: `.eyebrow`, `.hero`, `.primary` and friends are
+ * already taken by the legacy layer that styles the 11 preserved routes, and a
+ * new component using one of those names would silently inherit blueprint
+ * geometry with no compile error (§4.1).
+ *
+ * (WYS §23): AI material is never styled more premium than human source
+ * material. There is no sparkle, no gradient, no icon — the draft mark and the
+ * provenance label are the same 11px mono line in the same muted ink on both.
+ */
+
+/* ProvenanceMono — the ONLY place IBM Plex Mono is permitted (§4.8). */
+.mono {
+  margin: 0;
+  font: 400 11px / 1.5 var(--mono);
+  color: var(--muted);
+}
+
+.monoState {
+  font-size: 12px;
+  line-height: 1.7;
+}
+
+.monoOnDark {
+  color: var(--muted-on-dark);
+}
+
+/* DraftMark — same weight, same size, same ink as any other provenance line. */
+.draftMark {
+  margin: 10px 0 0;
+}
+
+.draftMarkCentred {
+  text-align: center;
+}
+
+/* Slots — a Ben slot is an empty labelled outline. It has no text prop, so it
+ * cannot be filled with generated prose (§6.4). */
+.slot {
+  padding: 20px;
+  border: var(--dash-ben);
+  border-radius: var(--radius-card-lg);
+  background: transparent;
+}
+
+.slotLabel {
+  margin: 0 0 6px;
+  font: 600 12px / 1.3 var(--sans);
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--accent-text-on-tint);
+}
+
+.slotAwaited {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.45;
+  color: var(--muted);
+}
+
+/* Grey dash = empty / optional / terminal. Teal dash = awaiting Ben. White dash
+ * on ink = a non-persisted scratch box. NEVER MIX THE INKS. */
+.dashedGrey {
+  border: 1.5px dashed var(--border-dashed);
+}
+
+.dashedScratch {
+  border: var(--dash-scratch);
+  color: var(--muted-on-dark);
+}
+
+.dashedScratch .slotLabel {
+  color: var(--accent-on-dark);
+}
+
+.dashedScratch .slotAwaited {
+  color: var(--muted-on-dark);
+}
+
+.slotOnDark .slotLabel {
+  color: var(--accent-on-dark);
+}
+
+.slotOnDark .slotAwaited {
+  color: var(--body-on-dark);
+}
+
+/* MediaSlot — never an image. A 135deg stripe, a mono caption, nothing else. */
+.media {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  overflow: hidden;
+  border-radius: var(--radius-card-lg);
+  background: var(--media-light);
+}
+
+.mediaDark {
+  background: var(--media-dark);
+}
+
+.mediaDisc {
+  border-radius: 50%;
+  background: var(--media-dark-disc);
+}
+
+.mediaOverlay {
+  position: absolute;
+  top: 12px;
+  left: 12px;
+  padding: 5px 10px;
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--accent-text-on-tint);
+  font: 500 12px / 1 var(--sans);
+}
