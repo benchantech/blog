@@ -157,3 +157,45 @@ export function bridgeStateLines(): string[] {
 export function isStamped(): boolean {
   return approvalState.stamp !== null;
 }
+
+/* -------------------------------------------------------------------------- */
+/* The disclosure strip's fourth sentence (Q1, SC-1, §5.5)                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The strip's fourth sentence, and the link that goes with it.
+ *
+ * The approved `4a` strip (dc.html:424) ends "Every published word was approved
+ * by Ben." Nothing is stamped, and R8 forbids fixing a false public claim in
+ * copy — so the sentence is a VARIANT SELECTED BY `approvalState.stamp`, not a
+ * string. While `stamp` is null the strip states the true position and points
+ * at the Ship's Log; the moment Ben stamps, the approved sentence renders and
+ * the link drops away. One typed value flips it, with no component edit.
+ *
+ * Why it lives here rather than in `content/claims.ts`: this is approval state,
+ * and approval state is data, never copy (§6.6). It is also why
+ * `tests/governance-strings.test.ts` can keep banning "approved by Ben" from
+ * every file under `app/` and `components/` — the literal exists once, here.
+ *
+ * Q1 is ratified at this default and THE WORDING IS ESCALATED TO BEN before
+ * launch (docs/facelift-build-notes.md). The unstamped line is factual build
+ * description in the third person, never Ben's voice (R10), and it does not
+ * upgrade a hedge into an assertion (packet 3.4).
+ */
+export interface DisclosureApprovalLine {
+  text: string;
+  /** Where the reader can check the claim. null once a stamp exists. */
+  href: string | null;
+  linkLabel: string | null;
+}
+
+export function disclosureApprovalLine(): DisclosureApprovalLine {
+  if (!approvalState.stamp) {
+    return {
+      text: "Nothing here is published as Ben's position until he stamps it.",
+      href: "/ships-log",
+      linkLabel: "Ship's Log"
+    };
+  }
+  return { text: "Every published word was approved by Ben.", href: null, linkLabel: null };
+}

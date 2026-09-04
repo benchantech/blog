@@ -208,3 +208,92 @@ by `grid-area` on `.plan-room-1` … `.plan-room-4`.
 - **Q5** — where the Captain's Quarters "Studio / rented laboratory" tile points.
   `GridTile` accepts no `href` so the ratified default (leave it unlinked with its
   label) is buildable; nothing is linked yet.
+
+---
+
+# Phase 5 — Chrome
+
+Appended at the Phase 5 gate. Everything below is chrome: header, footer,
+disclosure strip, and the three convention surfaces the repo never had.
+
+## F. Whole surfaces no artboard draws
+
+### F1. The compact mobile header (Q9, ratified at its default)
+
+**No artboard designs a mobile site header.** Today `.desktop-nav` is
+`display: none` below 700px with **no replacement**, so `/studio`, `/neon` and
+yymethod.com are unreachable from mobile chrome at all. Shipping six new ship
+surfaces on top of that gap would also break packet build step 11 ("Build mobile
+navigation first… Primary ship destinations should be extremely easy to reach").
+
+What ships: a `<details>`/`<summary>` disclosure in the header, opening a panel
+carrying **every** link from both tiers — the six ship links, the Start Lesson
+Zero CTA, and the three ecosystem links. No client JS, no hover-only behaviour,
+no modal trap, and it still opens with JavaScript off. Touch targets ≥ 44px.
+
+**What Ben is being asked to approve:** that a mobile header exists at all, and
+that it is a plain disclosure panel rather than a full-screen sheet.
+
+### F2. The footer as the complete mobile path to every link
+
+Independent of F1, and deliberately so: **if the mobile header is rejected, no
+link becomes unreachable.** The footer carries four groups — THE SHIP (six links
+plus the CTA), DOORS (the four destinations), REVIEWERS (`/studio`, `/neon`, and
+the yymethod.com root), LEGAL (the seven preserved legal links) — at both
+breakpoints, collapsing to two columns below 700px rather than hiding anything.
+
+Structural precedent is superseded turn `2f`'s stacked mobile footer (disclosure
+card, then a two-column THE SHIP grid, then the doors). The visual register is
+`5d`'s. **The `4a` footer draws one row of four door labels and a stamp line;
+this is materially more footer than the artboard shows.**
+
+### F3. The stacked mobile disclosure strip
+
+The strip exists in the approved set **only** at `4a` desktop. Its flex geometry
+(gap 32, two `nowrap` children, 18px body) cannot survive 390px minus 44px of
+gutters, and the handoff README requires the strip on **every** page footer. It
+stacks below 700px in the `5d` dark-card register (radius 22, padding 18), from
+the same DOM — nothing is duplicated and nothing is hidden.
+
+### F4. Root chrome on the course and ship screens (§5.6)
+
+The eleven phone artboards begin straight at content: no site header, no footer,
+no strip. The root header, footer and disclosure strip now render on **every**
+route, so **every Watch Your Step and ship screen gains vertical chrome its
+artboard does not show**. Suppressing the strip on those pages was rejected: it
+would break the README requirement and the site's own transparency claim.
+
+### F5. 404, error and global-error
+
+`app/not-found.tsx`, `app/error.tsx` and `app/global-error.tsx` are **new
+surfaces, not restyles** — the repo had none of them. No artboard exists for any
+of the three. They are deliberately plain: an eyebrow, a headline, a way out,
+and no explanation of the failure (a stack or message on a public page is an
+information leak). `app/global-error.tsx` replaces the root layout, so it cannot
+use `globals.css` or the `next/font` variables; its palette values are written
+out literally and must be updated by hand if the tokens change.
+
+### F6. Header behaviour between 700px and the artboard width
+
+`4a` is drawn at 1280px and the mobile rules take over at 700px, so **nothing in
+the approved set describes the header between those two widths**. Measured in
+Chrome at 768px: the ship tier is 676px wide and the brand is 170px, which with
+the 56px gutters and the 32px header gap needs about 990px — below that the
+header pushed the document to 910px of scroll width at a 768px viewport.
+
+Nothing may be hidden to fix that (both inventories ship, §3.3, R7), so below
+1100px **the two tiers wrap onto additional lines and their gaps tighten**. Same
+DOM, same links, same order; the header just grows taller. Found and fixed at
+the Phase 5 gate.
+
+## G. Departures from an artboard that does settle it
+
+| # | Departure | Reason |
+|---|---|---|
+| **G-a** | **The header is two tiers, not one.** `4a` draws one row: six ship links and a teal CTA. The three links the live header carries today (`/studio`, `/neon`, yymethod.com) are added as a quieter second row at 14px `--muted`. | R7: where a source implies replacing an existing surface, add the new and keep the old. Nine links plus a CTA do not fit one 1280px row minus 56px gutters at 15px / gap 32. |
+| **G-b** | **The wordmark stays "BenChanTech".** The artboard reads "Ben Chan Tech". | Q8, ratified at its default. Changing it touches root metadata and OG copy, so it is a metadata decision, not a chrome one. |
+| **G-c** | **The disclosure strip's fourth sentence is not the approved one while nothing is stamped.** `4a` ends "Every published word was approved by Ben." The strip renders instead: "Nothing here is published as Ben's position until he stamps it." with a link to the Ship's Log. | Q1 / SC-1. Nothing is stamped, and R8 forbids fixing a false public claim in copy. The sentence is a variant selected by `approvalState.stamp`: the approved wording renders automatically the moment a stamp exists. **The replacement wording is escalated to Ben.** |
+| **G-d** | **The footer's doctrine door reads "YY Method doctrine", not the `eyebrow` value "YY Method™".** | §3.3's two-distinct-labels rule. Both yymethod.com hrefs now appear in the same footer; rendering the eyebrow for both would give two links one accessible name and two destinations. The other three doors render their `eyebrow` verbatim, ™ included — itself the reported deviation from the artboard's bare "YY Method" label. |
+| **G-e** | **The REVIEWERS group carries three rows, not the two §3.3 names.** `/studio`, `/neon`, **and** the yymethod.com site root. | The root link would otherwise have no mobile home (F2). It is exactly the header's tier-2 inventory, mirrored. |
+| **G-f** | **The footer group labels are typed in caps** ("THE SHIP", "DOORS", "REVIEWERS", "LEGAL") and no `text-transform` is used anywhere. | §4.2's caps rule, applied to a group of labels the artboard does not draw at all. |
+| **G-g** | **A second nav landmark exists in the header.** `aria-label="Primary navigation"` stays exactly where it is today — on the preserved `.desktop-nav` element carrying `/studio`, `/neon` and yymethod.com. The NEW ship tier is labelled "Ship navigation", and the mobile disclosure panel "Mobile navigation". | Two nav landmarks in one header need two distinct names. The additive reading (R7, R9) is that the preserved landmark keeps its accessible name and the new one gets a new name — moving the shipped label onto the new tier would rename a live landmark, which the deletion contract forbids as much as dropping it. Asserted in `tests/preserved-surfaces.test.ts`. |

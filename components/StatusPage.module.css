@@ -1,0 +1,53 @@
+/* ==========================================================================
+   404 / error surface (plan Phase 5). NEW and unapproved — no artboard exists.
+   ========================================================================== */
+
+.status {
+  width: min(calc(100% - 2 * var(--gutter)), calc(var(--max) - 2 * var(--gutter)));
+  margin-inline: auto;
+  padding-block: 96px 120px;
+  display: grid;
+  justify-items: start;
+  gap: 14px;
+  max-width: 720px;
+}
+
+.title {
+  margin: 0;
+  font: 600 44px / 1.08 var(--sans);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 16px;
+  margin-top: 10px;
+}
+
+.link {
+  color: var(--accent);
+  font: 500 17px / 1.4 var(--sans);
+  text-decoration: none;
+  padding-block: 10px;
+}
+
+.link:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+@media (max-width: 700px) {
+  .status {
+    padding-block: 48px 64px;
+    max-width: none;
+  }
+
+  .title {
+    font-size: 32px;
+    line-height: 1.12;
+  }
+}

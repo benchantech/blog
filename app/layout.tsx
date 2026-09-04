@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { IBM_Plex_Mono, IBM_Plex_Sans } from "next/font/google";
-import Link from "next/link";
 import { ConsentBanner } from "@/components/ConsentBanner";
+import { DisclosureStrip } from "@/components/DisclosureStrip";
 import { GoogleAnalytics } from "@/components/GoogleAnalytics";
 import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
 import "./globals.css";
 
 /**
@@ -66,6 +67,21 @@ export const metadata: Metadata = {
   }
 };
 
+/**
+ * Root chrome renders on EVERY route, course and ship pages included (§5.6).
+ *
+ * The phone artboards begin straight at content with no site header and no
+ * footer strip, but the handoff README requires the disclosure strip on every
+ * page footer and mobile visitors need site navigation somewhere. Suppressing
+ * the strip on the Watch Your Step screens would break both the README
+ * requirement and the site's own transparency claim, so it renders everywhere
+ * and the vertical geometry of every WYS screen shifts from its artboard.
+ * NEW/unapproved; see docs/facelift-unapproved.md (Q9).
+ *
+ * PRESERVED HERE, VERBATIM: every metadata value above, the skip link and its
+ * `#main` target, `<main id="main">`, and the header's `<img aria-hidden>` +
+ * adjacent-text pairing (now inside components/SiteHeader.tsx).
+ */
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en" className={[plexSans.variable, plexMono.variable].join(" ")}>
@@ -73,22 +89,9 @@ export default function RootLayout({ children }: Readonly<{ children: React.Reac
         <a className="skip-link" href="#main">
           Skip to content
         </a>
-        <header className="site-header">
-          <Link className="brand" href="/">
-            <span className="brand-mark" aria-hidden="true">
-              <img src="/brand-mark.png" alt="" />
-            </span>
-            <span>BenChanTech</span>
-          </Link>
-          <nav className="desktop-nav" aria-label="Primary navigation">
-            <Link href="/studio">Violin for Parents</Link>
-            <Link href="/neon">Neon</Link>
-            <a href="https://yymethod.com" rel="noreferrer">
-              YY Method™
-            </a>
-          </nav>
-        </header>
+        <SiteHeader />
         <main id="main">{children}</main>
+        <DisclosureStrip />
         <SiteFooter />
         <GoogleAnalytics />
         <ConsentBanner />

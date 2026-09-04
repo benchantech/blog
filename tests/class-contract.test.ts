@@ -278,7 +278,12 @@ test("mode 2: every styles.<key> resolves to a class in its sibling .module.css"
   // by 25 primitives. A later phase that adds a primitive updates this number
   // deliberately; that is the point of the assertion, and it is what stops a
   // module quietly falling out of coverage.
-  assert.equal(modulesChecked, 25, "CSS Module imports across app/ and components/ — update deliberately");
+  //
+  // 25 -> 31 in Phase 5 (chrome): SiteHeader, DisclosureStrip, RouteStub and
+  // StatusPage each import their own module, and the two Watch Your Step route
+  // groups — `(shell)/layout.tsx` and `(flow)/layout.tsx` — both import
+  // `app/watch-your-step/wys-groups.module.css`.
+  assert.equal(modulesChecked, 31, "CSS Module imports across app/ and components/ — update deliberately");
 });
 
 /* -------------------------------------------------------------------------- */

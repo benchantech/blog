@@ -828,13 +828,20 @@ main {
 }
 
 /* --- footer -------------------------------------------------------------- */
-/* An inset ink slab (§4.9), not a full-bleed band, and no rule above it. */
+/* An inset ink slab (§4.9), not a full-bleed band, and no rule above it.
+
+   Phase 5 restructured the footer into four link groups (§3.3): The Ship, the
+   four Doors, Reviewers, and the seven preserved legal links. It is also the
+   complete mobile path to every link in the header, independently of Q9 — so
+   the group grid collapses to two columns at 700px rather than hiding
+   anything. The footer stays in the LEGACY LAYER rather than moving to a CSS
+   Module: `.site-footer` is already the public API of this stylesheet for a
+   preserved surface, and keeping one owner avoids a module and a global rule
+   competing for the same element by injection order. */
 .site-footer {
   margin-block: var(--section-gap) 40px;
   padding: 36px 40px;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  align-items: start;
   gap: 32px;
   background: var(--ink);
   color: var(--body-on-dark);
@@ -843,7 +850,7 @@ main {
   width: min(calc(100% - 2 * var(--gutter)), calc(var(--max) - 2 * var(--gutter)));
 }
 
-.site-footer div {
+.footer-identity {
   display: grid;
   gap: 8px;
 }
@@ -859,18 +866,37 @@ main {
   font: 400 15px / 1.5 var(--sans);
 }
 
-.site-footer nav {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 8px 20px;
-  max-width: 560px;
+.footer-groups {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  align-items: start;
+  gap: 28px;
+}
+
+.footer-group {
+  display: grid;
+  align-content: start;
+  gap: 2px;
+}
+
+/* Caps are TYPED IN THE COPY, never `text-transform` (§4.2). */
+.footer-group-label {
+  margin: 0 0 6px;
+  color: var(--accent-on-dark);
+  font: 600 12px / 1.2 var(--sans);
+  letter-spacing: 0.06em;
+}
+
+.footer-stamp {
+  margin: 0;
+  color: var(--muted-on-dark);
+  font: 400 13px / 1.5 var(--sans);
 }
 
 .site-footer a {
   color: var(--accent-on-dark);
   text-decoration: none;
-  padding-block: 10px;
+  padding-block: 10px; /* §4.6: touch targets >= 44px */
 }
 
 /* --- consent banner (visual only; the state machine is frozen) ----------- */
@@ -1142,13 +1168,17 @@ main {
   }
 
   .site-footer {
-    grid-template-columns: 1fr;
     padding: 24px;
+    gap: 26px;
     border-radius: var(--radius-card-lg);
   }
 
-  .site-footer nav {
-    justify-content: flex-start;
+  /* Two columns, not one, and nothing is hidden: below 700px this footer is
+     the complete path to every link in the header (§3.3). Structural
+     precedent is superseded turn `2f`'s stacked mobile footer. */
+  .footer-groups {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 22px;
   }
 
   .consent-banner {

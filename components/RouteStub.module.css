@@ -1,0 +1,54 @@
+/* ==========================================================================
+   Route stub (plan Phase 5). Deliberately plain: a stub that looked finished
+   would read as the surface it is standing in for.
+   ========================================================================== */
+
+.stub {
+  width: min(calc(100% - 2 * var(--gutter)), calc(var(--max) - 2 * var(--gutter)));
+  margin-inline: auto;
+  padding-block: 72px 96px;
+  display: grid;
+  justify-items: start;
+  gap: 12px;
+  max-width: 720px;
+}
+
+.title {
+  margin: 0;
+  font: 600 40px / 1.1 var(--sans);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.pillRow {
+  margin: 0;
+}
+
+.back {
+  margin: 10px 0 0;
+}
+
+.back a {
+  color: var(--accent);
+  font: 500 17px / 1.4 var(--sans);
+  text-decoration: none;
+  padding-block: 10px;
+}
+
+.back a:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+@media (max-width: 700px) {
+  .stub {
+    padding-block: 40px 56px;
+    max-width: none;
+  }
+
+  .title {
+    font-size: 32px;
+    line-height: 1.12;
+  }
+}

@@ -1,0 +1,27 @@
+/* ==========================================================================
+   The two Watch Your Step route groups (plan §5.4).
+
+   `app/watch-your-step/(shell)` carries the persistent bottom tab bar and
+   110px of bottom padding; `(flow)` carries the progress rail, no bottom nav
+   and 60px. Under the App Router a child inherits its parent layout, so this
+   split is the only way Lesson Zero can sit at /watch-your-step/start without
+   the tab bar. Route groups do not affect URLs.
+
+   Phase 5 ships the STRUCTURE and the page padding only. The BottomNav is
+   deliberately NOT mounted yet: its five tabs point at /today, /plan,
+   /progress, /practice and /data, which do not exist until Phase 7, and this
+   phase's exit is "no dead links". The progress rail is likewise Phase 7's,
+   because it needs the step count that only Lesson Zero's content supplies.
+
+   Mobile page padding is the artboards' (§4.2): 74px top on the WYS landing,
+   72px on Lesson Zero, 110px bottom where a tab bar will be, 60px where none
+   will.
+   ========================================================================== */
+
+.shell {
+  padding-bottom: 110px;
+}
+
+.flow {
+  padding-bottom: 60px;
+}

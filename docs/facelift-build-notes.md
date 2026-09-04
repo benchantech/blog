@@ -1092,3 +1092,168 @@ the 1280px and the 390px column with every primitive rendered through its real
 component and its real module classes), but **nobody looked at it in a browser**.
 Pixel fidelity against the five PNGs at 1280 and 390 remains manual QA under
 Phase 0's Q15 decision, and is Phase 12's side-by-side check.
+
+---
+
+# Phase 5 — Chrome
+
+**Goal (plan Phase 5):** every existing link survives, the disclosure strip
+appears on every page footer, and no governance claim is hardcoded.
+
+## What shipped
+
+| Deliverable | Files |
+|---|---|
+| Header carrying **both** nav inventories, two tiers, plus the compact mobile menu | `components/SiteHeader.tsx`, `components/SiteHeader.module.css`, `app/layout.tsx` |
+| The nav inventories as data, and the footer-door label overlay | `content/nav.ts` |
+| Footer: four link groups, all seven legal links, the four doors from `destinations.map()`, the stamp line from `approvalState` | `components/SiteFooter.tsx`, `app/globals.css` (footer block) |
+| Disclosure strip, desktop + stacked mobile, on every route | `components/DisclosureStrip.tsx`, `components/DisclosureStrip.module.css` |
+| The strip's fourth sentence as approval **state**, not copy | `lib/approval-state.ts` (`disclosureApprovalLine()`) |
+| Seven route stubs + the `(shell)` / `(flow)` route-group split | `app/{bridge,standing-orders,ships-log,crew,ben}/page.tsx`, `app/watch-your-step/(shell)/{layout,page}.tsx`, `app/watch-your-step/(flow)/{layout.tsx,start/page.tsx}`, `app/watch-your-step/wys-groups.module.css`, `components/RouteStub.tsx` + module |
+| 404 / error / global-error | `app/not-found.tsx`, `app/error.tsx`, `app/global-error.tsx`, `components/StatusPage.tsx` + module |
+| Coverage for all of it | `tests/preserved-surfaces.test.ts` (9 new tests), `tests/class-contract.test.ts` (module count 25 → 31) |
+
+`components/ConsentBanner.tsx` was **not edited**. Its restyle is a task row in
+this phase, and Phase 4 had already done the whole of it in `globals.css`
+(`.consent-banner` and its buttons, plus the `try/catch` hardening from Phase 2).
+The task was visual-only by its own terms, so the correct Phase 5 diff for that
+file is an empty one. Consent behaviour is byte-identical.
+
+## Escalations recorded here, as the ratification instruction requires
+
+1. **Q1 / SC-1 — the disclosure strip's fourth sentence. ESCALATED TO BEN.**
+   The approved `4a` strip ends "Every published word was approved by Ben."
+   Nothing is stamped, so the sentence is false today, and R8 forbids fixing a
+   false public claim in copy. Shipped at the ratified default: the first three
+   sentences render verbatim from `content/claims.ts` (`zero-ai.inline` and
+   `ai-assisted-ben-approved.inline`), and the fourth is
+   `disclosureApprovalLine()` — a variant selected by `approvalState.stamp`.
+   While the stamp is null it reads **"Nothing here is published as Ben's
+   position until he stamps it."** followed by a link to the Ship's Log. The
+   approved sentence renders automatically the moment a stamp exists; no
+   component changes. **Ben has to approve that replacement wording.**
+2. **Q9 — mobile navigation and root chrome on course pages. FLAGGED
+   NEW/UNAPPROVED** in `docs/facelift-unapproved.md` §F1–F4. Both halves
+   shipped: the footer is a complete mobile path to every link regardless of how
+   Q9 resolves, and a compact mobile header sits on top of that.
+3. **Q8 — the wordmark.** Untouched: "BenChanTech" everywhere, including root
+   metadata. Recorded in `docs/facelift-unapproved.md` §G-b.
+
+## Decisions this phase made, with reasons
+
+- **The footer stayed in the legacy layer instead of moving to a CSS Module.**
+  §4.1 sends every NEW surface to CSS Modules, and the header's new parts did go
+  there. The footer did not, because `.site-footer` is *already* the public API
+  of `globals.css` for a preserved surface, and a module rule and a global rule
+  competing for the same element resolve by injection order, which is not
+  something a component should depend on. New footer-scoped names
+  (`.footer-identity`, `.footer-groups`, `.footer-group`, `.footer-group-label`,
+  `.footer-stamp`) were added to the legacy layer instead, and they are covered
+  by `class-contract` modes 1 and 3 exactly like every other legacy name.
+  `.site-footer div` and `.site-footer nav` — two bare descendant selectors that
+  would have styled every new group wrapper by accident — were replaced by those
+  named classes. No class selector was dropped from the file.
+- **Where a module rule must beat a global one it is written with two classes**
+  (`.tiers .ecosystemNav`), never as a bare single class. Same reason.
+- **Four footer groups, not §3.3's three.** §3.3 lists doors, Reviewers and
+  legal; the phase task row separately requires the footer to be a complete
+  mobile path to every link "regardless of how Q9 resolves". A THE SHIP group is
+  the only way both hold, and superseded turn `2f` shows exactly that structure.
+- **The BottomNav is deliberately NOT mounted** in `(shell)/layout.tsx`. Its five
+  tabs point at `/today`, `/plan`, `/progress`, `/practice` and `/data`, none of
+  which exist until Phase 7 — mounting it now would have created five dead links
+  inside the phase whose exit criterion is "no dead links". The layout exists so
+  Phase 7 has the anchor, and the route-group split is proven by the build.
+- **`app/global-error.tsx` is self-contained.** It replaces the root layout, so
+  it cannot use `globals.css` or the `next/font` variables. Its palette values
+  are written out literally against a system font stack, and that is called out
+  in the file: if the tokens change, this is the one file that needs hand-editing.
+- **Stubs may not impersonate the surface they stand in for.** `RouteStub`
+  renders an eyebrow, the surface name, a grey `in build` pill and an 11px mono
+  line naming the phase that fills it. No summary of an unwritten page, no
+  Ben-attributed prose (R9, R10).
+- **New-route metadata is title-only plus `alternates.canonical`** (§5.2, §5.2
+  "Canonical URLs"). No `description` on any new route, and the four preserved
+  pages that export no metadata at all were left exactly as they are. Asserted
+  in `tests/preserved-surfaces.test.ts`.
+
+## Measured at the gate
+
+- `npm test` — **178 tests, 178 pass, 0 fail** (169 before this phase).
+- `PORT=3999 npm run build` — **19 routes, every one `○ (Static)`, zero `ƒ`**,
+  21 static pages generated. Baseline was 12 rows; the seven stubs are the
+  difference and nothing regressed from `○`.
+- `scripts/check-no-deletions.sh` exits 0 — zero removed files, zero renames.
+- **Every link is on every page.** The built HTML for `/privacy` was parsed:
+  38 distinct hrefs, including all seven legal links, all six ship links, the
+  CTA, `/studio`, `/neon`, **both** `https://yymethod.com` and
+  `https://yymethod.com/doctrine`, and the other three doors. `Crew Manifest`,
+  `Start Lesson Zero` and the stamp line are present in **all eighteen** built
+  HTML files — the strip really is on every page footer.
+- The `class-contract` module-import count moved **25 → 31**, updated
+  deliberately in the test with the six new imports named.
+
+## Phase 5 gate — verified in a browser, and two defects fixed
+
+The implementer's report closed with "neither breakpoint was opened in a
+browser". The gate opened both, against `npx next start` on the real production
+build, in headless Chrome.
+
+**Verified, with measurements rather than inspection:**
+
+- **Every pre-facelift href is reachable at 390px and at 1280px** — and at 768px
+  and 1024px. The check is a DOM walk over `a[href]` filtered to elements that
+  actually have client rects and are not `display:none`/`visibility:hidden`, on
+  `/`, `/crew`, `/watch-your-step`, `/watch-your-step/start`, `/privacy`,
+  `/system`, `/bridge` and a 404. All 21 required destinations are **visibly
+  rendered** at every width — the footer alone carries the whole inventory, so
+  the claim does not depend on the mobile menu being opened. Zero missing.
+- **No horizontal overflow** on any of those pages at any of those widths
+  (`documentElement.scrollWidth === innerWidth`).
+- **The disclosure strip renders on every one of them, including the 404**, with
+  all four sentences and both links (`/ships-log`, `/crew`).
+- **Consent behaviour byte-identical.** Rebuilt with a throwaway measurement ID
+  so the banner's render guard opens. `dataLayer` at first paint is
+  `js` → `consent default {analytics_storage: denied, ad_storage: denied,
+  ad_user_data: denied, ad_personalization: denied, wait_for_update: 500}` →
+  `set ads_data_redaction true` → `config <id> {anonymize_ip, send_page_view,
+  allow_google_signals: false, allow_ad_personalization_signals: false}`. Body
+  copy and the labels "Decline" / "Allow analytics" unchanged. Clicking "Allow
+  analytics" writes `bct_analytics_consent = granted` and pushes
+  `consent update {analytics_storage: granted, ad_storage: denied,
+  ad_user_data: denied, ad_personalization: denied}` — the three `ad_*` denials
+  survive a grant, exactly as before.
+- The mobile `<details>` panel opens and lists all ten links; the two-column
+  mobile footer renders all four groups.
+
+**Two defects the gate found and fixed:**
+
+1. **The header overflowed the document between roughly 700px and 990px.**
+   `4a` is drawn at 1280 and the mobile rules start at 700, so the range between
+   them was undescribed. Measured at a 768px viewport: `scrollWidth` 910 against
+   `innerWidth` 768, i.e. 142px of horizontal page scroll on every route.
+   Fixed in `components/SiteHeader.module.css` with a `max-width: 1100px` block
+   that lets both tiers wrap and tightens their gaps. Nothing is hidden; the
+   header just grows taller. Recorded in `docs/facelift-unapproved.md` §F6.
+2. **The "Start Lesson Zero" pill rendered `--body` on `--accent`, about
+   1.9:1.** `.shipNav a { color: var(--body) }` (0,1,1) outranked
+   `.cta { color: var(--white) }` (0,1,0), so the module's own base rule ate its
+   own CTA — and `.shipNav a:hover` additionally underlined the pill and turned
+   it `--ink`. Rewritten as `.shipNav .cta` / `.shipNav .cta:hover`. Measured
+   after the fix: **4.98:1**, and every other link in the header, footer and
+   strip is between 5.47:1 and 16.46:1. This is exactly the failure mode the
+   module's own header comment warns about, one selector further in.
+
+**One record corrected.** `docs/facelift-unapproved.md` §G-g claimed
+`aria-label="Primary navigation"` had been moved onto the ship tier and the
+ecosystem row renamed "Ecosystem navigation". The code does the opposite, and
+correctly: the preserved label stays on the preserved `.desktop-nav` element and
+the new tier is "Ship navigation" — which is what `tests/preserved-surfaces.test.ts`
+asserts. The doc was wrong, not the build; §G-g now describes what ships.
+
+## What this gate still could not verify
+
+**Pixel fidelity against the five approved PNGs.** The gate confirmed structure,
+reachability, overflow, contrast and consent behaviour — it did not compare
+spacing, type scale or colour against the artboard images side by side. That
+remains manual QA under Phase 0's Q15 decision and is Phase 12's check.

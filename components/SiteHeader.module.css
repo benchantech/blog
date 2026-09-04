@@ -1,0 +1,182 @@
+/* ==========================================================================
+   Site header — the NEW parts only (plan Phase 5, §3.3, §4.1).
+
+   The preserved parts (`.site-header`, `.brand`, `.brand-mark`,
+   `.desktop-nav`) keep their global rules in `app/globals.css`: those class
+   names are the public API of that stylesheet and the header is a preserved
+   surface. Everything the artboard adds — the ship tier, the teal CTA, the
+   two-tier stack and the compact mobile menu — is scoped here, because
+   `.brand`, `.primary` and friends are already taken globally and a new
+   component reusing one would silently inherit blueprint geometry (§4.1).
+
+   Where a rule here has to beat a global one it is written as
+   `.tiers .ecosystemNav`, never as a bare single class: two single-class
+   selectors of equal specificity resolve by injection order, which is not
+   something a component should depend on.
+
+   No divider under the nav (§4.9): the only chrome border in the approved set
+   is the mobile tab bar's top hairline.
+   ========================================================================== */
+
+/* The two tiers, right-aligned. `.site-header` stays `justify-content:
+   space-between`, so this is its second flex child on desktop. */
+.tiers {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 8px;
+}
+
+/* Tier 1 — the six approved ship links plus the teal CTA (mockup 4a). */
+.shipNav {
+  display: flex;
+  align-items: center;
+  gap: 28px;
+  font-family: var(--sans);
+  font-size: 15px;
+  color: var(--body);
+}
+
+.shipNav a {
+  color: var(--body);
+  text-decoration: none;
+  padding-block: 10px; /* §4.6: touch targets >= 44px */
+  white-space: nowrap;
+}
+
+.shipNav a:hover {
+  color: var(--ink);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+/* The one teal fill in the chrome (§4.7.2: teal is reserved for the nav CTA
+   and continue/secondary pills; every primary action pill is ink).
+
+   Written `.shipNav .cta`, not `.cta`: the CTA is a child of `.shipNav`, so the
+   `.shipNav a` rule above (0,1,1) outranks a bare `.cta` (0,1,0) and the pill
+   renders --body on --accent — about 1.9:1, and underlined on hover. */
+.shipNav .cta {
+  padding: 12px 22px;
+  background: var(--accent);
+  color: var(--white);
+  border-radius: var(--radius-pill);
+  font-size: 15px;
+  font-weight: 500;
+  text-decoration: none;
+  white-space: nowrap;
+  transition: background-color var(--reveal) ease-out;
+}
+
+.shipNav .cta:hover {
+  background: #1a6b7b;
+  color: var(--white);
+  text-decoration: none;
+}
+
+/* Tier 2 — the three preserved ecosystem links. Set one step quieter than the
+   ship row so the header reads as a hierarchy rather than nine equal links. */
+.tiers .ecosystemNav {
+  gap: 24px;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.tiers .ecosystemNav a {
+  color: var(--muted);
+}
+
+/* --- compact mobile header (NEW/unapproved, Q9) --------------------------- */
+/* A <details> disclosure: no client JS, no hover-only behaviour, no modal
+   trap, and it still opens with JS off. */
+.menu {
+  display: none;
+  position: relative;
+}
+
+.menuButton {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding: 10px 18px;
+  border: 1.5px solid var(--border-pill-strong);
+  border-radius: var(--radius-pill);
+  font-family: var(--sans);
+  font-size: 15px;
+  font-weight: 500;
+  color: var(--ink);
+  cursor: pointer;
+  list-style: none;
+}
+
+.menuButton::-webkit-details-marker {
+  display: none;
+}
+
+.menuPanel {
+  position: absolute;
+  right: 0;
+  top: calc(100% + 10px);
+  z-index: 20;
+  display: grid;
+  gap: 2px;
+  min-width: 232px;
+  padding: 10px;
+  background: var(--white);
+  border: 1.5px solid var(--border-card);
+  border-radius: var(--radius-card-lg);
+  box-shadow: var(--shadow-demo-mobile);
+}
+
+.menuPanel a {
+  display: block;
+  padding: 12px 12px;
+  border-radius: var(--radius-row);
+  color: var(--body);
+  font-family: var(--sans);
+  font-size: 16px;
+  text-decoration: none;
+}
+
+.menuPanel a:hover {
+  background: var(--tint-grey);
+  color: var(--ink);
+}
+
+@media (max-width: 700px) {
+  .tiers {
+    display: none;
+  }
+
+  .menu {
+    display: block;
+  }
+}
+
+/* --- the gap between the mobile breakpoint and the artboard width ---------- */
+/* The `4a` header is drawn at 1280px, where nine links plus the CTA fit two
+   right-aligned rows. They do not fit between 700px and roughly 1070px: the
+   ship tier alone measures about 758px (six labels at 15px, five 28px gaps and
+   a 177px pill) and the brand plus the 56px gutters take about 280px more, so
+   below that width the header overflows the document and takes the page's
+   horizontal scrollbar with it.
+
+   Nothing may be hidden to fix that — both inventories ship (§3.3, R7) — so
+   the rows WRAP and the gaps tighten. Same DOM, same links, same order. */
+@media (max-width: 1100px) {
+  .tiers {
+    min-width: 0;
+  }
+
+  .shipNav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 12px 20px;
+  }
+
+  .tiers .ecosystemNav {
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 8px 18px;
+  }
+}

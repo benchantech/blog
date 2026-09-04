@@ -1,0 +1,97 @@
+/* ==========================================================================
+   Disclosure strip (plan §5.5; mockup 4a, dc.html:422-426).
+
+   Desktop measurements are the artboard's: ink slab, radius 28, padding
+   36x40, flex, align-items center, gap 32, 18px/1.5 body, an outlined teal
+   `nowrap` pill and a `nowrap` 15px --accent-on-dark "Crew Manifest ->".
+
+   It is an inset slab (§4.9): `margin: 24px var(--gutter) 0`, never full-bleed,
+   and there is no rule above the footer.
+
+   Mobile is NEW and unapproved (§5.5). The desktop flex geometry cannot
+   survive 390px minus 44px of gutters, so the three children stack. Same DOM,
+   one media query — nothing is duplicated or hidden.
+   ========================================================================== */
+
+.strip {
+  width: min(calc(100% - 2 * var(--gutter)), calc(var(--max) - 2 * var(--gutter)));
+  margin: 24px auto 0;
+  padding: 36px 40px;
+  box-sizing: border-box;
+  display: flex;
+  align-items: center;
+  gap: 32px;
+  background: var(--ink);
+  color: var(--white);
+  border-radius: var(--radius-block);
+}
+
+.pill {
+  margin: 0;
+  flex: none;
+  padding: 8px 14px;
+  border: 1px solid var(--accent-on-dark);
+  border-radius: var(--radius-pill);
+  font-family: var(--sans);
+  font-size: 13px;
+  color: var(--accent-on-dark);
+  white-space: nowrap;
+}
+
+.body {
+  margin: 0;
+  font-family: var(--sans);
+  font-size: 18px;
+  line-height: 1.5;
+  color: var(--white);
+  text-wrap: pretty;
+}
+
+.inlineLink,
+.crew {
+  color: var(--accent-on-dark);
+  text-decoration: none;
+}
+
+.inlineLink:hover,
+.crew:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.crew {
+  flex: none;
+  font-family: var(--sans);
+  font-size: 15px;
+  white-space: nowrap;
+  padding-block: 10px; /* §4.6: touch targets >= 44px */
+}
+
+@media (max-width: 900px) {
+  .strip {
+    gap: 22px;
+  }
+
+  .body {
+    font-size: 16px;
+  }
+}
+
+/* Stacked mobile variant — the `5d` dark-card register: radius 22, padding 18. */
+@media (max-width: 700px) {
+  .strip {
+    display: grid;
+    justify-items: start;
+    gap: 12px;
+    padding: 18px;
+    border-radius: var(--radius-card-lg);
+  }
+
+  .body {
+    font-size: 15px;
+  }
+
+  .crew {
+    font-size: 15px;
+  }
+}

@@ -47,6 +47,18 @@ const sourceFiles = [
 /** Every scanned source file, concatenated, with its path kept for messages. */
 const corpus = sourceFiles.map((file) => readFileSync(file, "utf8")).join("\n\n");
 
+/**
+ * Strip comments before counting a code-level occurrence.
+ *
+ * The landmark assertions below count how many elements carry an accessible
+ * name. A doc comment that QUOTES the name is not an element, and the header
+ * documents its own preservation rule in prose — so counting the raw file
+ * conflates documentation with markup and fails on a correct component.
+ */
+function stripComments(source: string): string {
+  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
+}
+
 function occurrences(haystack: string, needle: string): number {
   let count = 0;
   let index = haystack.indexOf(needle);
@@ -236,4 +248,227 @@ test("scripts/check-no-deletions.sh exits 0 (nothing deleted or renamed)", () =>
     stdio: ["ignore", "pipe", "pipe"]
   });
   assert.match(output, /Deletion contract OK/);
+});
+
+/* -------------------------------------------------------------------------- */
+/* New links mounted in Phase 5 — the other half of the promise               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Nothing may be dropped, AND nothing new may ship dead.
+ *
+ * Phase 5 mounts a header carrying two nav inventories, a footer carrying four
+ * link groups, and a disclosure strip on every page footer. Every internal
+ * destination among them has to resolve to a real page file, which is why the
+ * phase stubs seven routes rather than five: the six nav items and the CTA
+ * point at destinations Phases 7 and 9 do not create until later.
+ */
+
+/** Every URL the app directory actually serves, with route groups stripped. */
+function servedUrls(): Set<string> {
+  const urls = new Set<string>();
+  const appDir = path.join(repoRoot, "app");
+
+  function visit(dir: string, segments: string[]): void {
+    for (const entry of readdirSync(dir)) {
+      if (skipDirs.has(entry)) continue;
+      const full = path.join(dir, entry);
+      if (statSync(full).isDirectory()) {
+        // `(shell)` and `(flow)` are route GROUPS: they organise layouts and do
+        // not appear in the URL (plan §5.4).
+        visit(full, entry.startsWith("(") && entry.endsWith(")") ? segments : [...segments, entry]);
+      } else if (entry === "page.tsx") {
+        urls.add(`/${segments.join("/")}`.replace(/\/+$/, "") || "/");
+      }
+    }
+  }
+
+  visit(appDir, []);
+  return urls;
+}
+
+/** Internal hrefs written in the chrome, wherever they are declared. */
+function chromeInternalHrefs(): { href: string; file: string }[] {
+  const files = [
+    "content/nav.ts",
+    "components/SiteHeader.tsx",
+    "components/SiteFooter.tsx",
+    "components/DisclosureStrip.tsx",
+    "lib/approval-state.ts"
+  ];
+  const found: { href: string; file: string }[] = [];
+  for (const file of files) {
+    for (const match of readRepoFile(file).matchAll(/"(\/[A-Za-z0-9/-]*)"/g)) {
+      found.push({ href: match[1], file });
+    }
+  }
+  return found;
+}
+
+test("the route-group structure serves /watch-your-step and /watch-your-step/start", () => {
+  // Proving §5.4's (shell)/(flow) split before Phase 7 depends on it. Route
+  // groups do not affect URLs.
+  const urls = servedUrls();
+  assert.ok(urls.has("/watch-your-step"), "the (shell) landing does not serve /watch-your-step");
+  assert.ok(urls.has("/watch-your-step/start"), "the (flow) Lesson Zero does not serve /watch-your-step/start");
+  assert.ok(
+    existsSync(path.join(repoRoot, "app", "watch-your-step", "(shell)", "layout.tsx")),
+    "the (shell) layout — where Phase 7 hangs the bottom nav — is missing"
+  );
+  assert.ok(
+    existsSync(path.join(repoRoot, "app", "watch-your-step", "(flow)", "layout.tsx")),
+    "the (flow) layout — no bottom nav, 60px bottom padding — is missing"
+  );
+});
+
+test("the seven routes stubbed in Phase 5 all exist", () => {
+  const urls = servedUrls();
+  for (const url of [
+    "/bridge",
+    "/standing-orders",
+    "/ships-log",
+    "/crew",
+    "/ben",
+    "/watch-your-step",
+    "/watch-your-step/start"
+  ]) {
+    assert.ok(urls.has(url), `nav destination ${url} has no page file — it would ship dead`);
+  }
+});
+
+test("no internal href written in the chrome is dead", () => {
+  const urls = servedUrls();
+  const dead: string[] = [];
+  for (const { href, file } of chromeInternalHrefs()) {
+    if (!urls.has(href)) dead.push(`${file}: ${href}`);
+  }
+  assert.deepEqual(dead, [], "chrome links with no page file behind them");
+});
+
+test("both nav inventories survive in the header", () => {
+  // §3.3: the six approved ship links and the CTA are ADDED; the three links
+  // the live header carries today are KEPT. R7 forbids trading one for the
+  // other, so both must be present.
+  const nav = readRepoFile("content/nav.ts");
+  for (const label of [
+    "Watch Your Step",
+    "Bridge",
+    "Standing Orders",
+    "Ship's Log",
+    "Crew",
+    "Ben",
+    "Start Lesson Zero",
+    "Violin for Parents",
+    "Neon",
+    "YY Method™"
+  ]) {
+    assert.ok(nav.includes(`"${label}"`), `nav label "${label}" is missing from content/nav.ts`);
+  }
+  const header = readRepoFile("components/SiteHeader.tsx");
+  assert.ok(header.includes('className="brand"'), "the preserved brand link was dropped from the header");
+  assert.ok(header.includes('alt=""'), "the <img aria-hidden> + adjacent-text pairing was broken");
+  assert.ok(header.includes("BenChanTech"), "the wordmark changed (Q8: it stays BenChanTech)");
+  // The preserved accessible name stays on the PRESERVED element. Asserting the
+  // string alone would pass while the label was moved onto the new ship tier and
+  // the live three-link row was renamed — a rename of a shipped landmark, which
+  // the deletion contract forbids just as much as dropping it. The new tier gets
+  // a NEW name (R7, R9: add the new, keep the old).
+  assert.ok(
+    header.includes('className={cx("desktop-nav", styles.ecosystemNav)} aria-label="Primary navigation"'),
+    'aria-label="Primary navigation" must stay on the preserved .desktop-nav element'
+  );
+  assert.ok(header.includes('className={cx("desktop-nav"'), "the preserved .desktop-nav class was dropped");
+  assert.equal(
+    occurrences(stripComments(header), 'aria-label="Primary navigation"'),
+    1,
+    "exactly one landmark carries the preserved name"
+  );
+  for (const label of ["Ship navigation", "Mobile navigation"]) {
+    assert.ok(header.includes(`aria-label="${label}"`), `the new header landmark "${label}" is unnamed`);
+  }
+});
+
+test("the footer is a complete mobile path to every header link", () => {
+  // The gap this closes is real: `.desktop-nav` is display:none below 700px
+  // with no replacement today, so /studio, /neon and yymethod.com are
+  // unreachable from mobile chrome. This assertion holds however Q9 resolves.
+  const footer = readRepoFile("components/SiteFooter.tsx");
+  for (const inventory of ["shipNav", "lessonZeroCta", "footerDoors", "ecosystemNav"]) {
+    assert.ok(footer.includes(inventory), `the footer does not render ${inventory}`);
+  }
+  assert.ok(footer.includes("stampLabel()"), "the footer stamp line is not bound to approvalState");
+});
+
+test("the disclosure strip is mounted on every page and reads its sentence from state", () => {
+  const layout = readRepoFile("app/layout.tsx");
+  assert.ok(layout.includes("<DisclosureStrip />"), "the strip is not mounted in the root layout");
+
+  const strip = readRepoFile("components/DisclosureStrip.tsx");
+  assert.ok(strip.includes("disclosureApprovalLine()"), "the strip's fourth sentence is not read from state");
+  assert.ok(strip.includes('claimById("zero-ai")') || strip.includes('inlineClaim("zero-ai")'));
+  assert.ok(strip.includes('inlineClaim("ai-assisted-ben-approved")'));
+  // The approval sentence is a variant of approval STATE, never a literal in a
+  // component (§6.6, R8). tests/governance-strings.test.ts bans the literal
+  // from app/ and components/; this asserts the positive form.
+  assert.equal(/approved by ben/i.test(strip), false, "the strip hardcodes the approval sentence");
+  assert.ok(strip.includes('href="/crew"'), 'the strip\'s "Crew Manifest →" target was dropped');
+});
+
+test("every root metadata value survives verbatim", () => {
+  const layout = readRepoFile("app/layout.tsx");
+  for (const value of [
+    'title: "BenChanTech"',
+    'metadataBase: new URL("https://benchantech.com")',
+    'url: "https://benchantech.com"',
+    'siteName: "BenChanTech"',
+    'type: "website"',
+    '{ url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" }',
+    '{ url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" }',
+    '{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }',
+    '{ url: "/icon-512.png", sizes: "512x512", type: "image/png" }',
+    'apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }]'
+  ]) {
+    assert.ok(layout.includes(value), `root metadata lost ${value}`);
+  }
+  assert.ok(
+    layout.includes("Ben Chan's systems work across AI, software, violin, and human judgment"),
+    "the root description changed"
+  );
+  assert.ok(
+    layout.includes("AI systems, software infrastructure, violin-informed product design"),
+    "the OpenGraph description changed"
+  );
+});
+
+test("every new route declares a title and a canonical URL", () => {
+  // §5.2: title only, matching "X - BenChanTech"; plus alternates.canonical so
+  // §5.1's one-canonical-node rule is visible to crawlers, not only to a test.
+  // The four preserved pages that export no metadata at all stay that way.
+  const newRoutes = [
+    "app/bridge/page.tsx",
+    "app/standing-orders/page.tsx",
+    "app/ships-log/page.tsx",
+    "app/crew/page.tsx",
+    "app/ben/page.tsx",
+    "app/watch-your-step/(shell)/page.tsx",
+    "app/watch-your-step/(flow)/start/page.tsx"
+  ];
+  for (const file of newRoutes) {
+    const source = readRepoFile(file);
+    assert.match(source, /title: "[^"]+ - BenChanTech"/, `${file} breaks the title convention`);
+    assert.match(source, /alternates: \{ canonical: "\/[^"]*" \}/, `${file} declares no canonical URL`);
+    assert.equal(/description:/.test(source), false, `${file} adds a description — that is a new convention`);
+  }
+});
+
+test("the three new NEW-surface convention files exist and are client components where required", () => {
+  const notFound = readRepoFile("app/not-found.tsx");
+  const error = readRepoFile("app/error.tsx");
+  const globalError = readRepoFile("app/global-error.tsx");
+  assert.ok(notFound.includes("StatusPage"));
+  assert.ok(error.startsWith('"use client"'), "app/error.tsx must be a client component");
+  assert.ok(globalError.startsWith('"use client"'), "app/global-error.tsx must be a client component");
+  // global-error replaces the root layout, so it renders its own document.
+  assert.ok(globalError.includes("<html"), "app/global-error.tsx must render its own <html>");
+  assert.ok(globalError.includes("<body"), "app/global-error.tsx must render its own <body>");
 });
