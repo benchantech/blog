@@ -10,6 +10,7 @@ import {
   type CanonicalTextVariantKey,
   canonicalTextIndex,
   isAwaitingCopy,
+  policyForCanonicalText,
   renderCanonicalText,
   resolveVariant,
   validateCanonicalText
@@ -17,6 +18,10 @@ import {
 import { CLAIM_IDS, claimById, claims } from "@/content/claims";
 import { anyHashPublished, authorityChain, authorityChainInOrder } from "@/content/authority-chain";
 import { approvalState } from "@/lib/approval-state";
+import { judgmentFrameworkRecords } from "@/content/canonical/judgment-framework";
+import { wysCanonicalRecords, wysContentObjects } from "@/content/watch-your-step";
+import { CONTENT_INTEGRITY_DIGESTS, wysSourceById } from "@/content/watch-your-step/sources";
+import { shipContentObjects } from "@/content/ship";
 
 /**
  * One definition, many presentations (plan §6.8; packet: governance validation).
@@ -54,13 +59,30 @@ const surfaceFiles = [
   ...walk(path.join(repoRoot, "components"), [".tsx"])
 ];
 
-/** Every canonical record the build knows about today. Phases 6-9 add to this. */
-const canonicalRecords: readonly AnyCanonicalText[] = claims;
+/**
+ * Every canonical record the build knows about.
+ *
+ * THESE TWO ARRAYS ARE THE CHECK. All eight of the packet's build checks run
+ * over them and over nothing else, so a content module that is not reachable
+ * from here escapes every one of them silently
+ * (docs/facelift-build-notes.md §7.5). Phase 6 wired the WYS and ship
+ * registries in — `content/watch-your-step/index.ts` and `content/ship/index.ts`
+ * collect their own modules and `tests/wys-content.test.ts` fails if a module in
+ * either directory is missing from its registry, so adding a module to the
+ * registry is enough; forgetting to is a test failure rather than a silent gap.
+ */
+const canonicalRecords: readonly AnyCanonicalText[] = [
+  ...claims,
+  ...judgmentFrameworkRecords,
+  ...wysCanonicalRecords
+];
 
 /** Every content object carrying provenance fields, canonical or not. */
 const contentObjects: readonly { id: string; status: string; origin: string; canonical?: boolean; supersededBy?: string; approvedBy?: string; approvedAt?: string; standingOrdersVersion?: string }[] = [
   ...claims,
-  ...authorityChain
+  ...authorityChain,
+  ...wysContentObjects,
+  ...shipContentObjects
 ];
 
 function words(value: string): string[] {
@@ -140,6 +162,46 @@ test("every variantSources key is a declared variant and resolves into sourceIds
       }
     }
   }
+});
+
+/**
+ * Added at the Phase 6 gate.
+ *
+ * `renderPolicyFor` returns `canon` for a `published` record at a Ben origin,
+ * and `canon` means "may render as Ben-attributed". Phase 6 shipped four such
+ * records whose longer variants extended an approved sentence with prose that
+ * appears in no source — sentences Ben has never seen, carrying the label
+ * "Approved by Ben". `sourceIds` did not catch it, because a record-level
+ * citation is satisfied by ONE sourced variant however many unsourced ones sit
+ * beside it.
+ *
+ * So the citation is required per rendered string: every string variant on a
+ * record that resolves to `canon` must name, in `variantSources`, which spec
+ * section or artboard region it was taken from. That does not prove the words
+ * are in the source, but it makes an invented string impossible to add without
+ * writing down a source that can be checked — which is the difference between
+ * provenance and a habit of writing plausible ids (content/source-refs.ts).
+ *
+ * Non-canon records are exempt: draft/placeholder copy is build-authored by
+ * definition, carries its own provenance mark, and does not render publicly
+ * while RENDER_MARKED_DRAFT is false.
+ */
+test("every string variant that may render as Ben-attributed names its own source", () => {
+  const unsourced: string[] = [];
+
+  for (const record of canonicalRecords) {
+    if (policyForCanonicalText(record).kind !== "canon") continue;
+    for (const key of CANONICAL_TEXT_VARIANT_KEYS) {
+      const value = record.variants[key];
+      if (typeof value !== "string") continue;
+      const sources = record.variantSources?.[key];
+      if (!sources || sources.length === 0) {
+        unsourced.push(`${record.id}.${key} renders as Ben-attributed with no variantSources entry`);
+      }
+    }
+  }
+
+  assert.deepEqual(unsourced, []);
 });
 
 test("every canonical component reference in content/ resolves to a real record", () => {
@@ -271,10 +333,30 @@ test("nothing claims per-object approval while the site is unstamped", () => {
 /* Check 7 — stale governance hash                                            */
 /* -------------------------------------------------------------------------- */
 
+/**
+ * TWO KINDS OF DIGEST, separated at the Phase 6 gate.
+ *
+ * A GOVERNANCE digest is the SHA-256 of the frozen YY Method v2.3 Markdown.
+ * (packet: hashing) requires freeze -> digest -> publish on yymethod.com/work
+ * -> THEN cite, and Ben has published none, so `approvalState.keel.sha256` is
+ * null and no such digest may exist anywhere.
+ *
+ * A CONTENT-INTEGRITY digest identifies the file a provenance record stands
+ * for. Plan §6.12 requires exactly one — the raw voice corpus — and the first
+ * Phase 6 pass dropped it because this check treated every 64-hex string as a
+ * governance digest. Scanning source text for a digest was always a proxy for
+ * §6.8's actual requirement, "no hash string RENDERS anywhere on the site", so
+ * the check now enforces that requirement directly: nothing under `app/`,
+ * `components/` or `lib/` may carry a digest at all, and `content/` may carry
+ * only the digests declared in `CONTENT_INTEGRITY_DIGESTS`, in the one file
+ * that declares them.
+ */
 test("the keel hash is null and no digest renders anywhere", () => {
   assert.equal(approvalState.keel.sha256, null);
   assert.equal(anyHashPublished(), false);
 
+  const declaredDigests = new Set<string>(CONTENT_INTEGRITY_DIGESTS.map((entry) => entry.digest));
+  const digestHome = path.join("content", "watch-your-step", "sources.ts");
   const offences: string[] = [];
   const scanned = [
     ...surfaceFiles,
@@ -282,17 +364,37 @@ test("the keel hash is null and no digest renders anywhere", () => {
     ...walk(path.join(repoRoot, "lib"), [".ts"])
   ];
   for (const file of scanned) {
+    const relative = path.relative(repoRoot, file);
     const source = readFileSync(file, "utf8");
     for (const match of source.matchAll(/\b[0-9a-f]{64}\b/g)) {
-      offences.push(`${path.relative(repoRoot, file)}: ${match[0].slice(0, 12)}...`);
+      if (relative === digestHome && declaredDigests.has(match[0])) continue;
+      offences.push(`${relative}: ${match[0].slice(0, 12)}...`);
     }
   }
 
   assert.deepEqual(
     offences,
     [],
-    `A 64-hex digest is present while approvalState.keel.sha256 is null. packet: hashing requires freeze -> SHA-256 -> publish on yymethod.com/work -> THEN cite.\n${offences.join("\n")}`
+    `An undeclared 64-hex digest is present while approvalState.keel.sha256 is null. packet: hashing requires freeze -> SHA-256 -> publish on yymethod.com/work -> THEN cite.\n${offences.join("\n")}`
   );
+});
+
+test("every declared content digest belongs to a record that renders on no surface", () => {
+  assert.ok(CONTENT_INTEGRITY_DIGESTS.length > 0, "plan §6.12 requires the corpus digest to be recorded");
+
+  for (const entry of CONTENT_INTEGRITY_DIGESTS) {
+    assert.match(entry.digest, /^[0-9a-f]{64}$/, `${entry.ownerId}'s digest is not a SHA-256`);
+    assert.notEqual(entry.digest, approvalState.keel.sha256 as string | null);
+    assert.ok(entry.reason.trim().length > 0, `${entry.ownerId}'s digest has no recorded reason`);
+
+    const owner = wysSourceById(entry.ownerId);
+    assert.deepEqual(
+      owner.allowedSurfaces,
+      [],
+      `${entry.ownerId} carries a digest and is allowed on a surface; a digest must never reach one`
+    );
+    assert.equal(owner.hash, entry.digest, `${entry.ownerId} does not carry the digest declared for it`);
+  }
 });
 
 test("no content object cites a keel version other than the recorded one", () => {

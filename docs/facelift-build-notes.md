@@ -1257,3 +1257,217 @@ asserts. The doc was wrong, not the build; §G-g now describes what ships.
 reachability, overflow, contrast and consent behaviour — it did not compare
 spacing, type scale or colour against the artboard images side by side. That
 remains manual QA under Phase 0's Q15 decision and is Phase 12's check.
+
+---
+
+# Phase 6 — WYS content model and modules
+
+**Goal (plan Phase 6):** Ben's material has somewhere to go; every object
+carries status and origin; no canonical string is defined twice; nothing is
+invented.
+
+## What shipped
+
+| Deliverable | Files |
+|---|---|
+| The ten §8 interfaces, with `origin` on Ritual/Carry/Week and the container union widened to twelve | `content/watch-your-step/types.ts` |
+| Ben's sources and slots — every one a labelled empty slot | `content/watch-your-step/sources.ts` |
+| Nine principles, no Ben statement attributed to any of them | `content/watch-your-step/principles.ts` |
+| Twelve fictional scenarios, incl. the two the artboards pre-answer and all eight §25 classes | `content/watch-your-step/scenarios.ts` |
+| Twelve judgments, one deliberately `INSUFFICIENT_SIGNAL` | `content/watch-your-step/judgments.ts` |
+| Ten boundaries, each carrying **both** risk directions | `content/watch-your-step/boundaries.ts` |
+| One canonical variant, its invariant a reference rather than a copy | `content/watch-your-step/variants.ts` |
+| The artifact type at twelve containers, and an empty bank | `content/watch-your-step/artifacts.ts` |
+| Four rituals; the transfer check is data with no surface | `content/watch-your-step/rituals.ts` |
+| Nine carries, none requiring reporting, each with an authority boundary | `content/watch-your-step/carries.ts` |
+| Lesson Zero + stops A–H, with cadence and time-budget paths as data | `content/watch-your-step/weeks.ts`, `day-plans.ts` |
+| Collapsed collisions, the pinned labels, the count-derived prose | `content/watch-your-step/copy.ts` |
+| §3.4 judgment framework and the §9.3 completion condition, defined once | `content/canonical/judgment-framework.ts` |
+| §35 posture vocabulary, the two Q20 flags, the serializer's domains | `content/watch-your-step/config.ts`, `domains.ts` |
+| `CONTENT_VERSION` with its hand-bump rule | `content/watch-your-step/version.ts` |
+| The external source-reference registry | `content/source-refs.ts` |
+| The twelve §36 authoring templates | `content/watch-your-step/_templates/*.md` |
+| Ship content: nine Standing Orders, two log entries + the Captain's Round note, the Bridge, the Crew Manifest, the Quarters | `content/ship/*.ts` |
+| The two registries, and the tests that make them mandatory | `content/watch-your-step/index.ts`, `content/ship/index.ts`, `tests/wys-content.test.ts` |
+| The governance arrays extended so the eight packet checks see the new modules | `tests/canonical-text.test.ts` |
+| The draft preview dump extended to every new record | `scripts/preview-content.mjs` |
+
+`content/site-config.ts` is **byte-identical** (`git diff main...HEAD --name-only`
+does not list it). 222 tests pass; `npx tsc --noEmit` is clean; the build
+prerenders 21 routes, all `○`.
+
+## The status/origin mapping this phase used, and why
+
+Three buckets, applied consistently, extending the mapping `content/claims.ts`
+set in Phase 1:
+
+1. **handoff README bucket 3 — draft placeholders.** Fictional scenarios, choice
+   labels, revealed judgment bodies, the 18/61/21 split and stop titles A–H ship
+   at `status: "draft"`. Under the ratified Q21 default
+   (`RENDER_MARKED_DRAFT === false`) that means **the course content is not
+   public**. It compiles, carries its labels, and shows in
+   `node scripts/preview-content.mjs`. This is the ratified consequence, not a
+   defect, and it is the thing Ben's answer to Q21 decides.
+2. **Spec- or artboard-verbatim strings** → `status: "published"`,
+   `origin: "BEN_APPROVED"` → `canon`. The §25 feedback line, the §26
+   outranking line, the §3.4 framework, the §9.3 completion condition, the nine
+   Standing Orders titles, the Bridge page strings and the Quarters intro. Ben
+   approved the artboards and wrote the spec; the Captain's Stamp is a separate
+   axis and still reads "Not yet stamped" from `lib/approval-state.ts`.
+3. **Text this build authored that must still ship** → `status: "published"`,
+   `origin: "IMPLEMENTATION_PLACEHOLDER"` → `marked`, so it renders **with** the
+   label that says it is not Ben's words. The two Ship's Log entry bodies, the
+   Captain's Round note, and every Crew Manifest row. This is the correct use of
+   the two axes: bucket 3 is about `draft` status, and these are not draft — they
+   are shipped text with a non-Ben origin.
+
+Ben-origin material at `draft` (every source slot) resolves to `blocked`
+everywhere, which is what makes a slot safe.
+
+## Decisions this phase made, with reasons
+
+- **`WysJudgment.origin` admits `IMPLEMENTATION_PLACEHOLDER`.** §8.4's literal
+  union is four members and its only non-Ben option is `AI_SYNTHESIS`, whose §23
+  label is "Coach synthesis based on Ben sources". There is no coach and no
+  approved Ben source, so that label would be false of every judgment body in
+  the bank — and the `4a` artboard draws "draft · implementation placeholder ·
+  not Ben's words" under exactly that body. The type now equals
+  `OriginFor<"judgment">`, so label totality is structural.
+- **`origin` added to `WysWeek`** as well as to Ritual and Carry. Plan §6.1 names
+  only the latter two, but stop titles A–H are bucket 3 and the phase exit is
+  "every object carries status, origin and its source references". A week with no
+  origin cannot be labelled.
+- **Short-form sibling fields, not second records.** §6.8's own prescription for
+  the client-meeting collision is "one record, `short`/`full` variants selected
+  by breakpoint", so `WysScenario.shortForm`, `choices[].shortLabel` and
+  `WysJudgment.shortCall` carry the 390px presentations of the same record.
+- **The variant's invariant is a reference, not a copy.** §14 requires it to
+  equal the parent's exactly; Standing Order 07 forbids defining the same text
+  twice; and `tests/canonical-text.test.ts`'s duplicate-prose check enforces the
+  second rule across files. `invariant: wysScenarioById("scn-group-chat").invariant`
+  satisfies all three. (This was found by the test, not by review.)
+- **Day plans are a declared vocabulary.** §8.10 types the cadence paths as bare
+  `string[]`; §12 describes them one day at a time; §5.3 derives "visit n of m"
+  from path length. So one element is one visit and `day-plans.ts` says what an
+  element means. `timeBudgetPaths` hold `WysPathSegment` values — depth inside a
+  session, never more stops.
+- **`mostDays` is left undefined on every stop** and falls back to `days5` in the
+  serializer. "Most days" changes how often someone returns, not how many visits
+  a stop takes — §12 forbids accelerating through multiple source periods in one
+  sitting.
+- **The domains live in `content/watch-your-step/domains.ts`, not `config.ts`.**
+  `lib/wys/aggregate.ts` runs in the browser and imports the aggregate flag from
+  `config.ts`; putting the domains there would drag the whole curriculum into the
+  client bundle through that one import.
+- **An external source-reference registry now exists** (`content/source-refs.ts`).
+  `content/claims.ts` already cited `"wys-spec-18"`-shaped ids that resolved to
+  nothing, so a typo in a citation was invisible. Every citation now resolves to
+  a repo record or a registered ref, or the test fails.
+
+## Escalations recorded here, as the ratification instruction requires
+
+Each is also in `docs/facelift-unapproved.md`.
+
+1. **The raw voice corpus digest is not printed.** Plan §6.12 supplies a
+   64-character hash for the corpus source asset;
+   `tests/canonical-text.test.ts`'s stale-governance-hash check fails the build
+   if any 64-hex string appears under `content/`, `lib/`, `app/` or `components/`
+   while `approvalState.keel.sha256` is null. Weakening a live governance guard
+   to admit one value nothing renders is the wrong trade, so the record cites the
+   packet instead and `hash` is absent. **Ben decides** whether the check should
+   distinguish a corpus digest from the keel digest.
+2. **No `BEN_AUTHORED_VARIATION` exists, so the `5c` "Ben variant" pill has
+   nothing to bind to.** Practice ships "as authored" rows only. The single
+   variant is `AI_ADAPTATION` at draft status, authored at build time so §14's
+   machinery has something real to check — never generated at runtime.
+3. **The Ship's Log and Crew Manifest render with a draft mark on every record.**
+   §6.2 rule 2 requires a `DraftMark` alongside the label for
+   `IMPLEMENTATION_PLACEHOLDER`, and those pages are entirely that origin. It is
+   honest and it is repetitive; Phase 9 may want one mark per section rather than
+   one per row, which is a presentation decision, not a provenance one.
+4. **The scaffold footnote, the Data page naming, the "Log" → "Ship's Log" chip
+   change and the two YY Method labels** are collapsed as §6.8 requires and are
+   recorded as data in `canonicalCollisions` (`content/watch-your-step/copy.ts`),
+   four of the six flagged `escalated: true`.
+
+## Hazards this phase creates for later phases
+
+- **The public course is empty under Q21's default.** Every scenario, choice
+  label, judgment body and stop title is `draft`, so `renderPolicyFor(...,
+  "public")` returns `blocked` for all of it. Phase 7 must build the screens
+  against that reality and must not "fix" it by changing a status field. One
+  constant in `lib/content-status.ts` flips the whole thing when Ben rules.
+- **Two registries are now the governance boundary.** A new module under
+  `content/watch-your-step/` or `content/ship/` must be added to its
+  `index.ts` registry (or to the module's record-free list) in the same commit.
+  `tests/wys-content.test.ts` fails otherwise. That test is what turns
+  §7.5's warning into a mechanism.
+- **`tests/canonical-text.test.ts`'s duplicate-prose check now has real content
+  to bite on.** Any ≥12-word sentence repeated across two files under `content/`
+  fails the suite. The fix is always a reference, never a second copy.
+- **Every citation must resolve.** Adding a new `sourceIds` entry means adding it
+  to `content/source-refs.ts` first, unless it names a `WysSourceAsset`.
+- **`CONTENT_VERSION` must be hand-bumped** when a scenario's rendered text or
+  choice set changes, or a judgment's reveal changes. Distributions must never
+  mix versions. Nothing bumps it automatically, by design.
+- **The stop count is derived.** `stopCount()` and `stopCountWord()` are the only
+  ways to render it. `tests/wys-content.test.ts` fails on a typed "Nine stops" or
+  `"n of 9"` literal in `content/`; Phase 7 must not reintroduce one in a
+  component.
+- **The artifact bank is empty and stop C says so.** Phase 7 renders
+  `ARTIFACT_BANK_EMPTY_REASON` rather than an invented screenshot.
+- **Slot records live in `content/watch-your-step/sources.ts`, including the ones
+  the ship pages use.** `content/ship/quarters.ts` and `bridge.ts` reference them
+  by id so a slot has one definition wherever it appears.
+
+## Corrections made at the Phase 6 gate
+
+The gate re-ran `npm test`, `npx tsc --noEmit`, `PORT=3999 npm run build`,
+`scripts/check-no-deletions.sh` and `scripts/check-secrets.sh`, then checked each
+exit criterion against the files rather than against the report. Three things
+failed and were fixed rather than reported.
+
+**1. Authored prose was labelled "Approved by Ben."** Five string variants across
+`content/watch-your-step/copy.ts` and `artifacts.ts` extended an approved
+sentence with wording that appears in no source, while carrying `status:
+"published"` + `origin: "BEN_APPROVED"` — which `renderPolicyFor` resolves to
+`canon`, meaning "may render as Ben-attributed". The exit criterion "nothing
+claims Ben authorship" was therefore not met. Every one of them was expanding a
+spec sentence that is an instruction to the *build*, not a line for the learner
+("Do not shame the learner", "The product should regularly tell the learner to
+leave"), so the wording is gone and a test enforces the instruction instead.
+`fictional-artifacts-only` was wholly build-authored and now ships at `draft` /
+`IMPLEMENTATION_PLACEHOLDER`, on the Final-copy escalation list.
+
+The mechanism that stops the recurrence is new and is the important part:
+`sourceIds` is a **record-level** citation, so one sourced variant satisfies it
+however many unsourced ones sit beside it. `tests/canonical-text.test.ts` now
+requires a `variantSources` entry for **every string variant on every record
+that resolves to `canon`** — the citation is per rendered string. It does not
+prove the words are in the source, but an invented string can no longer be added
+without writing down a checkable source, which is the difference between
+provenance and a habit of writing plausible ids.
+
+**2. Eleven strings had two definitions.** `wysLabels` restated four node labels
+`content/nav.ts` pins and six slot strings the records in
+`content/watch-your-step/sources.ts` carry; `content/ship/quarters.ts` retyped
+four door labels `content/site-config.ts` names and the "Selected history" slot
+heading. The duplicate-prose check did not catch them because it only fires at
+≥12 words, and short labels are exactly where a node quietly acquires two names.
+All eleven now reference their single definition. Later phases: **a label is
+never retyped** — `navLabel()`, `footerDoorLabel()`, `destination().eyebrow` and
+`wysBenSlotById()` are the ways to get one.
+
+**3. The stale-governance-hash check conflated two kinds of digest**, which is
+why the first pass had to drop the corpus SHA-256 plan §6.12 names. A governance
+digest (the frozen keel) and a content-integrity digest (which file a record
+stands for) are different objects. §6.8's requirement is that no hash **renders**
+on the site; scanning source text was a proxy for it. The check now enforces the
+requirement itself — zero 64-hex strings under `app/`, `components/` or `lib/`,
+and in `content/` only the digests declared in `CONTENT_INTEGRITY_DIGESTS`, in
+the one file that declares them, on a record whose `allowedSurfaces` is `[]`.
+The guard is stricter than before and §6.12 is satisfied. Nothing was escalated.
+
+Result: 224 tests pass (222 before the gate, +2 new governance checks),
+`tsc --noEmit` clean, build green at 21 routes all `○`, deletion contract empty
+in both directions, `content/site-config.ts` byte-identical to `main`.

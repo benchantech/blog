@@ -36,6 +36,24 @@ const { claims } = await import("../content/claims.ts");
 const { authorityChain } = await import("../content/authority-chain.ts");
 const { resolveVariant } = await import("../lib/canonical-text.ts");
 const { approvalState, bridgeStateLines } = await import("../lib/approval-state.ts");
+const { wysRegistry, wysCanonicalRecords } = await import("../content/watch-your-step/index.ts");
+const { shipRegistry } = await import("../content/ship/index.ts");
+const { judgmentFrameworkRecords } = await import("../content/canonical/judgment-framework.ts");
+const { stopCount, stopCountWord, wysWeeks } = await import("../content/watch-your-step/weeks.ts");
+const { CONTENT_VERSION } = await import("../content/watch-your-step/version.ts");
+
+/**
+ * Which surface kind a module's records render on, so the preview shows the
+ * SAME policy a screen would compute. `general` is the fallback, exactly as in
+ * tests/wys-content.test.ts.
+ */
+const SURFACE_BY_MODULE = {
+  "content/watch-your-step/sources.ts": "human-source",
+  "content/watch-your-step/sources.ts (Ben slots)": "human-source",
+  "content/watch-your-step/scenarios.ts": "fictional-scenario",
+  "content/watch-your-step/variants.ts": "fictional-scenario",
+  "content/watch-your-step/judgments.ts": "judgment"
+};
 
 function describePolicy(policy) {
   if (policy.kind === "blocked") return `blocked (${policy.reason})`;
@@ -118,3 +136,54 @@ console.log("");
 console.log("## Approval state (lib/approval-state.ts)");
 console.log(`stamp: ${approvalState.stamp === null ? "null" : "set"}`);
 for (const line of bridgeStateLines()) console.log(`  ${line}`);
+
+console.log("");
+
+console.log("## Watch Your Step content (content/watch-your-step/*)");
+console.log(`CONTENT_VERSION = ${CONTENT_VERSION}`);
+console.log(`stops = ${stopCount()} (${stopCountWord()}) — derived from wysWeeks.length, never typed`);
+console.log("");
+
+for (const group of [...wysRegistry, ...shipRegistry]) {
+  if (group.records.length === 0) {
+    console.log(`### ${group.module} — no records (deliberately empty)`);
+    console.log("");
+    continue;
+  }
+  const surfaceKind = SURFACE_BY_MODULE[group.module] ?? "general";
+  console.log(`### ${group.module}  [surface: ${surfaceKind}]`);
+  table(
+    group.records.map((record) => ({
+      id: record.id,
+      status: record.status,
+      origin: record.origin,
+      public: describePolicy(renderPolicyFor({ ...record, surfaceKind }, "public")),
+      preview: describePolicy(renderPolicyFor({ ...record, surfaceKind }, "preview"))
+    }))
+  );
+  console.log("");
+}
+
+console.log("## Curriculum canonical records");
+table(
+  [...judgmentFrameworkRecords, ...wysCanonicalRecords].map((record) => ({
+    id: record.id,
+    status: record.status,
+    origin: record.origin,
+    public: describePolicy(renderPolicyFor(record, "public"))
+  }))
+);
+console.log("");
+
+console.log("## Stops (content/watch-your-step/weeks.ts)");
+table(
+  wysWeeks.map((week) => ({
+    order: week.order,
+    id: week.id,
+    title: week.title,
+    source: week.primarySourceId ?? "(none — Q10)",
+    visits2: week.cadencePaths.days2.length,
+    visits3: (week.cadencePaths.days3 ?? week.cadencePaths.days2).length,
+    visits5: week.cadencePaths.days5.length
+  }))
+);

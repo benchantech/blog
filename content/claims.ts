@@ -97,6 +97,9 @@ export const claims = [
     status: "published",
     origin: "BEN_APPROVED",
     sourceIds: ["artboard-4a-disclosure-strip"],
+    variantSources: {
+      inline: ["artboard-4a-disclosure-strip"]
+    },
     variants: {
       inline:
         "You're not talking to AI anywhere on this site. No chatbot, no coach, no generated answers.",
@@ -112,6 +115,9 @@ export const claims = [
     status: "published",
     origin: "BEN_APPROVED",
     sourceIds: ["artboard-4a-disclosure-strip"],
+    variantSources: {
+      inline: ["artboard-4a-disclosure-strip"]
+    },
     variants: {
       inline: "AI did help build the site and draft the copy — as crew, listed in the manifest.",
       full: {
@@ -127,6 +133,9 @@ export const claims = [
     status: "published",
     origin: "BEN_APPROVED",
     sourceIds: ["artboard-4a-how-the-site-is-run"],
+    variantSources: {
+      short: ["artboard-4a-how-the-site-is-run"]
+    },
     variants: {
       short: "AI can crew the ship. It can't sign the logbook.",
       full: {

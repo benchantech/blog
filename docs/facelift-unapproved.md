@@ -297,3 +297,175 @@ the Phase 5 gate.
 | **G-e** | **The REVIEWERS group carries three rows, not the two §3.3 names.** `/studio`, `/neon`, **and** the yymethod.com site root. | The root link would otherwise have no mobile home (F2). It is exactly the header's tier-2 inventory, mirrored. |
 | **G-f** | **The footer group labels are typed in caps** ("THE SHIP", "DOORS", "REVIEWERS", "LEGAL") and no `text-transform` is used anywhere. | §4.2's caps rule, applied to a group of labels the artboard does not draw at all. |
 | **G-g** | **A second nav landmark exists in the header.** `aria-label="Primary navigation"` stays exactly where it is today — on the preserved `.desktop-nav` element carrying `/studio`, `/neon` and yymethod.com. The NEW ship tier is labelled "Ship navigation", and the mobile disclosure panel "Mobile navigation". | Two nav landmarks in one header need two distinct names. The additive reading (R7, R9) is that the preserved landmark keeps its accessible name and the new one gets a new name — moving the shipped label onto the new tier would rename a live landmark, which the deletion contract forbids as much as dropping it. Asserted in `tests/preserved-surfaces.test.ts`. |
+
+## H. Phase 6 — content-model departures and escalations
+
+Nothing in this section is a visual change. These are departures from the
+governing spec's literal listings, from an approved artboard's implied content,
+or from the build plan's own text — recorded because a provenance decision that
+nobody wrote down is indistinguishable from an accident.
+
+### H1. Additions to the (WYS §8) interfaces
+
+All additive; nothing in §8 was removed or renamed.
+
+| Addition | Type | Why |
+|---|---|---|
+| `origin: ContentOrigin` | `WysRitual`, `WysCarry` | Plan §6.1. The spec gives them `status` but no `origin`, and their text renders publicly on Today and Practice. |
+| `origin: ContentOrigin` | `WysWeek` | **Beyond §6.1's two.** Stop titles A–H are handoff README bucket 3, and the phase exit requires an origin on every object. A week with no origin cannot be labelled. |
+| `type` widened 9 → 13 | `WysFictionalArtifact` | Plan §6.10: §24's twelve containers plus `other`, kept last. Not a parallel `containerType`, which would be two fields for one concept. |
+| `IMPLEMENTATION_PLACEHOLDER` | `WysJudgment.origin` | §8.4's only non-Ben option is `AI_SYNTHESIS`, whose §23 label asserts "based on Ben sources" — false of every judgment body in the bank. The `4a` artboard draws the implementation-placeholder mark under exactly that body. |
+| `shortForm`, `choices[].shortLabel` | `WysScenario` | §6.8 collapse 1: one record, two presentations selected by breakpoint. |
+| `shortCall` | `WysJudgment` | Same collapse. The `4a` phone drops a sentence from the desktop body. |
+| `shortTitle` | `WysWeek` | §6.8 collapse 2, for the 15px `repeat(9,1fr)` desktop cells. |
+| `optionalPracticeIds` | `WysWeek` | Plan Phase 7's ratified default. (WYS §12) requires Plan to show optional practices; **no approved artboard draws the row**. NEW/unapproved. |
+| `overWithholdingClass`, `implicatesExternalAuthority` | `WysScenario` | §25 and §26 coverage is an acceptance box, so it has to be machine-checkable rather than read out of the prose. |
+| `emptyReferenceReason` | all | The phase exit permits an empty source reference only with "an explicit recorded reason". A comment is not machine-readable. |
+| `offSite`, `terminal` | `WysWeek` | The `5b` Plan row states for F and H, as data rather than a component branch. |
+| `principleIds`, `sourceIds` | `WysRitual` | §8.8 lists neither, so a ritual's provenance had nowhere to resolve to. |
+
+### H2. The raw voice corpus digest — resolved at the Phase 6 gate, not escalated
+
+Plan §6.12 says the corpus, if it enters the repo at all, enters as one
+`WysSourceAsset` carrying a named 64-character SHA-256. The first Phase 6 pass
+dropped that value and escalated the conflict, because
+`tests/canonical-text.test.ts` failed the build on **any** 64-hex string under
+`content/`, `lib/`, `app/` or `components/` while `approvalState.keel.sha256` is
+`null` — the stale-governance-hash check, one of the eight the packet requires.
+
+The gate found the conflict was in the check, not in the plan. Two different
+things were being called a hash:
+
+- a **governance digest** — the SHA-256 of the frozen YY Method v2.3 Markdown,
+  which (packet: hashing) forbids citing until Ben publishes it on
+  `yymethod.com/work`;
+- a **content-integrity digest** — which file a provenance record stands for.
+
+§6.8 states the actual requirement as "no hash string **renders** anywhere on
+the site", and scanning source text was only ever a proxy for it. So the check
+now enforces the requirement directly and the guard got *stronger*, not weaker:
+
+- nothing under `app/`, `components/` or `lib/` may contain a 64-hex string at
+  all — no digest can reach a rendered surface;
+- `content/` may contain only the digests declared in
+  `CONTENT_INTEGRITY_DIGESTS` (`content/watch-your-step/sources.ts`), and only
+  in that file;
+- a second test asserts every declared digest is a real SHA-256, is not the keel
+  digest, carries a written reason, matches the `hash` on its owning record, and
+  that the owning record's `allowedSurfaces` is `[]`.
+
+The corpus record therefore carries §6.12's digest, and everything else §6.12
+requires is unchanged — one record, `status: "draft"`, `origin: "BEN_AUTHORED"`,
+`approvedExcerpts: []`, `allowedSurfaces: []`, and a paraphrase policy
+forbidding embedding, chunking, indexing, retrieval and summary. Nothing here
+needs Ben.
+
+### H2b. Provenance overclaims found and corrected at the Phase 6 gate
+
+Two defects in the first pass, both of the class the whole plan exists to
+prevent, both fixed in architecture rather than in wording (R8).
+
+**1. Authored prose carried the label "Approved by Ben."** Four canonical
+records in `content/watch-your-step/copy.ts` and one in `artifacts.ts` shipped a
+`full`/`inline` variant that extended an approved sentence with prose appearing
+in no source — the spec, the artboards and the packet were all checked. At
+`status: "published"` with `origin: "BEN_APPROVED"`, `renderPolicyFor` returns
+`canon`, so those sentences would have rendered as Ben-attributed. Five strings
+were affected:
+
+| Record | String | Now |
+|---|---|---|
+| `over-withholding-feedback` | "Removing too much is a miss, not a failing…" | removed; `full` is (WYS §25)'s sentence |
+| `external-authority-outranks` | "Where an outside rule already governs…" | removed; `inline` falls back to the §26 sentence |
+| `anonymization-not-a-loophole` | "Removing the names does not create a permission…" | removed |
+| `disagreement-is-not-the-score` | "Nothing is counted against you…" | removed |
+| `carry-then-leave` | "The course regularly tells you to leave…" | removed |
+| `fictional-artifacts-only` | both variants (no artboard draws a learner-facing form) | kept, re-origined `draft` / `IMPLEMENTATION_PLACEHOLDER`, so it does not render publicly; **on the Final-copy escalation list for Ben** |
+
+In each case the spec sentence the prose was expanding is an instruction to the
+*build*, not a line for the learner, and is now enforced by a test rather than
+paraphrased into a rendered variant.
+
+**The mechanism, so it cannot recur:** `sourceIds` is a record-level citation
+and is satisfied by one sourced variant however many unsourced ones sit beside
+it. A new check in `tests/canonical-text.test.ts` — "every string variant that
+may render as Ben-attributed names its own source" — requires a
+`variantSources` entry for **every string variant on every record that resolves
+to `canon`**. `content/claims.ts` and `content/canonical/judgment-framework.ts`
+gained the entries they were missing.
+
+**2. Eleven strings were defined twice.** `wysLabels` restated four node labels
+that `content/nav.ts` pins and six slot strings that the slot records in
+`content/watch-your-step/sources.ts` carry, and `content/ship/quarters.ts`
+retyped four door labels that `content/site-config.ts` already names plus the
+"Selected history" slot heading. Standing Order 07 and plan §6.8 forbid the
+second definition, and the failure mode is concrete: the Ship's Log could be
+renamed in the header and stay "Ship's Log" in the course, from a different
+file, with every test green. All eleven now reference their single definition.
+The one remaining overlap is deliberate and plan-specified: the Captain's
+Quarters tile is labelled "YY Method" per the `5d` artboard and plan Phase 9,
+while the header link is "YY Method™" — collapse 6's two-labels-two-nodes rule.
+
+### H3. No `BEN_AUTHORED_VARIATION` exists, so the "Ben variant" pill has nothing to bind to
+
+Artboard `5c` Practice draws a teal "Ben variant" tag on the second Replay row.
+(WYS §35) decision 9 is open and Ben has authored no variation, so **v0 ships
+"as authored" rows only** — which is what plan Phase 7's "Ben variant where one
+exists" allows. One `AI_ADAPTATION` variant exists as data at `status: "draft"`
+so (WYS §14)'s invariant machinery has something real to check; it is authored at
+build time, never generated at runtime, and it is not public.
+
+### H4. The Ship's Log and Crew Manifest carry a draft mark on every record
+
+Plan §6.2 rule 2 requires a `DraftMark` alongside the provenance label for
+`AI_*` and `IMPLEMENTATION_PLACEHOLDER` origins. Both of those pages are
+entirely that origin — the entry bodies are factual build records and the crew
+rows describe systems, neither written by Ben. The result is honest and
+repetitive: at one mark per record the `5d` Log gains two marks and `/crew`
+gains five, none of which the artboards draw. Phase 9 may prefer one mark per
+section. That is a presentation decision and it does not change any origin.
+
+### H5. The collapsed canonical collisions
+
+Recorded as data in `canonicalCollisions` (`content/watch-your-step/copy.ts`) so
+the §38 report and this register render the same rows. Four of the six are
+flagged for Ben:
+
+| Collision | Ships as | Ben? |
+|---|---|---|
+| Client-meeting scenario and judgment at two lengths | One record each, `shortForm` / `shortCall` | no |
+| Three stop titles differ between `4a` and `5b` | The `5b` long forms, matching (WYS §11); `shortTitle` carries the cell form | no |
+| "Period titles…" (desktop) vs "Stop titles…" (mobile) | **"Stop titles are a working scaffold; Ben is choosing the recordings."** — the desktop wording is retired | **yes** |
+| The Data page is named four ways | Q6's default: sitewide title kept, one link label pinned, `bct_analytics_consent` rendered so the title is honest | **yes** |
+| `4a` nav says "Ship's Log", the governance chip row says "Log" | **"Ship's Log" everywhere.** The chip row is Final copy, so this is a copy amendment | **yes** |
+| "YY Method" names two different URLs | Two nodes, two labels — "YY Method™" (property) and "YY Method doctrine" (document). Neither href dropped | **yes** |
+
+Stop H is a fifth instance of the same class and is collapsed the same way:
+`5b` Progress reads "Learner-Owned Rules and Exit" and `5b` Plan reads
+"Your Rules. Exit."; those become the record's `title` and `shortTitle`.
+
+### H6. Narrowings recorded rather than hidden
+
+- **Day 5 of the five-day cadence ships CARRY-only (Q24).** (WYS §12)'s path ends
+  "delayed retrieval or transfer + CARRY" and the transfer-check **surface** is
+  deferred — no artboard draws one. Shipping the path with a day that renders
+  nothing would have been worse than saying so. The ritual, the local-state
+  field and the `wys_transfer_check_complete` event all exist; only the screen
+  does not. A minimal delayed-retrieval surface is Ben's call.
+- **The fictional-artifact bank is empty.** Source Period C renders
+  "not yet available" rather than an invented screenshot. Artifacts need image
+  and audio production (plan §13.1).
+- **"Memory Audit later" is not authored.** §8.8 names it; (WYS §2.2) requires
+  future concepts to be disabled and invisible in v0, and an authored record is
+  one import away from a screen.
+- **`mostDays` is undefined on every stop** and falls back to `days5`. "Most
+  days" changes return frequency, not the number of visits a stop takes — (WYS
+  §12) forbids accelerating through multiple source periods in one sitting.
+
+### H7. Principles ship with neither Ben field filled
+
+`exactBenStatement` and `approvedFormulation` are both absent on all nine
+principle records. (WYS §35) decision 6 — which Ben statements are canonical at
+launch — is open, and (WYS §11) forbids inventing Ben quotes. The split between
+the two fields is load-bearing for the provenance UI, so both are declared and
+both are empty. `tests/wys-content.test.ts` fails if either is filled.
