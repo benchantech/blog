@@ -38,6 +38,19 @@
   gap: 8px;
 }
 
+/* Below the desktop grid the nine cells become the same scrolling row the `4a`
+   phone draws for its peek. Declared on the primitive rather than on a page,
+   because every surface that renders nine cells needs it and a page-scoped
+   copy could not reach this class anyway (CSS Modules, §4.1). */
+@media (max-width: 900px) {
+  .stopStrip {
+    grid-template-columns: none;
+    grid-auto-flow: column;
+    grid-auto-columns: 140px;
+    overflow-x: auto;
+  }
+}
+
 .stopPeek {
   display: flex;
   gap: 8px;
@@ -481,5 +494,36 @@
 
   .screenTitle {
     font-size: 26px;
+  }
+}
+
+/* -------------------------------------------------------------------------- */
+/* HeroDemo — the `4a` live demo card, mounted on / and on /watch-your-step    */
+/* -------------------------------------------------------------------------- */
+
+/* dc.html:335 — the scenario paragraph inside the demo card. Larger than
+   ScenarioCard's 16px because the demo card is the page's focal object, not a
+   card inside a screen. The decision moment is bolded INSIDE the paragraph,
+   which is what the artboard draws; Today draws it as its own line. */
+.demoBody {
+  margin: 0 0 18px;
+  font: 400 19px / 1.45 var(--sans);
+  color: var(--ink);
+}
+
+/* dc.html:444 — the same paragraph at 390. */
+.demoBodyMobile {
+  margin: 0 0 14px;
+  font-size: 16px;
+}
+
+.demoMarks {
+  margin: 0 0 14px;
+}
+
+@media (max-width: 700px) {
+  .demoBody {
+    font-size: 16px;
+    margin-bottom: 14px;
   }
 }

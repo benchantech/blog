@@ -53,34 +53,44 @@ add and keep (plan R7).
 
 ---
 
-## 2. UNRESOLVED_CLASSNAMES register
+## 2. UNRESOLVED_CLASSNAMES register — CLOSED at Phase 10
 
 `className` tokens applied in a `.tsx` file with no matching rule anywhere.
-Allowlisted in `tests/class-contract.test.ts` (mode 1). **Resolution lands in
-Phase 10, which empties this list.** The allowlist is asserted *exactly*: a
-stale entry fails the test, so a fix and its de-registration land together.
+Allowlisted in `tests/class-contract.test.ts` (mode 1), asserted *exactly*, so a
+stale entry fails the test. **Phase 10 resolved both entries and the list is now
+empty.** From here an entry in it is a regression, not a to-do.
 
-| Token | Applied at | Finding | Scheduled |
+Both were resolved by giving the class the job it was already claiming to have.
+Neither was resolved by deleting a class from preserved markup — that direction
+was available and was not taken, because a className the page still carries and
+nothing styles is a smaller problem than an edit to a preserved surface.
+
+| Token | Applied at | Finding | Resolved |
 |---|---|---|---|
-| `hero-foyer` | `app/page.tsx:8` — `className="hero hero-foyer"` | No `.hero-foyer` rule exists in `app/globals.css` or anywhere else. The class does nothing today. | Phase 10 |
-| `secondary` | `app/page.tsx:26` — `className="audience-button secondary"` | `grep -n secondary app/globals.css` returns only `.secondary-results` at `:583`, `:590`, `:595` — a different, live selector. `.audience-button.primary` (`:228`) styles the first hero button and **nothing** styles the second, so the two hero buttons are asymmetric **by accident**, not by design. | Phase 10 |
+| `hero-foyer` | `app/page.tsx` — `className="hero hero-foyer"` | No `.hero-foyer` rule existed in `app/globals.css` or anywhere else. The class did nothing. | **Phase 10.** Q2's ratified stacking makes the foyer hero the SECOND hero on `/`, so `.hero-foyer` now carries exactly that difference: no top padding (the `4a` composition's seam supplies it) and a headline in the 44px section register instead of the 66px page register. Not one word of copy changed. |
+| `secondary` | `app/page.tsx` — `className="audience-button secondary"` | `.audience-button.primary` styled the "I'm human" button and **nothing** styled "I'm AI": the pair was asymmetric by accident. | **Phase 10.** `.audience-button.secondary` fills `--tint-grey` with no border and no shadow, against the primary's ink. Deliberately not `--tint-teal`: teal is the "current / next / selected" fill (§4.2) and neither button is selected. |
 
-## 3. ORPHAN_RULES register
+## 3. ORPHAN_RULES register — CLOSED at Phase 10
 
 Class selectors defined in `app/globals.css` and referenced by no `className` in
-any `.tsx`. Allowlisted in `tests/class-contract.test.ts` (mode 3). **Resolution
-lands in Phase 10, which empties this list.**
+any `.tsx`. Allowlisted in `tests/class-contract.test.ts` (mode 3). **Phase 10
+resolved both entries and the list is now empty.**
 
-These are a **different kind of finding** from §2 and are deliberately kept in a
+These are a **different kind of finding** from §2 and were deliberately kept in a
 separate list. A `className → selector` scan never visits an orphan rule, so an
 orphan can never be reported "unresolved"; parked in `UNRESOLVED_CLASSNAMES` it
-would sit there forever and let Phase 10's "remove them from the allowlist" step
-pass for an item that was never in scope.
+would have sat there forever and let Phase 10's "remove them from the allowlist"
+step pass for an item that was never in scope. That separation is what made both
+lists closeable rather than one list mostly closeable.
 
-| Selector | Defined at | Finding | Scheduled |
+Both were rules with no consumer **at all** — not markup that lost its styling,
+but styling that never had markup — so both retire. No route, `href`, id,
+metadata title or word of copy is involved in either.
+
+| Selector | Defined at | Finding | Resolved |
 |---|---|---|---|
-| `.hero-principle` | `app/globals.css:178` | Referenced by no `className` in any `.tsx`. A complete rule block (max-width, margin, font) with no consumer. | Phase 10 |
-| `.card-eyebrow` | `app/globals.css:162` | **Measured addition to the plan's one-item list** — see deviation D2 below. One member of the `.welcome-label, .eyebrow, .question-label, .card-eyebrow, .room-number` selector group; the other four are live, this one is referenced nowhere. | Phase 10 |
+| `.hero-principle` | `app/globals.css` | A complete rule block (max-width, margin, font) with no consumer in any `.tsx`. | **Phase 10.** Retired. |
+| `.card-eyebrow` | `app/globals.css` | One member of the `.welcome-label, .eyebrow, .question-label, .card-eyebrow, .room-number` caps-label group; the other four are live. | **Phase 10.** Removed from the selector group. The other four members are untouched. |
 
 ---
 
@@ -3328,3 +3338,115 @@ the JSON, source-ref resolution, and `AGENTS.md` agreeing with the module.
    automatically. That is the design — one definition, many presentations — but
    it means a draft record added carelessly is visible as a withheld object with
    its id and its provenance label, and its id is a disclosure of its own.
+
+---
+
+# Phase 10 — Home assimilation, the landing, and the preserved-surface verification
+
+## What shipped
+
+| File | What it is |
+|---|---|
+| `content/watch-your-step/landing.ts` | **New.** The `4a` copy: thirteen canonical records, the pinned labels, the eight struck anti-feature pills, and the one governed object — the fabricated 18/61/21 split, which carries its own caption. Registered in **both** `wysCanonicalRecords` and `wysRegistry` in `content/watch-your-step/index.ts`, in the same commit, so it cannot escape the eight governance checks (§7.5). |
+| `content/source-refs.ts` | Eight new artboard citations (`artboard-4a-hero`, `-hero-mobile`, `-instructor-band-mobile`, `-stop-peek-mobile`, `-four-moves`, `-anti-features`, `-anti-features-mobile`, `-data-link-mobile`). Additive; nothing removed. |
+| `components/wys/HeroDemo.tsx` | **New.** The `4a` live demo, mounted by `/` at `desktop` and by `/watch-your-step` at `mobile`. Q3's "same component bound to the same content object" lives here. |
+| `components/wys/landing-stops.ts` | **New.** The nine path cells, derived. Pure TypeScript — no JSX, no CSS import — so a test can import it. |
+| `app/watch-your-step/(shell)/page.tsx` | The Phase 5 stub becomes the `4a` phone landing. Closes `docs/facelift-unapproved.md` GT7 and fills row 11 of the GT1 roster. |
+| `app/watch-your-step/(shell)/landing.module.css` | **New.** |
+| `app/page.tsx` | The `4a` composition, then the complete preserved foyer beneath it. |
+| `app/home.module.css` | **New.** |
+| `app/globals.css` | Four rule-level changes, all of them the two registers closing: `.hero-foyer` and `.audience-button.secondary` gain rules; `.hero-principle` retires; `.card-eyebrow` leaves the caps-label group. |
+| `components/wys/wys-primitives.module.css` | `.demoBody` / `.demoBodyMobile` / `.demoMarks` for the demo card, and a `≤900px` rule that turns the nine-cell `.stopStrip` into the same scrolling row the phone peek already used. |
+| `tests/class-contract.test.ts` | Both registers emptied; `modulesChecked` 56 → 59, re-measured. |
+| `tests/home-landing.test.ts` | **New**, 17 tests. |
+| `docs/facelift-qa.md` | **New.** The preserved-surface verification: method, evidence, and what it does not cover. |
+
+Route count 40, all `○`/`●`, zero `ƒ`. 493 tests pass.
+
+## The verification, and what it actually found
+
+Plan Phase 10's hardest instruction is "**verify — do not assume** — that the
+token re-point restyled every preserved page without changing a word", by "a
+mechanism that exists". `main` was built in a throwaway worktree, the branch was
+built, and the text inside `<main id="main">` was diffed for all ten non-home
+preserved routes, plus the `href` set inside `<main>` separately.
+
+**All ten are byte-identical in both dimensions.** `/system`'s live
+`routeNodes.length` still renders 12; `/neon` keeps both `.detail-grid` blocks
+and its library callout; `/studio` keeps its CTA with `target="_blank"
+rel="noopener"`. The full method, the per-route table and the four things the
+check does **not** cover are in `docs/facelift-qa.md`.
+
+`/` differs in one direction only: 68 lines added, **zero `href`s removed**, and
+six lines removed that Phase 4 removed — the three `aria-hidden` scaffolding
+blocks. That is recorded in the QA file rather than left for a future reader to
+re-derive.
+
+## Decisions this phase made, with reasons
+
+1. **The `/watch-your-step` landing was built here, before `/`.** It was a Phase
+   7 task that did not land (GT7), and Q3 makes that URL the canonical owner of
+   the pitch — so `/` cannot "mount the same component bound to the same content
+   object" until the object and the component exist for the canonical node
+   first. The Phase 9 gate asked for exactly this order.
+2. **`HeroDemo` looks its own content up; neither page passes a scenario in.** A
+   `scenarioId` prop would make "the same content object" a convention that the
+   next edit could break silently. The binding is
+   `heroDemoDistribution.scenarioId`, and `tests/home-landing.test.ts` asserts
+   that each page's `<HeroDemo … />` carries a breakpoint and nothing else.
+3. **The 18/61/21 caption is a FIELD on the object that carries the numbers**,
+   not a canonical record of its own. §6.5 requires them inseparable, and two
+   objects can be separated. With `DistributionBars`'s required `caption` prop
+   that is two independent mechanisms, which is what "inseparable" has to mean
+   for a number that is fabricated (Q11, Q12).
+4. **The demo card's committed state is built and is currently unreachable.**
+   Every scenario and judgment is `draft` + `IMPLEMENTATION_PLACEHOLDER`, so
+   under Q21's ratified default `allShowable()` is false, the exercise does not
+   render, and the ink judgment card, the distribution and the two-button
+   actions row have no path to the screen. They are built anyway, through the
+   render policy, because Q21 is a one-line flip and this is the phase that owes
+   the composition.
+5. **The path cells count the THREE-DAY cadence.** `visitCount` needs a cadence
+   and a public page has no learner to ask — it reads no local state at all. The
+   `4a` cells read "A · 3 visits", which is `cadencePaths.days3`, so that is the
+   path the cells count (R1). The number is still derived from the path's
+   length, never typed, and the hero paragraph above carries the full range
+   ("2 to 5 short visits").
+6. **A withheld stop title falls back to the derived stop name.** "Stop A" is
+   structure, from `order`; the draft title is prose Ben has not approved. The
+   same fallback Plan's `CurrentCard` already uses, and the scaffold footnote
+   that both artboards draw renders underneath to say why.
+7. **No second disclosure strip on `/`.** `4a` draws one above the footer;
+   `app/layout.tsx` already mounts `DisclosureStrip` on every route (§5.5).
+   Composing another on this page would be two nodes for one claim.
+8. **The `4a` block order is the artboard's, and the preserved blocks are
+   appended below it, in their original order.** Q2's ratified default. The
+   order assertion in `tests/home-landing.test.ts` is deliberate: relocating a
+   preserved block *inside* the new composition would satisfy every "is it still
+   there" check and still be the thing the plan forbids.
+
+## Hazards this phase creates for later phases
+
+1. **`/`'s First Load JS went 108 kB → 126 kB.** `HeroDemo` statically imports
+   `JudgeCard`, which is a client component, so it is in the home page's client
+   manifest even though Q21's default means it never renders. It is the same
+   118–128 kB band every course route already sits in, and the cost disappears
+   in the direction that matters: when Ben answers Q21 the card becomes
+   reachable and the bundle is already there. If the number is a problem before
+   then, the fix is a dynamic import in `HeroDemo`, not a second component.
+2. **`modulesChecked` is 59.** Phase 11 may move it again. Re-measure at the
+   gate; do not increment from this figure.
+3. **Both class-contract registers are empty and asserted exactly.** Any new
+   `className` with no rule, or any new rule with no `className`, now fails
+   `npm test` outright. That is the intended end state, and it means a Phase 11
+   stylesheet edit has to land with its markup.
+4. **Two `<h1>`s exist on `/`.** Recorded for Ben in
+   `docs/facelift-unapproved.md`. If he chooses one, the change is a heading
+   level on a preserved element, which is a preserved-markup edit and needs to
+   be a deliberate decision rather than a tidy-up.
+5. **`content/watch-your-step/landing.ts` now feeds two surfaces and the
+   machine mirrors do not see it.** It is registered for the governance checks,
+   but `content/canonical-surfaces.ts` needed no new entry (both routes were
+   already listed), so nothing about `llms.txt`, `sitemap.xml` or `state.json`
+   changed. Worth knowing before assuming the machine surfaces describe the new
+   copy: they describe the routes, not the blocks.

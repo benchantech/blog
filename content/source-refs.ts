@@ -59,7 +59,15 @@ export const externalSourceRefs = [
   { id: "wys-spec-36", kind: "spec", locator: "WYS §36 — content authoring templates" },
 
   /* The approved artboards — design_handoff_bct_facelift/BCT Face Lift.dc.html */
+  { id: "artboard-4a-hero", kind: "artboard", locator: "4a desktop hero, badge/H1/lead/CTA row, dc.html:326-331" },
+  { id: "artboard-4a-hero-mobile", kind: "artboard", locator: "4a phone hero, badge/H1/lead/try-line, dc.html:435-440" },
   { id: "artboard-4a-hero-demo", kind: "artboard", locator: "4a desktop hero demo card, dc.html:333-359" },
+  { id: "artboard-4a-instructor-band-mobile", kind: "artboard", locator: "4a phone instructor pill, dc.html:461-464" },
+  { id: "artboard-4a-stop-peek-mobile", kind: "artboard", locator: "4a phone stop peek row, dc.html:465-471" },
+  { id: "artboard-4a-four-moves", kind: "artboard", locator: "4a Watch/Try/Judge/Carry block, dc.html:393-406" },
+  { id: "artboard-4a-anti-features", kind: "artboard", locator: "4a what you will not find here, dc.html:407-414" },
+  { id: "artboard-4a-anti-features-mobile", kind: "artboard", locator: "4a phone struck pill row, dc.html:472" },
+  { id: "artboard-4a-data-link-mobile", kind: "artboard", locator: "4a phone data link row, dc.html:474" },
   { id: "artboard-4a-hero-demo-mobile", kind: "artboard", locator: "4a phone hero demo card, dc.html:441-459" },
   { id: "artboard-4a-instructor-band", kind: "artboard", locator: "4a instructor band, dc.html:361-374" },
   { id: "artboard-4a-the-path", kind: "artboard", locator: "4a the path, nine cells, dc.html:378-391" },

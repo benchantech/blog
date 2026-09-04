@@ -21,6 +21,7 @@ import { wysCopyRecords } from "./copy";
 import { dataCopyRecords } from "./data";
 import { endBenSlots } from "./end";
 import { judgeCopyRecords } from "./judge";
+import { landingCopyRecords, landingGovernedObjects } from "./landing";
 import { wysJudgments } from "./judgments";
 import { lessonZeroBenSlots, lessonZeroCopyRecords } from "./lesson-zero";
 import { practiceCopyRecords } from "./practice";
@@ -71,7 +72,11 @@ export const wysRegistry: readonly WysRegistryGroup[] = [
   { module: "content/watch-your-step/today.ts (Ben slot)", records: todayBenSlots },
   { module: "content/watch-your-step/end.ts (Ben slot)", records: endBenSlots },
   { module: "content/watch-your-step/lesson-zero.ts (Ben slot)", records: lessonZeroBenSlots },
-  { module: "content/watch-your-step/weeks.ts", records: wysWeeks }
+  { module: "content/watch-your-step/weeks.ts", records: wysWeeks },
+  // Phase 10. One governed object: the fabricated 18/61/21 split the `4a` hero
+  // draws, which is `draft` + `IMPLEMENTATION_PLACEHOLDER` and carries its
+  // caption as a field so the two cannot be separated (plan §6.5, Q11).
+  { module: "content/watch-your-step/landing.ts", records: landingGovernedObjects }
 ];
 
 /** Every WYS content object carrying provenance fields. */
@@ -84,6 +89,7 @@ export const wysCanonicalRecords: readonly AnyCanonicalText[] = [
   ...wysCopyRecords,
   ...dataCopyRecords,
   ...judgeCopyRecords,
+  ...landingCopyRecords,
   ...lessonZeroCopyRecords,
   ...practiceCopyRecords,
   ...progressCopyRecords,

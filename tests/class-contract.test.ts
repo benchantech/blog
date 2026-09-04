@@ -18,34 +18,52 @@ import { fileURLToPath } from "node:url";
  *   2. styles.<key> member access -> sibling .module.css class selector
  *   3. globals.css class selector -> some className token (orphan-rule scan)
  *
- * The two registers below are ALLOWLISTS OF KNOWN MISMATCHES, and they are
+ * The two registers below were ALLOWLISTS OF KNOWN MISMATCHES, and they are
  * asserted EXACTLY, not as an upper bound: a stale entry fails the test. Phase
- * 10 resolves every entry and empties both lists. They are two lists because
+ * 10 resolved every entry and BOTH LISTS ARE NOW EMPTY, which is the state the
+ * plan schedules them into — from here a mismatch in either direction is a
+ * regression rather than a to-do. They stay two lists because
  * they are two different kinds of finding — a className→selector scan never
  * visits an orphan rule, so an orphan parked in UNRESOLVED_CLASSNAMES could
  * never be reported and would sit there forever.
  */
 
-/** className tokens applied in .tsx with no rule anywhere. Phase 10 resolves. */
-const UNRESOLVED_CLASSNAMES = [
-  // app/page.tsx:8 — `hero hero-foyer`; no `.hero-foyer` rule exists.
-  "hero-foyer",
-  // app/page.tsx:26 — `audience-button secondary`; globals.css has only
-  // `.secondary-results` (:583/:590/:595), so the two hero buttons are
-  // asymmetric by accident: `.audience-button.primary` styles one, nothing
-  // styles the other.
-  "secondary"
-];
+/**
+ * className tokens applied in a `.tsx` with no rule anywhere.
+ *
+ * EMPTY, as of Phase 10, and it is asserted EXACTLY — a stale entry fails this
+ * test, so a fix and its de-registration land together. The two Phase 0
+ * findings were resolved by giving each class the job it was already claiming
+ * to have, never by deleting a class from preserved markup:
+ *
+ *  - `hero-foyer` (app/page.tsx:8) now modifies the preserved foyer hero, which
+ *    Q2's ratified stacking makes the SECOND hero on `/`: no top padding, and a
+ *    headline in the 44px section register rather than the 66px page register.
+ *  - `secondary` (app/page.tsx, the "I'm AI" button) now fills `--tint-grey`
+ *    against `.audience-button.primary`'s ink, so the two hero buttons are a
+ *    deliberate pair instead of asymmetric by accident.
+ *
+ * A NEW entry here is a regression, not a to-do. Add a rule or drop the class.
+ */
+const UNRESOLVED_CLASSNAMES: readonly string[] = [];
 
-/** globals.css class selectors referenced by no className. Phase 10 resolves. */
-const ORPHAN_RULES = [
-  // globals.css:178 — referenced by no className in any .tsx.
-  "hero-principle",
-  // globals.css:162 — a member of the .welcome-label/.eyebrow/.question-label/
-  // .card-eyebrow/.room-number selector group; the other four are live.
-  // MEASURED ADDITION to the plan's one-item list (see docs/facelift-build-notes.md).
-  "card-eyebrow"
-];
+/**
+ * globals.css class selectors referenced by no className.
+ *
+ * EMPTY, as of Phase 10. Both Phase 0 findings were rules with no consumer at
+ * all — not markup that lost its styling, but styling that never had markup:
+ *
+ *  - `.hero-principle` (a complete max-width / margin / font block) is retired.
+ *  - `.card-eyebrow` leaves the `.welcome-label, .eyebrow, .question-label,
+ *    .room-number` caps-label group; the other four members are live and are
+ *    untouched.
+ *
+ * No route, href, id, metadata title or word of copy is involved in either.
+ * This list is kept SEPARATE from UNRESOLVED_CLASSNAMES on purpose: a
+ * className -> selector scan never visits an orphan rule, so an orphan parked
+ * in that list could never be reported and would sit there forever.
+ */
+const ORPHAN_RULES: readonly string[] = [];
 
 /**
  * Class names built at runtime from data. The static prefix before `${` is the
@@ -315,7 +333,14 @@ test("mode 2: every styles.<key> resolves to a class in its sibling .module.css"
   // app/robots.ts, app/llms.txt/route.ts and
   // app/author-ship/state.json/route.ts — import no stylesheet at all and
   // therefore move this figure by zero.
-  assert.equal(modulesChecked, 56, "CSS Module imports across app/ and components/ — update deliberately");
+  // Phase 10 (home assimilation) adds THREE, measured rather than incremented:
+  // `app/page.tsx` imports `app/home.module.css`, the `/watch-your-step` landing
+  // imports `app/watch-your-step/(shell)/landing.module.css`, and
+  // `components/wys/HeroDemo.tsx` — the one component both of those pages mount
+  // (Q3) — imports `components/wys/wys-primitives.module.css`.
+  // `components/wys/landing-stops.ts` is a pure module and imports no
+  // stylesheet, so it moves this figure by zero.
+  assert.equal(modulesChecked, 59, "CSS Module imports across app/ and components/ — update deliberately");
 });
 
 /* -------------------------------------------------------------------------- */

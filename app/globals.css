@@ -328,13 +328,34 @@ main {
   max-width: 760px;
 }
 
+/* PHASE 10 — the foyer hero is now the SECOND hero on `/`.
+   `app/page.tsx:8` has carried `className="hero hero-foyer"` since the
+   blueprint, with no `.hero-foyer` rule anywhere: the modifier did nothing, and
+   it was registered in UNRESOLVED_CLASSNAMES for exactly that reason. It is
+   resolved by giving it the job it now has rather than by deleting a class from
+   preserved markup. Q2's ratified default appends the preserved foyer below the
+   `4a` composition, so this block no longer opens the page: its top padding
+   comes from the composition's own seam, and its headline steps down from the
+   66px page H1 to the 44px section register. Not one word of its copy changes. */
+.hero-foyer {
+  padding-block: 0 72px;
+  grid-template-columns: minmax(0, 1fr) 380px;
+}
+
+.hero-foyer h1 {
+  max-width: 22ch;
+  margin-top: 0;
+  font-size: clamp(1.875rem, 3.6vw, 2.75rem);
+  line-height: 1.08;
+  letter-spacing: -0.025em;
+}
+
 /* The caps micro-label group. The blueprint set these in uppercase IBM Plex
    Mono; the approved register sets caps labels in Sans 12/600 at --accent, and
    reserves Mono for 11-12px provenance and state lines only. */
 .welcome-label,
 .eyebrow,
 .question-label,
-.card-eyebrow,
 .room-number {
   margin: 0;
   color: var(--accent-text-on-tint);
@@ -349,14 +370,6 @@ main {
   font: 600 clamp(2.375rem, 5vw, 4.125rem) / 1.02 var(--sans);
   letter-spacing: -0.03em;
   text-wrap: balance;
-}
-
-/* Orphan rule — no className references it. Registered in ORPHAN_RULES and
-   scheduled for Phase 10, which empties that register. Not resolved here. */
-.hero-principle {
-  max-width: 760px;
-  margin: 0;
-  font: 500 clamp(1.15rem, 2.2vw, 1.55rem) / 1.35 var(--sans);
 }
 
 .hero-copy {
@@ -410,6 +423,20 @@ main {
   background: var(--ink);
   color: var(--white);
   border-color: var(--ink);
+}
+
+/* PHASE 10 — the second audience button stops being asymmetric by accident.
+   `app/page.tsx:26` has carried `audience-button secondary` with no matching
+   rule (globals.css defines only the unrelated `.secondary-results`), so
+   `.audience-button.primary` styled the human button and NOTHING styled the AI
+   one. Registered in UNRESOLVED_CLASSNAMES at Phase 0 and resolved here, in the
+   safe direction: the pair becomes a deliberate ink/tint pair rather than
+   losing a class from preserved markup. --tint-grey, not teal: teal is the
+   "current / next / selected" fill (§4.2) and neither button is selected. */
+.audience-button.secondary {
+  background: var(--tint-grey);
+  border-color: transparent;
+  box-shadow: none;
 }
 
 .audience-button span {

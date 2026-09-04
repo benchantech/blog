@@ -2122,15 +2122,16 @@ right place for the reasoning and the wrong place to count them. The roster:
 | 8 | Standing Orders | `5d` | none | SO1 |
 | 9 | Ship's Log | `5d` | none | SL1 |
 | 10 | Captain's Quarters (`/ben`) | `5d` | none | BQ7 |
-| 11 | `/watch-your-step` landing | `4a` phone | none | **NOT YET — the surface is still a Phase 5 stub. See GT7.** |
+| 11 | `/watch-your-step` landing | `4a` phone | none | **HM3** — built and recorded at Phase 10; was "NOT YET" here while the surface was a Phase 5 stub |
 | 12 | `/crew` | none at any width | none | CRW1, CRW4 |
 | 13 | `/watch-your-step/stop/[stopId]` | none | none | Phase 7 (shell), §I |
 | 14 | `/watch-your-step/end` | none | none | G4 |
 | 15 | `/not-found` | — | none | A (whole layers), and unchanged since Phase 5 |
 
-Fourteen of the fifteen are drawn and recorded. Row 11 is the one the plan calls
-"the highest-stakes one in the set", and it cannot be extrapolated to desktop
-because it has not been built at either width.
+Fourteen of the fifteen were drawn and recorded at Phase 9. Row 11 — the one the
+plan calls "the highest-stakes one in the set" — could not be extrapolated to
+desktop then, because it had not been built at either width. **Phase 10 built it
+at both and recorded it at HM3, so all fifteen are now drawn and recorded.**
 
 ## GT2. Four machine surfaces exist that no artboard draws, and no artboard could
 
@@ -2186,7 +2187,7 @@ the worst kind of small lie. The sitemap carries URLs and nothing else.
 `/robots.txt` adds no `disallow` rule for the same reason — every rule it could
 add would describe a surface that does not exist.
 
-## GT7. `/watch-your-step` is still a Phase 5 stub — and it is the canonical owner of the pitch
+## GT7. `/watch-your-step` was still a Phase 5 stub — CLOSED at Phase 10
 
 Not a Phase 9 deviation; a Phase 7 task that did not land (plan Phase 7,
 "Landing: centred hero, mobile demo card, dark instructor pill…"). It matters
@@ -2197,6 +2198,12 @@ nothing claims otherwise, but the highest-traffic entry in the ship nav is a
 placeholder. **Flagged for the next phase, not patched here** — writing the
 landing at the gate would be writing the pitch, which is exactly the copy R10
 reserves.
+
+**Closed at Phase 10.** The landing is built from the `4a` phone artboard, its
+copy comes from `content/watch-your-step/landing.ts` (approved artboard text,
+`BEN_APPROVED`, cited per variant), and no pitch was written at a gate. See HM3
+for the desktop extrapolation and HM5-HM7 for what the surface renders while Q21's
+default holds.
 
 ## GT8. Three headings in `llms.txt` are authored group names
 
@@ -2213,3 +2220,167 @@ names actually live. `AGENTS.md` is a repo file rather than a public surface, so
 this is a build-facing addition — but it is copy, it was added by this build,
 and `tests/machine-surfaces.test.ts` binds it to
 `content/ship/agent-bootstrap.ts` so the two can never disagree.
+
+---
+
+# Phase 10 — `/` and the Watch Your Step landing
+
+## HM1. The home page now carries TWO `<h1>`s, and that is a consequence of Q2
+
+The `4a` hero headline ("The AI course that never asks you to trust AI.") is the
+page's primary heading. The preserved foyer keeps the `<h1>` it shipped with
+("Come on in - even if you're AI."), because demoting it to `<h2>` would be a
+semantic edit to preserved markup and constraint 2 does not distinguish between
+editing a word and editing the element that carries it.
+
+Two `<h1>`s is valid HTML and is not a WCAG failure, but it is a real statement
+about the page: **there are two pitches on one URL now**, which is exactly what
+Q2 asks about. If the answer to Q2 changes — interleaved rather than appended,
+or the foyer moved to its own route — this resolves with it.
+
+The `.hero-foyer` rule steps the second headline down from 66px to the 44px
+section register so the visual hierarchy says what the DOM cannot, and the
+foyer's copy is untouched.
+
+**Status: a consequence, flagged. Ben's call under Q2.**
+
+## HM2. The mobile home page is extrapolated — `4a`'s phone is the OTHER page
+
+`4a` draws a 1280 home page and a 390 `/watch-your-step` landing. **There is no
+approved mobile home page**, so everything below 900px on `/` is composed from
+the desktop block order plus the landing's own treatment.
+
+One thing the artboards do settle and this build carries across: **the desktop
+hero is left-aligned and the mobile hero is centred.** That alignment change is
+theirs, not this build's.
+
+What is this build's: the single-column collapse order, the 32px slab padding,
+the four-move grid becoming one column, and the nine-cell path row becoming a
+horizontally scrolling strip (declared on the shared `.stopStrip` primitive, so
+every surface that draws nine cells gets the same behaviour).
+
+**Status: NEW. Unapproved.**
+
+## HM3. `/watch-your-step` at 1280 — row 11 of the GT1 roster, now drawn
+
+The landing was the one surface in the fifteen-item desktop-extrapolation roster
+that could not be extrapolated, because it had not been built at either width
+(GT1 row 11, GT7). It is built now, and the desktop rendering follows the rule
+the other fourteen follow: **the reading column widens inside the 1280 shell and
+the composition does not change.** No second column, no re-ordered blocks, no
+desktop-only IA. The measure grows from 390 to 640, and the headline from 38px
+to 44px.
+
+**Status: NEW. Unapproved.** GT1 row 11 can now be read as recorded here.
+
+## HM4. The Data page link label is the phone's wording on BOTH breakpoints (Q6)
+
+`4a` desktop writes "exactly what this site stores about you" (dc.html:414) and
+`4a` phone writes "See what this site knows about you" (dc.html:474). Q6 is
+ratified: one pinned link label, and it is the phone's.
+
+So the desktop home page renders a different string from the one drawn in the
+approved artboard. That is an **amendment to Final copy**, in the same class as
+the Ship's Log chip ("Log" → "Ship's Log") already recorded at the Phase 6 gate,
+and for the same reason: one node cannot have two names.
+
+**Status: a deliberate departure from an approved artboard. Needs Ben's stamp.**
+
+## HM5. Nine path cells that cannot show their titles, and what they show instead
+
+Every stop title is `draft` + `IMPLEMENTATION_PLACEHOLDER` — a working scaffold
+(WYS §11), not Ben-approved doctrine — so under Q21's ratified default the
+`4a` cells cannot render "Start With Distrust", "Task Before Prompt" and the
+rest. **They show the derived stop name instead** ("Lesson 0", "Stop A", "Stop
+B"), with the scaffold footnote underneath.
+
+The visible cost: a cell reads "A · 3 visits" over "Stop A", which repeats the
+letter. The alternatives were an empty cell (reads as broken), the provenance
+label at 140px (does not fit and is not a title), or the draft title itself
+(which is the thing Q21 decides). The redundancy disappears the moment Ben
+answers Q21 — no component changes, the titles simply become renderable.
+
+**Status: a consequence of Q21, flagged.**
+
+## HM6. "A · 3 visits" counts the three-day cadence, on a page with no learner
+
+`4a` writes "A · 3 visits". A visit count needs a cadence, and `/` and
+`/watch-your-step` read no local state at all, so there is no visitor pace to
+count in. The cells count `cadencePaths.days3`, because that is the path whose
+length is the number the approved artboard draws (R1).
+
+Two things this is not: it is not a typed 3 (it is the path's length, so a
+curriculum change moves the cell), and it is not a claim that every learner
+takes three visits — the hero paragraph directly above says "2 to 5 short
+visits", which is the full range.
+
+**Status: an interpretation of an approved number. Reported.**
+
+## HM7. The landing's audio slot is a pill where the artboard draws a text line
+
+`4a`'s phone writes the instructor card's audio affordance as plain text:
+"▶ Hear Ben, 60 seconds · Ben source". The landing renders the shared
+`AudioSlotPill` instead — the same primitive the desktop instructor band uses —
+which carries the **fuller** slot descriptor, "Ben source · slot awaiting
+selection".
+
+R9 direction: more provenance than the artboard, never less. The phone's shorter
+"· Ben source" reads like an attribution for something that exists; the longer
+one says the recording has not been chosen, which is true.
+
+**Status: a safe-direction override of an approved artboard. Reported.**
+
+## HM8. The pre-commit note is desktop-only, exactly as the artboards draw it
+
+`4a` puts "You commit before you see anything. That's the whole method." under
+the Commit pill at 1280 and draws nothing there at 390. Unlike the three R9
+overrides plan §6.3 names — the `DraftMark`, the distribution caption, the Reset
+control, all of which the phone also omits and all of which this build restores
+— **this omission removes no provenance mark and makes no state transition
+unreachable.** So R1 governs and the artboard is followed as drawn.
+
+Recorded because it is an asymmetry between breakpoints that a reader will
+notice and could mistake for an oversight.
+
+## HM9. Two class-contract findings resolved by adding rules, not by editing markup
+
+Phase 0 measured two `className` tokens with no rule (`hero-foyer`, `secondary`)
+and two rules with no `className` (`.hero-principle`, `.card-eyebrow`). Phase 10
+closes all four, and both registers are now empty and asserted exactly.
+
+The two orphan RULES retire — they had no consumer at all, and no route, `href`,
+id, metadata title or word of copy is involved in either.
+
+The two orphan CLASSES gained rules rather than being deleted from `app/page.tsx`.
+That is a visual change to the preserved home page, so it is named here:
+
+- **`.hero-foyer`**: no top padding, and the headline drops from the 66px page
+  register to the 44px section register — the foyer hero is the second hero on
+  the page now.
+- **`.audience-button.secondary`**: `--tint-grey` fill, no border, no shadow,
+  against the primary's ink. Deliberately not `--tint-teal`, which is reserved
+  for "current / next / selected" and neither button is selected. Until now
+  nothing styled the "I'm AI" button at all.
+
+**Status: a visual change to an as-live surface. Reported.**
+
+## HM10. The `4a` disclosure strip is the sitewide one, not a second copy
+
+`4a` draws a disclosure strip between "How the site is run" and the footer. The
+site already renders `components/DisclosureStrip.tsx` on every route from
+`app/layout.tsx` (§5.5), immediately below `<main>` — which is the same place on
+the page. No second strip was composed. The block order the visitor sees matches
+the artboard; the DOM node belongs to the layout rather than to the page.
+
+## HM11. The committed state of the hero demo ships and cannot currently be reached
+
+The ink judgment card with its mono draft line, the distribution card with its
+caption, and the two-button actions row are all built, through the render
+policy, on both breakpoints. No screenshot in the handoff shows them, because
+the artboard's committed state is behind a prototype conditional.
+
+Under Q21's ratified default they render for nobody: the scenario's own prose is
+blocked, so the exercise does not run and there is nothing to commit. **The home
+page's demo card is currently a scenario pill and a provenance line.** That is
+the honest state of a course whose content Ben has not approved, and it is worth
+seeing plainly before deciding Q21 — it is what a visitor gets today.
