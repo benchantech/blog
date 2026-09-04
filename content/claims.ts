@@ -165,17 +165,42 @@ export const claims = [
     }
   },
   {
+    /**
+     * Card 2's approved sentence (mockup 5c, dc.html:195), WRITTEN IN PHASE 8
+     * as its `awaiting` descriptor said it would be — against the shipped
+     * adapter rather than against the artboard.
+     *
+     * IT IS A STATE-BOUND STRING, and the state is the consent gate. `trackWys`
+     * sends nothing at all unless `bct_analytics_consent === "granted"` (Q7's
+     * ratified full-suppression default, plan §8.3), so asserting flatly that
+     * coarse counts are sent would be false for every visitor who declined and
+     * for every visitor who has not chosen. The Data page therefore renders
+     * this variant ONLY in the state that makes it true, and renders a truthful
+     * state line otherwise (`content/watch-your-step/data.ts`). That is stop
+     * condition SC-2, fixed in architecture rather than in copy (R8).
+     *
+     * The sentence stops where the artboard's second sentence begins. That
+     * second sentence — the first-party counter — is not stored here at all:
+     * it lives in `content/watch-your-step/config.ts` behind
+     * `aggregateCounterSentence()`, so it is absent from the DOM while
+     * `WYS_AGGREGATE_ENABLED` is false (SC-12, Q22). Two sentences, two truth
+     * conditions, two homes — one record each.
+     *
+     * Status and origin follow the file's own mapping: approved artboard copy
+     * is `published` + `BEN_APPROVED`. It was `draft` +
+     * `IMPLEMENTATION_PLACEHOLDER` only because no wording existed yet.
+     */
     id: "analytics",
     surfaceKind: "general",
-    status: "draft",
-    origin: "IMPLEMENTATION_PLACEHOLDER",
-    sourceIds: ["wys-spec-19", "docs-legal-analytics"],
+    status: "published",
+    origin: "BEN_APPROVED",
+    sourceIds: ["artboard-5c-data-card-2", "wys-spec-19", "docs-legal-analytics"],
+    variantSources: {
+      short: ["artboard-5c-data-card-2"]
+    },
     variants: {
-      short: {
-        awaiting:
-          "Data page card 2, conditioned on the consent gate (Q7) and on WYS_AGGREGATE_ENABLED (Q22); written in Phase 8 against the shipped adapter",
-        writtenBy: "phase-8"
-      },
+      short:
+        "Page analytics, and coarse counts: someone started, finished a stop, used replay, reached a carry, asked for depth.",
       full: {
         awaiting: "/privacy and /cookies analytics prose, written in Phase 11 against the frozen event allowlist",
         writtenBy: "phase-11"

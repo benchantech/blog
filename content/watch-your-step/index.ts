@@ -18,6 +18,7 @@ import { artifactCanonicalRecords, wysFictionalArtifacts } from "./artifacts";
 import { wysBoundaries } from "./boundaries";
 import { wysCarries } from "./carries";
 import { wysCopyRecords } from "./copy";
+import { dataCopyRecords } from "./data";
 import { endBenSlots } from "./end";
 import { judgeCopyRecords } from "./judge";
 import { wysJudgments } from "./judgments";
@@ -81,6 +82,7 @@ export const wysContentObjects: readonly WysGovernedObject[] = wysRegistry.flatM
 /** Every canonical text record the WYS content modules define. */
 export const wysCanonicalRecords: readonly AnyCanonicalText[] = [
   ...wysCopyRecords,
+  ...dataCopyRecords,
   ...judgeCopyRecords,
   ...lessonZeroCopyRecords,
   ...practiceCopyRecords,
@@ -100,6 +102,12 @@ export const wysCanonicalRecords: readonly AnyCanonicalText[] = [
 export const WYS_NON_RECORD_MODULES: readonly string[] = [
   "config.ts",
   "copy.ts",
+  // Phase 8 (Data page). `data.ts` carries ten canonical records — registered
+  // in `wysCanonicalRecords` above — plus the page labels and the
+  // `(status, origin)` pair the two lib-defined confirmation explanations
+  // render under. No governed object of its own, so it takes the same route
+  // `judge.ts`, `practice.ts` and `progress.ts` take.
+  "data.ts",
   "day-plans.ts",
   "domains.ts",
   "index.ts",

@@ -672,19 +672,32 @@ export function updateWysState(
 /**
  * Shown BEFORE the operation runs, never after. (WYS §17): "explain exactly
  * what happens before executing". Factual build description only — no first
- * person, no claim about anything outside this browser.
+ * person, and no claim this build cannot check.
+ *
+ * WHY EACH ONE NAMES ITS OWN EVENT. The Data page's confirm panels are the one
+ * place a learner is told what an operation does immediately before it runs,
+ * and each operation ALSO fires an allowlisted GA4 event —
+ * `wys_restart_course` and `wys_local_state_clear`, both bare, both after the
+ * local work. The Phase 8 gate found this text claiming "Nothing is sent
+ * anywhere" one line above a button that sends one, which is precisely the
+ * false-claim class (WYS §34, plan R8) this whole screen exists to refuse. The
+ * fix is the true statement, hedged to the conditions `trackWys` actually
+ * checks — analytics configured for the build AND granted on the device — and
+ * naming the exposure, which is the event and nothing else.
  */
 export const RESTART_COURSE_EXPLANATION: readonly string[] = [
   "Restart clears your curriculum progress in this browser: completed stops, scenarios and carries, replay counts, and the judgments you kept.",
   "Your pace, time and posture preferences stay, unless you choose to clear them here too.",
   "Your rulebook stays, unless you choose to clear it here too.",
-  "Nothing is sent anywhere, and nothing outside this browser changes."
+  "None of what you wrote or chose is sent anywhere, and no copy of it exists off this device to change.",
+  "If analytics are running and allowed on this device, this site counts that a restart happened — the count only, with nothing about you in it."
 ];
 
 export const CLEAR_ALL_WYS_DATA_EXPLANATION: readonly string[] = [
   "Clearing removes every wys: key this course stored in this browser, including your rulebook, and returns you to a clean onboarding state.",
-  "Your analytics choice is stored under a different key and is not touched, so you will not be asked about cookies again.",
-  "This clears this browser only. It does not erase hosting logs, and it does not erase anything already recorded in Google Analytics."
+  "Your analytics choice is stored under a different key and is not touched, so clearing does not change whether this site asks you about cookies.",
+  "This clears this browser only. It does not erase hosting logs, and it does not erase anything already recorded in Google Analytics.",
+  "None of what you wrote is sent anywhere by clearing. If analytics are running and allowed on this device, this site counts that a clear happened — the count only, with nothing about you in it."
 ];
 
 export interface RestartCourseOptions {

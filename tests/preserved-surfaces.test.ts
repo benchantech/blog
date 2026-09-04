@@ -336,6 +336,23 @@ test("the seven routes stubbed in Phase 5 all exist", () => {
   }
 });
 
+test("every course tab URL has a page file behind it", () => {
+  // Phase 7 shipped the five-tab bottom nav and Phase 8 landed the last screen
+  // behind it. The bar is persistent chrome on six routes, so a missing page
+  // here is a 404 reachable from every course screen — the "nothing new ships
+  // dead" half of the deletion contract, applied to course-internal navigation.
+  const urls = servedUrls();
+  for (const url of [
+    "/watch-your-step/today",
+    "/watch-your-step/plan",
+    "/watch-your-step/progress",
+    "/watch-your-step/practice",
+    "/watch-your-step/data"
+  ]) {
+    assert.ok(urls.has(url), `course tab ${url} has no page file — it would ship dead`);
+  }
+});
+
 test("no internal href written in the chrome is dead", () => {
   const urls = servedUrls();
   const dead: string[] = [];

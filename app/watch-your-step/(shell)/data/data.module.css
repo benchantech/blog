@@ -1,0 +1,265 @@
+/*
+ * The Data page (mockup `5c` Data, dc.html:179-207).
+ *
+ * Scoped to this route. `CardShell`, `KvRow`/`KvList`, `ActionPill`,
+ * `SectionEyebrow` and `ProvenanceMono` carry the three cards, the label/value
+ * rows, the three action pills, the caps eyebrows and the mono lines, so none of
+ * that geometry is restated here. What this file carries is the four things the
+ * shared set has no primitive for: the 12px card stack, the key register under
+ * card 1, the raw-JSON and event disclosures, and the two confirmation panels
+ * that no artboard draws.
+ *
+ * ONE DELIBERATE LOCAL EYEBROW. `SectionEyebrow` paints
+ * `--accent-text-on-tint`, which is correct on the two grey cards and unreadable
+ * on card 3's ink slab, where the artboard uses `--accent-on-dark` (#7FC8D6,
+ * dc.html:198). Rather than widen a shared primitive from a route file, card 3
+ * uses `.eyebrowOnInk` below and the request for a `tone` prop on
+ * `SectionEyebrow` is recorded for the gate — the same route
+ * `app/watch-your-step/(shell)/progress` took for `GatedText` size variants.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* The card stack — 12px between cards (dc.html:182, :193, :197)              */
+/* -------------------------------------------------------------------------- */
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 22px;
+}
+
+/* The 12px/600 caps eyebrow, reversed out on card 3's ink slab. */
+.eyebrowOnInk {
+  margin: 0 0 8px;
+  color: var(--accent-on-dark);
+  font: 600 12px / 1.3 var(--sans);
+  letter-spacing: 0.04em;
+}
+
+.cardBody {
+  margin: 0;
+  font: 400 15px / 1.45 var(--sans);
+  color: var(--ink);
+}
+
+.cardBodyOnInk {
+  color: var(--white);
+}
+
+/* A second paragraph inside a card keeps the artboard's 10px rhythm. */
+.cardBodyStacked {
+  margin-top: 10px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Card 1 — the register of keys, and the two disclosures                     */
+/* -------------------------------------------------------------------------- */
+/*
+ * `BROWSER_KEYS` is the registry plan §7.5 requires so this list is GENERATED
+ * rather than hand-maintained. Two keys today; a third added in month three
+ * appears here with no edit to this stylesheet or to the component.
+ */
+.keys {
+  margin: 12px 0 0;
+  padding: 12px 0 0;
+  border-top: 1px solid var(--border-nav);
+  list-style: none;
+}
+
+.keysHeading {
+  margin: 0 0 8px;
+  color: var(--muted);
+  font: 400 13px / 1.4 var(--sans);
+}
+
+.key {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+  padding: 4px 0;
+}
+
+.keyName {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.keyValue {
+  flex: none;
+  color: var(--muted);
+  text-align: right;
+  font: 400 13px / 1.5 var(--sans);
+}
+
+/*
+ * The mono disclosure line (dc.html:191). The artboard draws
+ * "key: wys:v1 · raw JSON ↓" as a single 11px mono line with a downward arrow,
+ * which is a `<details>` summary drawn flat — so it is one, with the marker
+ * removed and the arrow left where the artboard put it.
+ */
+.disclosure {
+  margin: 10px 0 0;
+}
+
+.summary {
+  cursor: pointer;
+  font: 400 11px / 1.5 var(--mono);
+  color: var(--muted);
+  list-style: none;
+}
+
+.summary::-webkit-details-marker {
+  display: none;
+}
+
+.summary:focus-visible {
+  outline: 3px solid var(--focus);
+  outline-offset: 3px;
+}
+
+.json {
+  margin: 8px 0 0;
+  padding: 12px;
+  max-height: 320px;
+  overflow: auto;
+  border-radius: var(--radius-row);
+  background: var(--white);
+  font: 400 11px / 1.6 var(--mono);
+  color: var(--body);
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Card 2 — the event register                                                */
+/* -------------------------------------------------------------------------- */
+/*
+ * An ADDITION, and the reason for it is in the component: the approved sentence
+ * names five things and the closed allowlist can fire eleven, so a page whose
+ * whole subject is what is sent would be untrue by omission. The list is read
+ * from `lib/wys/telemetry.ts`'s own decision table, never typed.
+ */
+.events {
+  margin: 12px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.event {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: 6px 0;
+}
+
+.eventName {
+  font: 400 11px / 1.5 var(--mono);
+  color: var(--ink);
+}
+
+.eventWhen {
+  color: var(--muted);
+  font: 400 13px / 1.4 var(--sans);
+}
+
+/* -------------------------------------------------------------------------- */
+/* The infrastructure paragraph (dc.html:201)                                 */
+/* -------------------------------------------------------------------------- */
+.infrastructure {
+  margin: 0 4px 22px;
+}
+
+.infrastructureText {
+  margin: 0;
+  color: var(--muted);
+  font: 400 14px / 1.5 var(--sans);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Actions (dc.html:202-206) and the footnote (dc.html:207)                   */
+/* -------------------------------------------------------------------------- */
+.actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.footnote {
+  margin: 10px 0 0;
+  color: var(--muted);
+  font: 400 13px / 1.45 var(--sans);
+  text-align: center;
+}
+
+.footnoteAddition {
+  margin: 8px 0 0;
+  text-align: center;
+}
+
+.footnoteLink {
+  display: inline-block;
+  min-height: 44px;
+  padding: 12px 0 0;
+  color: var(--accent-text-on-tint);
+  font: 500 13px / 1.45 var(--sans);
+}
+
+/* -------------------------------------------------------------------------- */
+/* The confirmation panels — authored; no artboard draws one                  */
+/* -------------------------------------------------------------------------- */
+/*
+ * (WYS §17) requires both destructive operations to "explain exactly what
+ * happens before executing", so the explanation is a STEP, not a tooltip: the
+ * pill opens this panel and the panel carries the only control that acts.
+ */
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border: 1.5px solid var(--border-pill-strong);
+  border-radius: var(--radius-card-lg);
+}
+
+.confirmLine {
+  margin: 0;
+  color: var(--ink);
+  font: 400 15px / 1.45 var(--sans);
+}
+
+.confirmActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* The post-clear panel. Teal, because it is the state the learner just made. */
+.cleared {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0 0 8px;
+  padding: 18px;
+  border-radius: var(--radius-card-lg);
+  background: var(--tint-teal);
+}
+
+.clearedText {
+  margin: 0;
+  color: var(--ink);
+  font: 400 15px / 1.45 var(--sans);
+}
+
+.clearedActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+/* The blocked-storage variant (§7.3). A fact about the browser, not an error. */
+.notice {
+  margin: 0;
+  color: var(--body);
+  font: 400 15px / 1.45 var(--sans);
+}

@@ -2327,3 +2327,303 @@ it. If Plan should link the terminal row instead, that is a one-line change in
 **5 · Five strings on the terminal surface are authored** and are on the
 Final-copy list (`docs/facelift-unapproved.md` §G). The screen makes no outcome
 claim, tested for.
+
+---
+
+# Phase 8 — the Data page
+
+Plan Phase 8, (WYS §18), (WYS §20), artboard `5c`. The screen the whole
+provenance substrate was built to make possible: it renders the visitor's real
+browser state, and **every sentence on it is checked against the shipped code
+rather than against the artboard**.
+
+## What shipped
+
+| File | What it is |
+|---|---|
+| `content/watch-your-step/data.ts` | Ten canonical records, the page labels, the `(status, origin)` pair the two lib-defined confirmation explanations render under, and five pure derivations (`dataPageRowsInRenderOrder`, `consentReadingFor`, `browserKeyValueSummary`, `localDataFile`, `rawJsonPreview`). Registered in `wysCanonicalRecords` and in `WYS_NON_RECORD_MODULES`. |
+| `app/watch-your-step/(shell)/data/page.tsx` | The server screen. Resolves every record through the gate, decides the two build-time branches, and hands the client only what needs state. |
+| `.../DataManifest.tsx` | Card 1, the three actions, the two confirmation panels, the post-clear panel and the footnote. Owns the one `useWysState` instance. |
+| `.../AnalyticsReceipt.tsx` | Card 2's consent-conditioned line. |
+| `.../DataManifestTelemetry.tsx` | `wys_data_manifest_view`, once per session. Renders nothing. |
+| `.../DataText.tsx` | `DataText` / `DataLines` — gated prose in this screen's type scale. No `text` prop. |
+| `.../data.module.css` | The card stack, the key register, the two disclosures, the confirmation and post-clear panels. |
+| `tests/wys-data.test.ts` | 39 tests. Suite total 395 → 435, all green. |
+| `content/claims.ts` | `analytics.short` WRITTEN — the variant whose `AwaitingCopy` descriptor said `writtenBy: "phase-8"`. |
+| `content/source-refs.ts` | Five new refs; one locator corrected. |
+| `content/watch-your-step/index.ts` | `data.ts` registered. |
+| `tests/preserved-surfaces.test.ts` | All five course-tab URLs asserted served (Phase 7 gate hazard 3). |
+| `tests/class-contract.test.ts` | `modulesChecked` 48 → 51. |
+| `tests/canonical-text.test.ts` | The `analytics` awaiting assertion moved to a record that is still awaiting. |
+
+`/watch-your-step/data` builds `○ (Static)`. 36 static pages, 26 routes, **zero
+`ƒ`**. Shared First Load JS unchanged at 102 kB.
+
+## The one rule this screen was built against
+
+(WYS §37): "Data Manifest accurately describes what is actually deployed" and
+"no privacy claim exceeds implemented fact". (WYS §34) and plan R8: a false
+public claim is fixed in architecture, never in copy. So **three sentences do
+not exist as strings until the state that makes them true exists**, and one
+list is generated rather than written:
+
+1. **The first-party-counter sentence** (Q22, SC-12) comes from
+   `aggregateCounterSentence()` in `content/watch-your-step/config.ts`, bound to
+   the same `WYS_AGGREGATE_ENABLED` constant as `lib/wys/aggregate.ts`. It
+   returns `null`, so the string is never constructed and **is absent from the
+   rendered HTML and from every client chunk** — verified by grep over
+   `.next/server/app/**/*.html` and `.next/static/chunks/*.js`. It survives only
+   inside the server bundle as an unreferenced module constant, which is not the
+   DOM. `tests/wys-data.test.ts` flips the flag both ways against the same
+   function and asserts the page renders the function, never the constant.
+2. **The approved "coarse counts" sentence** (Q7, SC-2) renders only for a
+   browser that granted analytics; two authored lines cover declined and
+   undecided. See `docs/facelift-unapproved.md` DM2.
+3. **Card 2's opening** switches on `measurementIdIsSet()` at BUILD time: with
+   no `NEXT_PUBLIC_GA_MEASUREMENT_ID`, `GoogleAnalytics.tsx` returns `null` and
+   there is no analytics to describe. A deployment's prerendered HTML therefore
+   matches that deployment's own configuration. **Note for the gate: this repo's
+   `.env.local` does not set the variable, so a local build renders the
+   "no measurement id configured" branch. Both branches were built and read.**
+4. **The event register** is rendered from `WYS_DECISION_USE`, so the page
+   cannot claim a shorter list than the allowlist can fire. DM4.
+
+## Decisions this phase made, with reasons
+
+**1 · The clearing footnote is amended by ADDITION.** "Nothing is deleted"
+covers preserved copy, and rewording an approved Final-copy sentence to insert a
+clause would delete Ben's words on this build's authority. The approved sentence
+renders unchanged as canon; the new clause is a separate record at
+`AI_SYNTHESIS` / `published`, rendering with its label and draft mark, plus a
+link to `/cookies`. Ben can see exactly which half is his. (DM1.)
+
+**2 · Build-authored prose on this page is `published` + `AI_SYNTHESIS`, not
+`draft`.** Under Q21's ratified default a `draft` non-Ben record is `blocked`, so
+a draft footnote, a draft confirmation panel or a draft blocked-storage notice
+would be **withheld** — and a destructive control whose explanation is withheld
+is worse than one whose explanation is labelled. `RENDER_MARKED_DRAFT` exists to
+stop this build publishing draft **Ben doctrine**; none of these sentences is
+Ben's, and each renders saying so. Same reasoning `learnerRuleProvenance` uses
+for the rulebook, one surface further.
+
+**3 · One hook instance owns the interaction.** `useWysState` holds its snapshot
+in `useState`, so two components calling it hold two snapshots: a clear fired
+from an actions component would leave a rows component showing pre-clear state —
+the page lying about the browser in the exact moment it teaches the learner not
+to take its word for it. So `DataManifest` owns the hook and takes cards 2 and 3
+and the infrastructure paragraph as **slots**, which keeps them server-rendered.
+The infrastructure paragraph is a separate slot from `children` because the
+artboard puts it outside the 12px card stack and above the actions.
+
+**4 · "not read yet" is a different statement from "not set".** An em dash in
+the server HTML would assert "nothing stored" on the page that promises the rows
+are generated from what is actually stored, and a no-JS visitor would keep that
+assertion forever. The row labels still render, because the field set is (WYS
+§18)'s own "This browser can store" list. (DM7.)
+
+**5 · The download is every key in `BROWSER_KEYS`, not just `wys:v1`.** What the
+learner downloads then matches what card 1 lists and what the registry declares,
+and a third key is included with no edit. `localDataFile()` is pure and adds
+nothing: no timestamp, no build id, no fingerprint. Asserted.
+
+**6 · The consent read is stated once as a pure function.**
+`consentReadingFor()` and `analyticsConsentGranted()` are the same fail-closed
+rule, and the test drives both over the same inputs — including a throwing
+`localStorage` — so the page cannot promise a send the adapter refuses.
+
+**7 · Telemetry is exactly three events, fired after the local operation.**
+`wys_data_manifest_view` (bare but for the allowlisted `route_type`),
+`wys_local_state_clear` and `wys_restart_course`. The view guard is a
+module-level boolean, not `sessionStorage`: a session flag would be a **third
+browser key** that this very page would then have to list, which is the wrong
+trade for slightly better diagnostic precision. Order matters — the local
+operation runs first, so a browser with analytics blocked still gets it.
+
+## Requests for the gate — shared files this phase did NOT edit
+
+- **`SectionEyebrow` needs a `tone` prop.** Card 3's eyebrow is
+  `--accent-on-dark` on an ink slab and the primitive paints
+  `--accent-text-on-tint`. A local `.eyebrowOnInk` class ships instead of
+  widening a shared primitive from a route file. (DM11.)
+- **`GatedText` still needs a size variant.** Third route to compose its own
+  `DataText` around `ProvenanceMarks` for a type scale the fixed 16px body does
+  not fit. The composition is honest — no path from a record to prose without
+  its policy — but three copies of it is a primitive waiting to be written.
+- **`KvRow` still renders its label inside a `<span>`.** Progress recorded this;
+  card 1 gets away with it because its labels are plain strings, but a withheld
+  value would need a block element.
+
+## Hazards this phase creates for later phases
+
+**1 · `/privacy` and `/cookies` must now agree with this page word for word.**
+Plan §8b.2 requires the `/cookies` refresh to state "what 'Clear this browser's
+data' does and does not remove, **word-for-word identical to the Data page
+footnote**". That footnote is now two records — `data-clearing-footnote`
+(approved, canon) and `data-clearing-survives` (authored, marked) — and Phase 11
+must render the same pair or the same `full` variants, not retype them. The
+`analytics` claim's `full` variant is still `AwaitingCopy` with
+`writtenBy: "phase-11"` and is the right home for the longer legal wording.
+
+**2 · The Data page is now the site's most load-bearing truth surface, and it is
+checked by tests that read source text.** `tests/wys-data.test.ts` asserts, among
+other things, that no `wys_` event-name literal appears in `page.tsx`, that no
+key literal appears in `DataManifest.tsx`, and that exactly three `trackWys`
+calls exist in the route. A later phase that adds an event, a key or a literal
+here fails the suite — that is the check, not bookkeeping.
+
+**3 · The claim record `analytics` is now `published` + `BEN_APPROVED`.** It was
+`draft` + `IMPLEMENTATION_PLACEHOLDER`, and anything that counted draft claims
+or asserted `renderCanonicalText(claimById("analytics"), "short")` was
+`awaiting` sees the change. One such assertion in
+`tests/canonical-text.test.ts` was moved to `claimById("provenance")`, which is
+still genuinely awaiting.
+
+**4 · Phase 7 gate hazard 1 was considered and deliberately not actioned.** Draft
+curriculum prose still sits in two shared client chunks, and that hazard says to
+fix it "before the Data page makes any claim about what the site serves". **No
+sentence on this page makes such a claim** — card 1 is about this browser's
+storage, cards 2 and 3 are about what reaches Ben, and the infrastructure
+paragraph is about hosting and analytics. None is falsified by a labelled
+placeholder string in a JS chunk. The `content/watch-your-step/ids.ts` refactor
+across eight committed modules therefore stays scoped to its own task rather
+than being half-done inside this phase; it is unchanged and still owed.
+
+**5 · A build with no `NEXT_PUBLIC_GA_MEASUREMENT_ID` renders a different card
+2.** Any later phase that diffs prerendered HTML between builds (Phase 10's
+preserved-page text diff, Phase 12's screenshot pass) must hold that variable
+constant across both sides or it will see a spurious difference on this one
+route.
+
+---
+
+# Phase 8 — gate
+
+Ran `npm test`, `npx tsc --noEmit`, `PORT=3999 npm run build` and
+`scripts/check-no-deletions.sh`, then checked each Exit criterion against the
+prerendered HTML, the RSC payloads and the client chunks rather than against the
+phase report.
+
+## What was verified, and with what evidence
+
+**The deletion contract.** `git diff --name-only --diff-filter=D main...HEAD`
+and `--diff-filter=R` both print nothing, working tree included;
+`scripts/check-no-deletions.sh` exits 0.
+
+**Card 1 reflects real browser state including the consent key.** Rows are
+`WYS_DATA_PAGE_ROWS.flatMap(...)` over the declared `wys:v1` field set — eleven
+lines from nine declared fields, the artboard's five first and in its drawn
+order — and the key register is `BROWSER_KEYS.map(...)`, so `wys:v1` and
+`bct_analytics_consent` both appear with their live values and their clear
+disposition. Confirmed in `data.html`: no value literal in the server HTML, only
+`not read yet` until the effect returns.
+
+**Clear removes only `wys:*` and says so.** `clearAllWysData()` enumerates the
+store and removes only the `wys:` prefix; `tests/wys-local-state.test.ts` proves
+`bct_analytics_consent` and an unrelated control key both survive. The screen
+says so twice — the registry's `kept by clear` beside the key, and the
+`data-clearing-survives` addition.
+
+**The aggregate sentence is absent from the DOM (Q22, SC-12).** `grep
+"first-party counter"` over `.next/static` and over both prerendered
+`data.html` / `data.rsc` returns nothing; the string exists only inside the
+server-side compiled module, which no browser receives. The only "zero trust"
+occurrences on the site are the approved paragraph's own denial.
+
+**The approved coarse-counts sentence is state-bound (Q7, SC-2).** It is in the
+RSC payload as a prop — unavoidable, since `AnalyticsReceipt` decides with no
+network call — and reaches the DOM only for a browser that read
+`bct_analytics_consent === "granted"`.
+
+**Both card-2 branches were built and read.** A build with
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` set renders the two-conditions opening and the
+eleven-row event register; a build without it renders the no-measurement-id
+line and no register. Every one of the eleven `firedInV0: true` rows has a real
+`trackWys` call site in `app/` or `components/` — checked one by one — so the
+register over-states nothing.
+
+**Forbidden claims (§8b.3).** All fourteen phrases swept over the rendered HTML
+and the client chunks: zero hits outside the approved denial.
+
+## What the gate fixed
+
+Three sentences shipped that were **not true of the code in every state the
+build can reach**. Each was narrowed to the true claim (R8: narrow the feature,
+never soften the wording), and each is now locked by a test that asserts the
+comfortable wording cannot return.
+
+**1 · "so this site won't ask about cookies again"**
+(`data-clearing-survives`, and the same promise in
+`CLEAR_ALL_WYS_DATA_EXPLANATION`). `ConsentBanner` renders whenever no choice
+is stored, so for a visitor who has not answered the banner the promise is
+false — while card 1 shows `bct_analytics_consent · not set` on the same
+screen. Now: "so clearing does not change whether this site asks you about
+cookies", which is true in all three consent states.
+
+**2 · "nothing on this page is counted anywhere"**
+(`data-analytics-unavailable`, the no-measurement-id branch). A page load still
+reaches a host, which is exactly what the infrastructure paragraph two cards
+below discloses — so the absolute form contradicted an approved sentence on its
+own screen and sat one paraphrase from §8b.3's forbidden "no data collection".
+Now scoped to the two things the build can check: "no analytics script loads and
+Watch Your Step sends none of its counts from any browser."
+
+**3 · "Nothing is sent anywhere, and nothing outside this browser changes"**
+(`RESTART_COURSE_EXPLANATION`, rendered in the restart confirm panel). The
+button directly beneath it calls `trackWys("wys_restart_course")`. This is the
+worst of the three: a false denial of sending, one tap above a send, on the page
+that exists to refuse exactly that. Both explanations now name their own event,
+hedged to the two conditions `trackWys` actually checks:
+
+> If analytics are running and allowed on this device, this site counts that a
+> restart happened — the count only, with nothing about you in it.
+
+`CLEAR_ALL_WYS_DATA_EXPLANATION` gained the matching line, so the asymmetry
+cannot be read as "clear sends nothing".
+
+**4 · A comment corrected.** `DataManifestTelemetry` described its call as
+"BARE" while passing `route_type`. The decision row's declared exposure *is*
+"the event name and route_type", so the call is right and the word was wrong.
+
+Four new tests in `tests/wys-data.test.ts` (439 pass, was 435), and the
+forbidden-claims sweep now also reaches the two `lib/`-defined confirmation
+explanations, which render on this screen but lived outside the sweep.
+
+## What the gate examined and deliberately left
+
+- **`RESTART_COURSE_EXPLANATION`'s "unless you choose to clear them here too".**
+  The restart panel offers no such option; the Clear control directly beneath it
+  is the way to choose it, and `restartCourse(options)` genuinely retains unless
+  told otherwise (WYS §17). True as written, and adding per-restart checkboxes
+  is a new control the plan does not ask for. Recorded, not changed.
+- **`ui.lastRoute` has no writer**, so that row renders its empty value forever.
+  A true rendering of the field; adding a writer is new persistence behaviour.
+- **Phase 7 gate hazard 1 (draft prose in two shared client chunks) is still
+  open.** Re-checked against every sentence this screen ships, including the
+  three the gate rewrote: none makes a claim about what JS the site serves. The
+  `content/watch-your-step/ids.ts` refactor across eight committed modules stays
+  its own task and is still owed.
+- **The double provenance line under marked prose** ("Drafted during
+  implementation — not Ben's words", then "draft · implementation placeholder ·
+  not Ben's words") reads oddly under a `published` + `AI_SYNTHESIS` record,
+  since it is not draft. The mark string is verbatim approved artboard copy and
+  `requiresDraftMark()` is Phase 1 substrate shipped on `/watch-your-step/start`
+  already, so changing either here would be a substrate edit made from a route.
+  **Request for a later phase: a mark variant for authored-but-not-draft
+  material**, or Ben's ruling that the existing one is close enough.
+
+## Hazards this gate hands to the next phase
+
+**1 · `/cookies` must match the corrected wording, not the reported wording.**
+Plan §8b.2 requires `/cookies` to state what a clear does and does not remove
+**word-for-word identical to the Data page footnote**. That footnote is now
+three things: `data-clearing-footnote` (approved, canon),
+`data-clearing-survives` (authored, marked, **narrowed by this gate**) and the
+`/cookies` link. Phase 11 renders the same records; it does not retype them, and
+the pre-gate sentence is wrong.
+
+**2 · The two confirmation explanations are now five and four lines**, not four
+and three. Anything asserting a length, or diffing the panels, sees it.
+
+**3 · The `no-measurement-id` card-2 branch is unchanged in kind.** A later
+phase that diffs prerendered HTML between builds must hold
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` constant across both sides.

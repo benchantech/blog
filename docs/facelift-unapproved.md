@@ -1335,3 +1335,219 @@ No bottom tab bar. An ending is not a tab, and five tabs under it would invite
 the learner straight back into a course they have just finished — which is the
 opposite of (WYS §13)'s "the product should regularly tell the learner to
 leave". Consistent with §5.4's treatment of Lesson Zero.
+
+---
+
+# Phase 8 — the Data page (`/watch-your-step/data`, artboard `5c`)
+
+The handoff README marks the **Data page wording** as Final copy, so every
+change below is an escalation rather than an edit. Nothing approved was
+reworded: where a sentence had to become conditional, the condition is in the
+code and the approved string is unchanged; where something had to be said that
+no artboard says, it is a **separate, labelled addition** rendering under
+"Drafted during implementation — not Ben's words".
+
+## DM1. The clearing footnote is amended by ADDITION, not by rewrite
+
+Plan Phase 8 asks for the footnote to be "amended to name what survives (the
+analytics consent choice) and link to `/cookies`", and marks the change an
+escalation. Two ways to do that, and only one of them keeps Ben's sentence:
+
+- rewrite `"Clearing removes this browser's copy. It can't erase hosting or
+  analytics logs — and this page won't pretend it did."` to carry the new
+  clause — which deletes approved copy on this build's authority;
+- ship the approved sentence **unchanged** and add the new clause beside it,
+  under its own provenance label.
+
+The second is what shipped. `data-clearing-footnote` is the artboard's text at
+`BEN_APPROVED` / `published`, so it renders as canon. `data-clearing-survives`
+is the addition, at `AI_SYNTHESIS` / `published`, so it renders with its label
+and its draft mark:
+
+> Your analytics choice is kept under a separate key that clearing does not
+> touch, so clearing does not change whether this site asks you about cookies.
+
+followed by a link to `/cookies`. It is true of `clearAllWysData()`, which
+sweeps the `wys:` prefix and never touches `bct_analytics_consent`.
+
+**The second half was narrowed by the Phase 8 gate.** It shipped as "so this
+site won't ask about cookies again", which is false for a visitor who has not
+answered the banner: `ConsentBanner` renders whenever NO choice is stored, so
+that visitor would be asked — while card 1, two inches above, showed
+`bct_analytics_consent · not set`. One screen cannot carry both statements. The
+claim now says only what is true in every state, and
+`tests/wys-data.test.ts` asserts the promise cannot come back. **The key itself
+is not typed into the sentence** — it is named on screen from
+`lib/wys/browser-keys.ts` beside its live value, so a third surviving key would
+appear with no copy edit.
+
+**Status: the addition needs Ben's stamp. If he prefers one merged sentence,
+that is a rewrite of Final copy and his to make.**
+
+## DM2. Card 2's approved sentence is conditioned, not reworded (Q7, SC-2)
+
+Artboard `5c` card 2 asserts flatly: *"Page analytics, and coarse counts:
+someone started, finished a stop, used replay, reached a carry, asked for
+depth."* `trackWys` sends nothing at all unless `bct_analytics_consent ===
+"granted"` — Q7's ratified full suppression — so for a visitor who declined, and
+for a visitor who has not answered the banner, that sentence is false.
+
+What ships: the approved sentence is `claims.analytics.short`, written in this
+phase exactly as its `awaiting` descriptor said it would be, and it renders
+**only for a browser that granted analytics**. Two authored lines cover the
+other two states (`data-analytics-declined`, `data-analytics-undecided`), each
+saying plainly that no counts leave this browser. Both are NEW copy.
+
+**Difference from LZ9, deliberate.** Lesson Zero's step-9 card defaults to the
+not-sent line *before hydration*. This page renders **nothing** until the
+consent key has been read, because card 2 already carries an unconditional
+opening (DM3) that is true in every state, and because a line that flips after
+hydration is worse on the one page whose subject is what this browser holds.
+Same discipline, one surface further.
+
+## DM3. Card 2 gains an opening sentence the artboard does not have
+
+Two mechanisms with two different conditions are running, and the approved
+sentence names them in one breath, which reads as one promise with one
+condition. So `data-analytics-conditions` (authored, labelled) opens the card:
+
+> Two different things run here, on two different conditions. Ordinary page
+> analytics run on every page of this site. Watch Your Step's own counts are a
+> closed list, and none of them leaves a browser where analytics were declined
+> or never allowed.
+
+Ordinary GA4 page analytics are configured with `send_page_view: true` and
+Consent Mode v2 keeps sending cookieless page pings while `analytics_storage` is
+denied; Watch Your Step's own events do not. Saying so is the only way the
+approved sentence's two halves can each be true of the state they describe.
+
+**A fourth variant exists for a build with no measurement id.**
+`data-analytics-unavailable` renders instead when
+`NEXT_PUBLIC_GA_MEASUREMENT_ID` is unset, because `GoogleAnalytics.tsx` then
+returns `null` and there is no analytics to describe at all. The branch is
+decided at BUILD time, so a deployment's prerendered HTML always matches that
+deployment's own configuration.
+
+## DM4. The event register — an addition, and the reason it is not optional
+
+The approved sentence names five things. The closed (WYS §19.4) allowlist can
+fire **eleven**, including `wys_data_manifest_view` for opening this very page.
+A page whose entire subject is what gets sent cannot list five of eleven and let
+the list read as complete, and (WYS §37) requires the manifest to describe "what
+is actually deployed".
+
+So card 2 carries a `<details>` disclosure — closed by default, in the artboard's
+own mono voice — listing every allowlisted event this build can fire and when,
+**rendered from `WYS_DECISION_USE`**, the adapter's own decision table. Nothing
+is typed: the page cannot fall behind the allowlist, and the two deliberately
+unfired events (`wys_view`, `wys_transfer_check_complete`) are absent because the
+table says they never fire.
+
+The `firesWhen` strings are the adapter's, not a second learner-facing
+paraphrase — a second description of what an event means is exactly the
+duplication Standing Order 07 forbids. If Ben wants gentler wording, that is one
+edit in `lib/wys/telemetry.ts` and it moves both surfaces.
+
+**Status: NEW. Unapproved.**
+
+## DM5. Card 1 renders nine rows where the artboard draws five
+
+Carried forward from the Phase 2 escalation (build notes §8.4) and now visible.
+§7.5's rule is that card 1's rows derive from the declared `WysLocalStateV1`
+field set, so every persisted field surfaces and "Generated from what's actually
+stored right now" cannot quietly become false. The artboard's four rows (five
+lines) render **first, in their drawn order**; the five additions follow:
+
+| Added row | Why |
+|---|---|
+| Local judgments | (WYS §20) requires it; `5c` omits it |
+| Last route · Dismissed notices | (WYS §20) requires last route; `5c` omits it |
+| Schema version | falls out of the field-to-row bijection |
+| Started | same |
+| Last opened | same |
+
+They are marked `source: "new-unapproved"` in the DATA, not in a comment, so
+withholding them is a one-line change and no component edit.
+
+**Nothing writes `ui.lastRoute` yet**, so that row reads its empty value. That
+is a true rendering of the field, and adding a writer is a new persistence
+behaviour, not a Phase 8 task.
+
+## DM6. The key register, and why the sitewide title stays honest (Q6)
+
+Q6's ratified default keeps "What this site knows about you" — a claim about the
+SITE — and makes it true by listing `bct_analytics_consent` beside `wys:v1`. So
+card 1 carries a small register under its rows, generated from `BROWSER_KEYS`:
+each key's name in mono, its **current stored value**, and whether a clear
+removes it. A third key added in month three appears with no edit to the page.
+
+The heading "Keys in this browser" and the two dispositions ("removed by clear",
+"kept by clear") are authored labels. **NEW.**
+
+## DM7. "not read yet" is not "not set", and it is what a no-JS visitor keeps
+
+§7.3 forbids reading `wys:v1` during render, so the server HTML cannot know what
+this browser holds. An em dash there would be a **false statement** — "nothing
+stored" — on the one page that promises the rows are generated from what is
+actually stored. So every value renders `not read yet` until the effect returns,
+and a visitor with JavaScript disabled keeps that value.
+
+The row **labels** still render either way, because the set of fields this
+browser can hold is (WYS §18)'s own "This browser can store" list and is true at
+every moment.
+
+**Status: the token is authored. NEW.**
+
+## DM8. The confirmation step — no artboard draws one
+
+(WYS §17) requires both destructive operations to "explain exactly what happens
+before executing", and `5c` draws three pills and nothing else. So each of
+Restart and Clear opens an outlined panel carrying its explanation and the only
+control that acts; the pill itself never acts. The explanations are
+`RESTART_COURSE_EXPLANATION` and `CLEAR_ALL_WYS_DATA_EXPLANATION` from
+`lib/wys/local-state.ts`, written in Phase 2 beside the two functions so the
+words cannot drift from the behaviour, and they render through the gate under
+"Drafted during implementation — not Ben's words".
+
+**Status: the panel is NEW; the seven sentences inside it are on the Final-copy
+list and Ben's wording replaces them if he prefers his own.**
+
+## DM9. The post-clear panel is curriculum, and it is authored
+
+(WYS §20) asks the clear-reload-inspect loop to teach three things, so clearing
+opens a tint-teal panel carrying `data-cleared-demonstration` and a "Reload this
+page" control:
+
+> The rows above are empty because the keys are gone. Reload and they stay
+> empty: there was no server copy to restore, which is the whole difference
+> between local state and server data. Restarting the course would have kept
+> your rulebook; this did not. Neither one reaches a hosting log.
+
+**It deliberately does not say "nothing was sent."** Clearing fires
+`wys_local_state_clear`, which reaches GA4 for a browser that granted analytics,
+and claiming otherwise on this page would be the exact failure the page exists
+to avoid. **NEW.**
+
+## DM10. The blocked-storage variant, and three inert controls
+
+iOS Safari private browsing throws on `localStorage`, and iPhone Safari is the
+primary QA target. When `readWysState()` reports `storageBlocked`, card 1 renders
+`data-storage-blocked` instead of nine rows of empty values, and all three
+actions are disabled — there is nothing to download, restart or clear. **NEW.**
+
+## DM11. Card 3's eyebrow is a local class, not the shared primitive
+
+`SectionEyebrow` paints `--accent-text-on-tint`, which is correct on the two grey
+cards and unreadable on card 3's ink slab, where the artboard uses
+`--accent-on-dark` (#7FC8D6). Rather than widen a shared primitive from a route
+file, card 3 uses a local `.eyebrowOnInk`. **Request recorded for the gate: give
+`SectionEyebrow` a `tone` prop.** Same route Progress took for `GatedText` size
+variants.
+
+## DM12. Desktop is extrapolated
+
+`5c` draws the Data page at 390px only. The screen inherits `CourseScreen`'s
+centred 720px reading column at 1280px; the card stack, the row rhythm and the
+three full-width pills are unchanged. No new information is exposed in the
+margin and the IA is not redefined. **Unapproved, like the other fourteen
+desktop extrapolations.**

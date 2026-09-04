@@ -527,8 +527,16 @@ test("renderCanonicalText hands back the policy with the text, never text alone"
     "You're not talking to AI anywhere on this site. No chatbot, no coach, no generated answers."
   );
 
-  // A draft placeholder record is blocked in public under Q21's default.
-  const draft = renderCanonicalText(claimById("analytics"), "short", "public");
+  // Phase 8 wrote `analytics.short` — the approved card-2 sentence — so the
+  // record is `published` + `BEN_APPROVED` and its `short` resolves as canon.
+  // Its `full` is still unwritten and still resolves to `awaiting`, which is
+  // the branch this test was really covering.
+  const written = renderCanonicalText(claimById("analytics"), "short", "public");
+  assert.equal(written.kind, "text");
+  if (written.kind !== "text") return;
+  assert.equal(written.policy.kind, "canon");
+
+  const draft = renderCanonicalText(claimById("provenance"), "full", "public");
   assert.equal(draft.kind, "awaiting");
 });
 

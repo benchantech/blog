@@ -307,7 +307,7 @@ test("mode 2: every styles.<key> resolves to a class in its sibling .module.css"
   // app/watch-your-step/(shell)/progress/progress.module.css. The page imports
   // no stylesheet — every state-dependent mark on that screen is inside the one
   // client component, so there is nothing for the server half to style.
-  assert.equal(modulesChecked, 48, "CSS Module imports across app/ and components/ — update deliberately");
+  assert.equal(modulesChecked, 51, "CSS Module imports across app/ and components/ — update deliberately");
 });
 
 /* -------------------------------------------------------------------------- */
