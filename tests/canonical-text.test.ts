@@ -16,6 +16,7 @@ import {
   validateCanonicalText
 } from "@/lib/canonical-text";
 import { CLAIM_IDS, claimById, claims } from "@/content/claims";
+import { legalCopyRecords } from "@/content/legal";
 import { anyHashPublished, authorityChain, authorityChainInOrder } from "@/content/authority-chain";
 import { approvalState } from "@/lib/approval-state";
 import { judgmentFrameworkRecords } from "@/content/canonical/judgment-framework";
@@ -80,9 +81,19 @@ const surfaceFiles = [
  * collect their own modules and `tests/wys-content.test.ts` fails if a module in
  * either directory is missing from its registry, so adding a module to the
  * registry is enough; forgetting to is a test failure rather than a silent gap.
+ *
+ * Phase 11 added `content/legal.ts` — the page-specific legal prose — to both
+ * arrays. It is registered HERE rather than folded into `claims` because
+ * packet: one-definition fixes the claim vocabulary at nine components and
+ * `CLAIM_IDS.length` is asserted below; a correction that belongs to one legal
+ * page is prose about that page, not a tenth canonical component.
+ * `tests/legal-claims.test.ts` fails if a record in that module is missing from
+ * its own `legalCopyRecords` array, which is what keeps this registration
+ * total.
  */
 const canonicalRecords: readonly AnyCanonicalText[] = [
   ...claims,
+  ...legalCopyRecords,
   ...judgmentFrameworkRecords,
   ...wysCanonicalRecords
 ];
@@ -90,6 +101,7 @@ const canonicalRecords: readonly AnyCanonicalText[] = [
 /** Every content object carrying provenance fields, canonical or not. */
 const contentObjects: readonly { id: string; status: string; origin: string; canonical?: boolean; supersededBy?: string; approvedBy?: string; approvedAt?: string; standingOrdersVersion?: string }[] = [
   ...claims,
+  ...legalCopyRecords,
   ...authorityChain,
   ...wysContentObjects,
   ...shipContentObjects
@@ -507,11 +519,17 @@ test("the infrastructure paragraph keeps its two authoritative wordings apart", 
 });
 
 test("an unwritten variant resolves to awaiting, never to text and never to blank", () => {
-  const record = claimById("privacy-disclosure");
+  // `privacy-disclosure` and `provenance` were the examples until Phase 11
+  // wrote them, which is what their `writtenBy: "phase-11"` descriptors said
+  // would happen. `captain-stamp` is the remaining unwritten variant and is
+  // the right one to hold this check permanently: its `writtenBy` is "ben",
+  // so no phase of this build can write it and the branch cannot be retired
+  // by implementation.
+  const record = claimById("captain-stamp");
   const full = resolveVariant(record, "full");
   assert.equal(full.kind, "awaiting");
   if (full.kind !== "awaiting") return;
-  assert.equal(full.awaiting.writtenBy, "phase-11");
+  assert.equal(full.awaiting.writtenBy, "ben");
   assert.ok(full.awaiting.awaiting.length > 0);
   assert.ok(isAwaitingCopy(record.variants.full));
 });
@@ -523,7 +541,7 @@ test("inline falls back only to longer forms, never to a shorter one", () => {
   if (inline.kind !== "text") return;
   assert.equal(inline.variant, "short", "inline should fall back to short, not invent a sentence");
 
-  const missing = resolveVariant(claimById("provenance"), "short");
+  const missing = resolveVariant(claimById("captain-stamp"), "short");
   assert.equal(missing.kind, "awaiting");
 });
 
@@ -546,8 +564,17 @@ test("renderCanonicalText hands back the policy with the text, never text alone"
   if (written.kind !== "text") return;
   assert.equal(written.policy.kind, "canon");
 
-  const draft = renderCanonicalText(claimById("provenance"), "full", "public");
-  assert.equal(draft.kind, "awaiting");
+  // Phase 11 wrote `provenance.full` and moved the record to
+  // `published` + AI_SYNTHESIS, so it now renders `marked` — the words WITH
+  // their label — rather than being withheld. `captain-stamp` keeps the
+  // awaiting branch covered.
+  const marked = renderCanonicalText(claimById("provenance"), "full", "public");
+  assert.equal(marked.kind, "text");
+  if (marked.kind !== "text") return;
+  assert.equal(marked.policy.kind, "marked");
+
+  const awaiting = renderCanonicalText(claimById("captain-stamp"), "full", "public");
+  assert.equal(awaiting.kind, "awaiting");
 });
 
 test("the disclosure strip's approval sentence is not stored as renderable copy (SC-1, Q1)", () => {

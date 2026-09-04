@@ -1,6 +1,6 @@
 # BenChanTech
 
-Next.js source for [benchantech.com](https://benchantech.com), the routing foyer for the Ben Chan Tech LLC ecosystem.
+Next.js source for [benchantech.com](https://benchantech.com): the routing foyer for the Ben Chan Tech LLC ecosystem, the Watch Your Step course, and the public record of how the site is run.
 
 ## Stack
 
@@ -14,11 +14,13 @@ Next.js source for [benchantech.com](https://benchantech.com), the routing foyer
 ```bash
 npm install
 npm run dev
-npm run build
+PORT=3999 npm run build
 npm test
 ```
 
-Keep content in the Next app, typed content modules, and public assets under `public/`.
+`npm test` runs flat files in `tests/` through `node --import tsx --test`, so a test module cannot import a `.css` specifier. `scripts/check-no-deletions.sh` fails on any removed or renamed file; `tests/preserved-surfaces.test.ts` shells out to it, so a deletion fails the suite rather than a review.
+
+Keep content in typed content modules under `content/`, not in JSX, and public assets under `public/`. Claims that appear on more than one page are defined once in `content/claims.ts` and rendered as variants; `tests/canonical-text.test.ts` fails on a second definition.
 
 ## Analytics
 

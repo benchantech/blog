@@ -20,7 +20,14 @@
  * that a record still cites breaks the build, which is the point.
  */
 
-export type ExternalSourceRefKind = "spec" | "artboard" | "packet" | "repo-page" | "repo-doc";
+/**
+ * `repo-code` is added in Phase 11. The legal refresh is the first content
+ * that cites a SHIPPED MODULE as its authority rather than a document: §8b.1's
+ * rule is that every claim traces to one definition and one line of shipped
+ * code, and a claim sourced to "the serializer" with no way to say which file
+ * is a claim with no checkable source at all.
+ */
+export type ExternalSourceRefKind = "spec" | "artboard" | "packet" | "repo-page" | "repo-doc" | "repo-code";
 
 export interface ExternalSourceRef {
   id: string;
@@ -34,6 +41,8 @@ export const externalSourceRefs = [
   { id: "wys-spec-2-2", kind: "spec", locator: "WYS §2.2 — current scope; future concepts disabled and invisible" },
   { id: "wys-spec-3-3", kind: "spec", locator: "WYS §3.3 — core habit" },
   { id: "wys-spec-3-4", kind: "spec", locator: "WYS §3.4 — what anonymization means here" },
+  { id: "wys-spec-3-5", kind: "spec", locator: "WYS §3.5 — non-goals" },
+  { id: "wys-spec-4", kind: "spec", locator: "WYS §4 — audience; the 13+ design test, and do not collect exact age" },
   { id: "wys-spec-8", kind: "spec", locator: "WYS §8 — authoring data model" },
   { id: "wys-spec-9-1", kind: "spec", locator: "WYS §9.1 — required onboarding sequence" },
   { id: "wys-spec-9-3", kind: "spec", locator: "WYS §9.3 — Lesson Zero completion condition" },
@@ -50,11 +59,16 @@ export const externalSourceRefs = [
   { id: "wys-spec-19", kind: "spec", locator: "WYS §19 — analytics / telemetry doctrine" },
   { id: "wys-spec-20", kind: "spec", locator: "WYS §20 — see what this site knows about you" },
   { id: "wys-spec-21", kind: "spec", locator: "WYS §21 — appetite filter" },
+  { id: "wys-spec-22", kind: "spec", locator: "WYS §22 — future coach, schema only, disabled in v0" },
   { id: "wys-spec-23", kind: "spec", locator: "WYS §23 — provenance UI" },
   { id: "wys-spec-24", kind: "spec", locator: "WYS §24 — mixed-media disclosure curriculum" },
   { id: "wys-spec-25", kind: "spec", locator: "WYS §25 — over-withholding must be taught" },
   { id: "wys-spec-26", kind: "spec", locator: "WYS §26 — external authority" },
   { id: "wys-spec-27", kind: "spec", locator: "WYS §27 — accessibility" },
+  { id: "wys-spec-28", kind: "spec", locator: "WYS §28 — performance; no AI SDK, chat SDK or auth SDK in the v0 bundle" },
+  { id: "wys-spec-30", kind: "spec", locator: "WYS §30 — first-party aggregate telemetry endpoint; build only on an existing persistence layer" },
+  { id: "wys-spec-32", kind: "spec", locator: "WYS §32 — public risk / launch restraint" },
+  { id: "wys-spec-34", kind: "spec", locator: "WYS §34 — stop conditions; fix the architecture, not the copy" },
   { id: "wys-spec-35", kind: "spec", locator: "WYS §35 — open Ben content decisions" },
   { id: "wys-spec-36", kind: "spec", locator: "WYS §36 — content authoring templates" },
 
@@ -112,8 +126,38 @@ export const externalSourceRefs = [
 
   /* The live repo */
   { id: "app-privacy-page", kind: "repo-page", locator: "app/privacy/page.tsx, preserved verbatim" },
+  { id: "app-cookies-page", kind: "repo-page", locator: "app/cookies/page.tsx, preserved verbatim" },
+  { id: "app-terms-page", kind: "repo-page", locator: "app/terms/page.tsx, preserved verbatim" },
+  { id: "app-copyright-page", kind: "repo-page", locator: "app/copyright/page.tsx, preserved verbatim" },
+  { id: "app-accessibility-page", kind: "repo-page", locator: "app/accessibility/page.tsx, preserved verbatim" },
+  { id: "app-ai-disclosure-page", kind: "repo-page", locator: "app/ai-disclosure/page.tsx, preserved verbatim" },
   { id: "docs-legal-analytics", kind: "repo-doc", locator: "docs/legal-analytics.md" },
-  { id: "repo-intent-router", kind: "repo-page", locator: "components/IntentRouter.tsx — Capture / Why / Why-Not / Commit" }
+  { id: "docs-facelift-unapproved", kind: "repo-doc", locator: "docs/facelift-unapproved.md — the NEW/unapproved register and the Q23 contrast table" },
+  { id: "repo-intent-router", kind: "repo-page", locator: "components/IntentRouter.tsx — Capture / Why / Why-Not / Commit" },
+
+  /* Shipped modules cited as the authority for a legal claim (Phase 11, §8b.1) */
+  { id: "code-wys-local-state", kind: "repo-code", locator: "lib/wys/local-state.ts — the wys:v1 schema, the serializer and clearAllWysData()" },
+  { id: "code-wys-browser-keys", kind: "repo-code", locator: "lib/wys/browser-keys.ts — BROWSER_KEYS, the two keys this site writes" },
+  { id: "code-wys-telemetry", kind: "repo-code", locator: "lib/wys/telemetry.ts — WYS_EVENT_NAMES, WYS_PROPERTY_KEYS, the consent gate in trackWys" },
+  { id: "code-wys-aggregate", kind: "repo-code", locator: "lib/wys/aggregate.ts — AGGREGATE_ENDPOINT is null and no app/api route exists" },
+  { id: "code-wys-config", kind: "repo-code", locator: "content/watch-your-step/config.ts — WYS_AGGREGATE_ENABLED is false" },
+  { id: "code-content-status", kind: "repo-code", locator: "lib/content-status.ts — the provenance label table and the two-axis render policy" },
+  { id: "code-approval-state", kind: "repo-code", locator: "lib/approval-state.ts — approvalState.stamp and disclosureApprovalLine()" },
+  { id: "code-globals-css", kind: "repo-code", locator: "app/globals.css — :focus-visible, .skip-link, the 44px targets and the reduced-motion block" },
+  { id: "code-wys-artifacts", kind: "repo-code", locator: "content/watch-your-step/types.ts + content/watch-your-step/artifacts.ts — accessibilityText is non-optional and the bank is empty" },
+  { id: "code-wys-rulebook", kind: "repo-code", locator: "lib/wys/local-state.ts rulebook[] — learner-owned free text, never sent" },
+  {
+    id: "code-wys-scenarios",
+    kind: "repo-code",
+    locator:
+      "content/watch-your-step/scenarios.ts + content/watch-your-step/types.ts — every scenario carries a FICTIONAL_AUTHORED origin and renders under its fictional label"
+  },
+  {
+    id: "code-wys-no-scores",
+    kind: "repo-code",
+    locator:
+      "lib/wys/local-state.ts WYS_DECLARED_KEYS — the declared schema has no score, streak, percentage or grade field, so the serializer cannot persist one"
+  }
 ] as const satisfies readonly ExternalSourceRef[];
 
 export const EXTERNAL_SOURCE_REF_IDS: readonly string[] = externalSourceRefs.map((ref) => ref.id);

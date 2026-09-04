@@ -1,8 +1,32 @@
+import { rulebookOwnershipText, termsCourseText, termsNonGoalsText } from "@/content/legal";
+import { type GatedContent, gatedCanonicalText } from "@/lib/wys/content-gate";
+import { LegalProse } from "@/components/LegalProse";
+
+/**
+ * Refreshed in Phase 11 (plan §8b.2), IN PLACE, at the same URL, with the same
+ * metadata title. NOTHING WAS CORRECTED HERE — every sentence on the preserved
+ * page is still true of the enlarged site — so the whole refresh is addition:
+ * the course, its fictional material, the learner-owned rulebook, and (WYS
+ * §3.5)'s non-goals, which are a disclaimer whether or not they are printed on
+ * a terms page.
+ *
+ * The three additions come from `content/legal.ts`. The rulebook record is
+ * shared with /copyright, defined once and presented twice (§6.8).
+ */
+
 export const metadata = {
   title: "Terms of Use - BenChanTech"
 };
 
+function lines(...values: readonly (GatedContent | null)[]): GatedContent[] {
+  return values.filter((value): value is GatedContent => value !== null);
+}
+
 export default function TermsPage() {
+  const course = lines(gatedCanonicalText(termsCourseText, "full"));
+  const nonGoals = lines(gatedCanonicalText(termsNonGoalsText, "full"));
+  const rulebook = lines(gatedCanonicalText(rulebookOwnershipText, "full"));
+
   return (
     <article className="detail-page legal-page">
       <p className="eyebrow">Terms of Use</p>
@@ -16,6 +40,12 @@ export default function TermsPage() {
         The site describes company work, product direction, AI-assisted infrastructure, and related educational material.
         It does not guarantee business, technical, financial, learning, or professional outcomes.
       </p>
+      <h2>The course</h2>
+      <LegalProse lines={course} />
+      <h2>What the course is not</h2>
+      <LegalProse lines={nonGoals} />
+      <h2>Your rulebook</h2>
+      <LegalProse lines={rulebook} />
       <h2>No professional advice</h2>
       <p>
         Site content is not legal, medical, financial, investment, compliance, security, or professional consulting

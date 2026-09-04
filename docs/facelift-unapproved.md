@@ -2384,3 +2384,118 @@ blocked, so the exercise does not run and there is nothing to commit. **The home
 page's demo card is currently a scenario pill and a provenance line.** That is
 the honest state of a course whose content Ben has not approved, and it is worth
 seeing plainly before deciding Q21 — it is what a visitor gets today.
+
+---
+
+# Phase 11 — the legal and disclosure refresh
+
+Six pages were refreshed in place. The entries below are the parts of that
+refresh that Ben has not approved: prose this build authored, one visual
+consequence of the provenance substrate, and the two preserved clauses that were
+narrowed. Every sentence named here is Final-copy escalation territory, and
+`docs/facelift-copy-diff.md` is the written diff plan §8b.4 asks for.
+
+## LG1. Thirteen authored legal paragraphs, all labelled, none approved — eleven in `content/legal.ts`, two moved off Ben's name in `content/claims.ts`
+
+`content/legal.ts` holds thirteen records. **Eleven of them are prose this build
+wrote** at `published` + `AI_SYNTHESIS`, so each renders with "Drafted during
+implementation — not Ben's words" and its mono draft mark, exactly as the Data
+page's authored strings do. Two are spec wording at `published` +
+`BEN_APPROVED` and render unlabelled: `legal-terms-non-goals` (WYS §3.5) and
+`legal-rulebook-ownership` (WYS §16).
+
+`content/claims.ts` additionally gained seven `full` variants that Phase 11 was
+scheduled to write. Five of those sit on `BEN_APPROVED` records and therefore
+render as canon, so the rule applied to them was narrow: **a `full` on a
+Ben-approved record may state only what its cited sources state**, and each one
+names its own source per variant. They are longer presentations of a claim the
+artboard or the spec already makes — never a new claim wearing an old record's
+origin. That distinction is the whole of the Phase 6 gate's finding, applied
+again, and it is worth checking by hand:
+
+| Record | Cited as | What it presents |
+|---|---|---|
+| `zero-ai.full` | 4a strip · WYS §22 · WYS §28 | no runtime model call; coach is a disabled schema; no AI or chat SDK in the bundle |
+| `ai-assisted-ben-approved.full` | 4a strip · 4a how-the-site-is-run · packet Crew Manifest | AI as crew; each system named with access and limits |
+| `ai-role-boundaries.full` | 4a how-the-site-is-run · packet Captain's Stamp · lib/approval-state.ts | only a person signs; the state is data; the Log records changes |
+| `localStorage.full` | WYS §17 · WYS §18 · lib/wys/local-state.ts | §18's "This browser can store" list, plus the key name |
+| `analytics.full` | WYS §18 · WYS §19 · lib/wys/telemetry.ts | §18's "Ben may receive" list, plus the two closed allowlists |
+
+The two remaining records — `provenance` and `privacy-disclosure` — were
+authored, so they **moved off** `BEN_APPROVED`: both are now `published` +
+`AI_SYNTHESIS` and render labelled. `captain-stamp.full` is still awaiting Ben
+and is the only unwritten variant left in the module.
+
+**Status: NEW. Unapproved. Every sentence is in docs/facelift-copy-diff.md.**
+
+## LG2. Provenance marks now appear on legal pages
+
+This is the visible consequence of LG1 and it deserves its own decision.
+`/privacy` carries five "Drafted during implementation — not Ben's words" lines
+with their draft marks; `/accessibility` carries three; `/cookies`,
+`/ai-disclosure`, `/terms` and `/copyright` carry three, two, one and one
+(counted in the prerendered HTML, not estimated).
+
+The case for it: the substrate treats a legal claim like every other claim, and
+a page that hid the provenance of AI-drafted prose while `/ai-disclosure`
+promised provenance on every claim would be the exact contradiction §8b exists
+to stop.
+
+The case against it: "draft · implementation placeholder" under a paragraph of a
+privacy policy can read as though the *policy* were provisional, which is not
+what it means — the policy is in force; the sentence has not been stamped.
+
+**Not resolved by this build.** It ships marked. Changing it is one line in
+`components/LegalProse.tsx`, and the alternative worth considering is a single
+page-level provenance note rather than a per-section one.
+
+## LG3. Two preserved clauses were narrowed, and that is a copy edit
+
+Plan §3.0 says the only intentional line-level removal in the build is
+`app/globals.css:1`. Two clauses on the legal pages are the exception, and both
+were **narrowed by adding one word** rather than rewritten:
+
+- `/privacy`: "…uploads, or **server-side** personalized user memory."
+- `/ai-disclosure`: "…user account, or **server-side** persistent user memory."
+
+Both became false when `lib/wys/local-state.ts` shipped. §8b.2 uses the word
+"Correct" for exactly these two sections, and R8 forbids leaving a false public
+claim standing while adding a true sentence beneath it. Every other word of both
+paragraphs, and every heading on all six pages, survives verbatim —
+`tests/legal-claims.test.ts` asserts both.
+
+**Status: a copy edit to preserved legal text. Reported for Ben's approval.**
+
+## LG4. The Q23 contrast deviation is now published on `/accessibility`
+
+§B1's measured numbers reach the public site: 5.47:1 for the darkened teal on a
+tint, 3.23:1 for the muted disabled label, and the 1.69:1 it replaced. The page
+had to say something, because it publishes a contrast claim and the claim is
+only true because of the deviation. If Ben prefers option (b) or (c) from §B1,
+this paragraph changes with the token.
+
+## LG5. `/accessibility` states a rule where §8b.2 asked for a shipped fact
+
+§8b.2 asks the page to describe "transcripts alongside Ben audio" and "text
+alternatives for fictional artifacts". Neither has shipped: the artifact bank is
+empty and `public/` gained no files. So the page states the rule that is
+enforced in the type system — `accessibilityText` is non-optional, a media slot
+has no prose prop — instead of claiming an alternative that does not exist. A
+claim ahead of the fact is the one thing §8b.1 forbids outright.
+
+## LG6. `content/legal.ts` is a new content module, not a tenth claim
+
+packet: one-definition names nine canonical components and `CLAIM_IDS` is that
+list. A correction belonging to one legal page is prose about that page, not a
+tenth component of the site's claim vocabulary, so it lives in its own module
+and is registered in `tests/canonical-text.test.ts`'s two governance arrays
+alongside the rest. **This is a structural addition, reported** — the alternative
+was inflating a list the packet fixed.
+
+## LG7. `docs/facelift-legal-diff.md` is a pointer, not a document
+
+The Phase 11 brief named `docs/facelift-legal-diff.md`; plan §8b.4 and the
+Phase 11 task table name `docs/facelift-copy-diff.md`. The plan is the contract,
+so the diff lives at the plan's filename and the other is a one-line pointer to
+it. Two copies of a diff about drift would have been an unfortunate way to
+create some.

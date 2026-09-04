@@ -28,9 +28,36 @@
  * The nine ids below are the named canonical components from packet:
  * one-definition, quoted in plan §6.8. Do not add a tenth without adding it
  * there too.
+ *
+ * PHASE 11 wrote the `full` variants (plan §8b.1: "Phase 11 keeps only the
+ * legal-page prose pass, writing `full` onto these same records against frozen
+ * code"). Two rules governed that pass and both are load-bearing:
+ *
+ *  1. **A `full` on a BEN_APPROVED record may state only what its cited sources
+ *     state.** Those records resolve to `canon`, and `canon` means "may render
+ *     as Ben-attributed". The Phase 6 gate caught four records whose longer
+ *     variants EXTENDED an approved sentence with claims that appear in no
+ *     source; the fix was per-variant citation, and it only works if the
+ *     citation is honest. Each `full` below is a longer PRESENTATION of the
+ *     claim its `variantSources` name — §6.8's "one definition, many
+ *     presentations" — never a new claim wearing an old record's origin.
+ *  2. **Prose this build authored goes to a non-Ben origin.** `provenance` and
+ *     `privacy-disclosure` are exactly that, and they moved from
+ *     `draft` + IMPLEMENTATION_PLACEHOLDER to `published` + AI_SYNTHESIS —
+ *     which resolves to `marked`, so they render WITH "Drafted during
+ *     implementation — not Ben's words" and their draft mark. `published`
+ *     rather than `draft` for the same reason `content/watch-your-step/data.ts`
+ *     gave in Phase 8: Q21's flag exists to stop this build publishing draft
+ *     BEN doctrine, and a privacy page that silently withheld its own account
+ *     of what it stores would be worse than one that shows it labelled.
+ *
+ * Everything Phase 11 wrote is on the Final-copy escalation list in
+ * docs/facelift-unapproved.md, and every changed sentence is in
+ * docs/facelift-copy-diff.md with the code line that forced it.
  */
 
 import type { AnyCanonicalText } from "@/lib/canonical-text";
+import { WYS_STORAGE_KEY } from "@/lib/wys/local-state";
 
 export type ClaimId =
   | "minimal-trust"
@@ -96,17 +123,24 @@ export const claims = [
     surfaceKind: "general",
     status: "published",
     origin: "BEN_APPROVED",
-    sourceIds: ["artboard-4a-disclosure-strip"],
+    sourceIds: ["artboard-4a-disclosure-strip", "wys-spec-22", "wys-spec-28"],
     variantSources: {
-      inline: ["artboard-4a-disclosure-strip"]
+      inline: ["artboard-4a-disclosure-strip"],
+      full: ["artboard-4a-disclosure-strip", "wys-spec-22", "wys-spec-28"]
     },
     variants: {
       inline:
         "You're not talking to AI anywhere on this site. No chatbot, no coach, no generated answers.",
-      full: {
-        awaiting: "/ai-disclosure prose, written against frozen code in Phase 11 (plan §8b.2)",
-        writtenBy: "phase-11"
-      }
+      /**
+       * PHASE 11, /ai-disclosure. Three sourced claims and no fourth:
+       * (WYS §22) "FUTURE COACH — SCHEMA ONLY, DISABLED IN V0 … Do not
+       * implement runtime calls yet"; (WYS §28) "no AI SDK in v0 client bundle,
+       * no chat SDK"; artboard 4a's "No chatbot, no coach, no generated
+       * answers." Nothing here promises a model will never run — it says what
+       * this build contains.
+       */
+      full:
+        "No page on this site calls an AI model while you use it. There is no chatbot, no coach and no generated answer anywhere in the course: the coach that might exist one day is a disabled schema with no runtime call behind it, and the bundle this site ships to a browser contains no AI SDK and no chat SDK."
     }
   },
   {
@@ -114,17 +148,25 @@ export const claims = [
     surfaceKind: "general",
     status: "published",
     origin: "BEN_APPROVED",
-    sourceIds: ["artboard-4a-disclosure-strip"],
+    sourceIds: ["artboard-4a-disclosure-strip", "artboard-4a-how-the-site-is-run", "packet-crew-manifest"],
     variantSources: {
-      inline: ["artboard-4a-disclosure-strip"]
+      inline: ["artboard-4a-disclosure-strip"],
+      full: ["artboard-4a-disclosure-strip", "artboard-4a-how-the-site-is-run", "packet-crew-manifest"]
     },
     variants: {
       inline: "AI did help build the site and draft the copy — as crew, listed in the manifest.",
-      full: {
-        awaiting:
-          "/ai-disclosure section on AI's role as disclosed crew during authoring, word-for-word matched to the disclosure strip (SC-1)",
-        writtenBy: "phase-11"
-      }
+      /**
+       * PHASE 11, /ai-disclosure. SC-1 requires the approval language on that
+       * page to match the disclosure strip word for word, and it does — but
+       * NOT by being restated here. The approval sentence is
+       * `disclosureApprovalLine()` in lib/approval-state.ts, and
+       * /ai-disclosure renders that function, exactly as the strip does. This
+       * variant carries the OTHER half: what the crew did and where each one
+       * is listed (artboard 5d /crew, "Each AI aboard, its access, and its
+       * limits").
+       */
+      full:
+        "AI tools drafted copy, wrote code and did research for this site, as crew rather than as authors. Each system aboard is named in the Crew Manifest with what it was given access to and what it was not allowed to decide."
     }
   },
   {
@@ -132,16 +174,22 @@ export const claims = [
     surfaceKind: "general",
     status: "published",
     origin: "BEN_APPROVED",
-    sourceIds: ["artboard-4a-how-the-site-is-run"],
+    sourceIds: ["artboard-4a-how-the-site-is-run", "packet-captains-stamp", "code-approval-state"],
     variantSources: {
-      short: ["artboard-4a-how-the-site-is-run"]
+      short: ["artboard-4a-how-the-site-is-run"],
+      full: ["artboard-4a-how-the-site-is-run", "packet-captains-stamp", "code-approval-state"]
     },
     variants: {
       short: "AI can crew the ship. It can't sign the logbook.",
-      full: {
-        awaiting: "the Crew Manifest's system descriptions and what Ben has and has not approved",
-        writtenBy: "phase-11"
-      }
+      /**
+       * PHASE 11, /ai-disclosure. The boundary, not the state: WHAT has been
+       * signed is data (lib/approval-state.ts), never wording, so this variant
+       * says only what the roles are and where the current answer is read
+       * from. tests/governance-strings.test.ts keeps the state literals out of
+       * app/ and components/ for the same reason.
+       */
+      full:
+        "A tool may draft, code or research; only a person can sign something into the record as a position. Which sections have been signed is a stored value rather than a sentence, so it can change without anyone editing this page, and the Ship's Log is where each change is written down."
     }
   },
   {
@@ -149,19 +197,30 @@ export const claims = [
     surfaceKind: "general",
     status: "published",
     origin: "BEN_APPROVED",
-    sourceIds: ["artboard-5a-posture-footnote", "artboard-5b-rulebook-note"],
+    sourceIds: [
+      "artboard-5a-posture-footnote",
+      "artboard-5b-rulebook-note",
+      "wys-spec-17",
+      "wys-spec-18",
+      "code-wys-local-state"
+    ],
     variantSources: {
       inline: ["artboard-5a-posture-footnote"],
-      short: ["artboard-5b-rulebook-note"]
+      short: ["artboard-5b-rulebook-note"],
+      full: ["wys-spec-17", "wys-spec-18", "code-wys-local-state"]
     },
     variants: {
       inline: "Stays in this browser. Never sent.",
       short: "Stored here only. Export as text any time.",
-      full: {
-        awaiting:
-          "/privacy and /cookies prose naming the wys:v1 key and exactly what it holds, written against the frozen serializer in Phase 11",
-        writtenBy: "phase-11"
-      }
+      /**
+       * PHASE 11, /privacy and /cookies. The list is (WYS §18)'s own "This
+       * browser can store" list, plus §17's local judgments, and the key is
+       * COMPOSED from `WYS_STORAGE_KEY` rather than typed — the same rule
+       * `content/watch-your-step/data.ts` applies to `key: wys:v1 · raw JSON ↓`,
+       * so changing the storage key changes the legal page.
+       */
+      full:
+        `Watch Your Step keeps your course state in this browser, under a single namespaced key called ${WYS_STORAGE_KEY}. It holds whether you completed onboarding, your selected pace and time preference, where you are in the curriculum, which fictional exercises you completed, the choices you kept, your local rulebook, and whether you asked for deeper practice. Nothing in it is copied to a server, and the course keeps working if the browser refuses to store it at all.`
     }
   },
   {
@@ -194,30 +253,51 @@ export const claims = [
     surfaceKind: "general",
     status: "published",
     origin: "BEN_APPROVED",
-    sourceIds: ["artboard-5c-data-card-2", "wys-spec-19", "docs-legal-analytics"],
+    sourceIds: [
+      "artboard-5c-data-card-2",
+      "wys-spec-18",
+      "wys-spec-19",
+      "docs-legal-analytics",
+      "code-wys-telemetry"
+    ],
     variantSources: {
-      short: ["artboard-5c-data-card-2"]
+      short: ["artboard-5c-data-card-2"],
+      full: ["wys-spec-18", "wys-spec-19", "code-wys-telemetry"]
     },
     variants: {
       short:
         "Page analytics, and coarse counts: someone started, finished a stop, used replay, reached a carry, asked for depth.",
-      full: {
-        awaiting: "/privacy and /cookies analytics prose, written in Phase 11 against the frozen event allowlist",
-        writtenBy: "phase-11"
-      }
+      /**
+       * PHASE 11, /privacy and /cookies. (WYS §18)'s "Ben may receive" list,
+       * with §19.1A's "Do not include semantic learner answers" stated as the
+       * limit it is. The aggregate clause keeps §18's conditional — "if the
+       * first-party aggregate endpoint is enabled" — because the endpoint is
+       * NOT enabled and a flat assertion would be false; that it is not built
+       * is said outright by `legal-aggregate-not-built` in content/legal.ts,
+       * beside this one.
+       */
+      full:
+        "Ben may receive only what is necessary to understand how the course is used, and only what the enabled analytics allow: ordinary page and route analytics, coarse curriculum engagement events, an anonymous signal that someone wants deeper practice, and — only if the first-party aggregate endpoint is ever enabled — aggregate counts for selected structured exercises. The event names are a closed list and the properties they may carry are a closed list, and no entry in either one is a learner's answer."
     }
   },
   {
+    /**
+     * PHASE 11 wrote this against the shipped label table, and MOVED IT to
+     * `published` + AI_SYNTHESIS. It is build description, not Ben doctrine, so
+     * it renders `marked` — the words plus "Drafted during implementation — not
+     * Ben's words" plus its draft mark — rather than as canon.
+     */
     id: "provenance",
     surfaceKind: "general",
-    status: "draft",
-    origin: "IMPLEMENTATION_PLACEHOLDER",
-    sourceIds: ["wys-spec-23", "packet-one-definition"],
+    status: "published",
+    origin: "AI_SYNTHESIS",
+    sourceIds: ["wys-spec-23", "packet-one-definition", "code-content-status"],
+    variantSources: {
+      full: ["wys-spec-23", "code-content-status"]
+    },
     variants: {
-      full: {
-        awaiting: "the public explanation of how provenance labels are computed, once Phase 4 has shipped them",
-        writtenBy: "phase-11"
-      }
+      full:
+        "Every piece of writing on this site carries a record of where it came from, and two fields on that record decide what happens to it: one says how far along it is, the other says who produced it. Together they decide whether it may be shown at all, whether it must be shown with a line naming its author, and whether it may be presented as a person's position. Nothing that fails those checks is quietly published unlabelled; it is withheld, and the label says so in its place."
     }
   },
   {
@@ -239,16 +319,24 @@ export const claims = [
     }
   },
   {
+    /**
+     * PHASE 11 wrote this against frozen code, and MOVED IT to `published` +
+     * AI_SYNTHESIS for the same reason as `provenance` above. It is the
+     * paragraph that opens the enlarged /privacy surface and points at the
+     * Data page as a supplement — §8b.1: "The Data page supplements and does
+     * not supersede the legal pages."
+     */
     id: "privacy-disclosure",
     surfaceKind: "general",
-    status: "draft",
-    origin: "IMPLEMENTATION_PLACEHOLDER",
-    sourceIds: ["wys-spec-18", "app-privacy-page"],
+    status: "published",
+    origin: "AI_SYNTHESIS",
+    sourceIds: ["wys-spec-18", "wys-spec-20", "app-privacy-page", "code-wys-local-state"],
+    variantSources: {
+      full: ["wys-spec-18", "wys-spec-20", "app-privacy-page"]
+    },
     variants: {
-      full: {
-        awaiting: "the /privacy accuracy refresh in Phase 11, written against frozen code (§8b.2)",
-        writtenBy: "phase-11"
-      }
+      full:
+        "This site now carries more than a routing foyer. It also carries a finite course, a set of pages describing how the site is run, and state that lives in the browser you are reading this in. This policy covers all of it. The course's own Data page shows the same facts for your browser specifically, and reading it is a supplement to this policy rather than a replacement for it."
     }
   }
 ] as const satisfies readonly AnyCanonicalText[];

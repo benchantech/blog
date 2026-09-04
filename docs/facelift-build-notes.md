@@ -3450,3 +3450,98 @@ re-derive.
    already listed), so nothing about `llms.txt`, `sitemap.xml` or `state.json`
    changed. Worth knowing before assuming the machine surfaces describe the new
    copy: they describe the routes, not the blocks.
+
+
+---
+
+# Phase 11 — legal and disclosure refresh
+
+**Goal (plan §8b):** the six pages describe the enlarged surface exactly, from
+claims defined once, against frozen code.
+
+## What shipped
+
+| File | What it is |
+|---|---|
+| `content/legal.ts` | NEW. Thirteen `CanonicalText` records: the prose that belongs to exactly one legal page. Registered in both governance arrays in `tests/canonical-text.test.ts`. |
+| `content/claims.ts` | Seven `full` variants written; `provenance` and `privacy-disclosure` moved from `draft` + IMPLEMENTATION_PLACEHOLDER to `published` + AI_SYNTHESIS. `captain-stamp.full` is still Ben's. |
+| `content/source-refs.ts` | New `repo-code` kind, plus twelve shipped-module references and six spec/page references. The legal refresh is the first content that cites a MODULE as its authority. |
+| `components/LegalProse.tsx` | NEW. Gated prose in the legal-page register; one provenance mark per distinct label, not per paragraph. |
+| `components/BrowserKeyList.tsx` | NEW. Both browser keys, generated from `lib/wys/browser-keys.ts`, on `/privacy` and `/cookies`. |
+| the six pages | Refreshed in place. Same URLs, same metadata titles, every preserved heading intact. |
+| `tests/legal-claims.test.ts` | NEW, 21 tests: titles, preserved headings, the two corrections, one-definition, the site-wide forbidden-claims audit, and each claim against the module that implements it. |
+| `docs/legal-analytics.md`, `README.md` | Updated per plan §3.2. |
+| `docs/facelift-copy-diff.md` | The §8b.4 deliverable. `docs/facelift-legal-diff.md` points at it. |
+
+## The three decisions worth remembering
+
+**1. A `full` on a `BEN_APPROVED` record may state only what its cited sources
+state.** `canon` means "may render as Ben-attributed", and the Phase 6 gate
+caught four records whose longer variants extended an approved sentence with
+claims that appear in no source. The five `full` variants written onto approved
+records here are longer *presentations* of a claim the artboard or spec already
+makes, each citing its own source per variant. Everything this build actually
+authored went to `AI_SYNTHESIS`, which renders labelled. See
+docs/facelift-unapproved.md §LG1 for the table.
+
+**2. "Word for word" is a mechanism, not a promise.** `/cookies` renders the
+Data page's clearing sentences because it imports the same two records.
+`/ai-disclosure`'s approval language matches the disclosure strip because both
+call `disclosureApprovalLine()`. Neither surface holds the literal, and
+`tests/legal-claims.test.ts` fails if either starts to.
+
+**3. Two clauses were narrowed, not rewritten.** "personalized user memory" and
+"persistent user memory" each gained the word "server-side". Both became false
+when `wys:v1` shipped; every other word of both paragraphs survives. Leaving a
+false sentence and adding a true one beneath it is not a fix (R8), and deleting
+a true clause to repair a false one is a bigger change than qualifying it.
+
+## The hazard this phase nearly walked into
+
+Writing the legal prose onto the approved claim records *because the plan said
+Phase 11 writes `full` onto them* would have published five paragraphs Ben has
+never seen under a `canon` policy — with no test failure, because a record-level
+`sourceIds` is satisfied by one sourced variant however many unsourced ones sit
+beside it. The per-variant citation check added at the Phase 6 gate is what
+makes that visible; it only works if the citation is honest, so the split
+between "presents a sourced claim" and "authored here" is a judgement the next
+phase has to keep making by hand.
+
+## What the gate changed
+
+Four corrections, all narrow, none of them copy:
+
+1. **Two legal records traced to no code.** `legal-terms-course` and
+   `legal-terms-non-goals` cited only a spec section and the preserved page they
+   sit on, which satisfied the phase's own check because that check accepted
+   `code-`, `app-` OR `docs-`. §8b.1's exit criterion is "one definition and one
+   line of shipped code", so the check now REQUIRES a `repo-code` citation, and
+   resolves the file paths in its locator against the disk. Two references were
+   added for it: `code-wys-scenarios` (every scenario is `FICTIONAL_AUTHORED`)
+   and `code-wys-no-scores` (`WYS_DECLARED_KEYS` declares no score, streak or
+   percentage field, so "no privacy score, no literacy score and no streak" is a
+   schema fact rather than a promise).
+2. **Two locators named a bare sibling filename** (`… + types.ts`), which is not
+   resolvable from the repo root. Both now spell the full repo-relative path,
+   and the resolver only accepts a path containing a separator.
+3. **Two counts in the unapproved register were wrong.** LG1's heading said
+   twelve authored paragraphs where the body says eleven plus two; LG2 said
+   `/cookies` carries two provenance marks where the prerendered HTML carries
+   three. Both corrected against `.next/server/app/*.html`, counted rather than
+   estimated. A governance register Ben reads to make a decision is the one
+   document whose numbers have to be measured.
+4. **`README.md` lost a line it was not authorised to lose.** Plan §3.2 permits
+   the one-line description and the stack/scripts section "and nothing else";
+   the rewrite of the content-layout sentence dropped "public assets under
+   `public/`". Restored inside the new sentence.
+
+**Verified at the gate, with evidence rather than assertion:** every preserved
+sentence and every `href` on the six pages was extracted from `main`'s copies of
+the six files and matched against the prerendered HTML — exactly two sentences
+differ, and both are the disclosed `server-side` narrowings. The forbidden-claims
+sweep was re-run over all 34 prerendered HTML pages (not over source): four
+occurrences, all four sanctioned — three denials of "zero trust" inside the
+approved infrastructure paragraph, and the struck-through `AI you can trust` pill
+on the home page, which carries `primitives_struck__*`. A cross-file duplicate
+sweep over every long string in `app/`, `components/` and `content/` returns
+zero, so no two components render the same sentence from different sources.
