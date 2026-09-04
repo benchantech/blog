@@ -149,7 +149,11 @@ export default function WatchYourStepDataPage() {
           </div>
         }
       >
-        <CardShell fill="grey">
+        {/* Cards 2 and 3 are passed as `children` and re-rendered by
+          * DataManifest inside its own `.cards` div. Crossing that boundary
+          * makes React re-validate them as a list, so they carry explicit
+          * keys — without them the page logs a "unique key" warning. */}
+        <CardShell key="card-2-ben-may-receive" fill="grey">
           <SectionEyebrow breakpoint="mobile">{dataLabels.card2Eyebrow}</SectionEyebrow>
           <DataText content={conditions} className={styles.cardBody} />
 
@@ -174,7 +178,7 @@ export default function WatchYourStepDataPage() {
           ) : null}
         </CardShell>
 
-        <CardShell fill="ink">
+        <CardShell key="card-3-ben-does-not-need" fill="ink">
           <p className={styles.eyebrowOnInk}>{dataLabels.card3Eyebrow}</p>
           <DataText content={doesNotNeed} className={inkBodyClass} tone="dark" />
         </CardShell>

@@ -35,7 +35,10 @@
   display: grid;
   grid-template-columns: minmax(0, 1fr) 520px;
   gap: 64px;
-  align-items: center;
+  /* Artboard 4a top-aligns the two hero columns: the badge pill and the demo
+   * card share a baseline at the top of the grid. `center` floated the card
+   * above the badge by ~112px at 1280. */
+  align-items: start;
 }
 
 .heroBadge {
@@ -194,6 +197,12 @@
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   gap: 12px;
+  /* This is a <ul>. Without the reset the UA's disc markers and 40px
+   * padding-inline-start render OUTSIDE the four cards (dc.html:395-403 draws
+   * no bullets). */
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .move {

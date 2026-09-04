@@ -38,9 +38,17 @@ const legalLinks = [
 
 function FooterLink({ item }: { item: NavItem }) {
   if (item.external) {
+    /* Same treatment as the header (components/SiteHeader.tsx): the four
+     * property destinations leave the site, so they open in a new tab and mark
+     * it. Kept identical here because yymethod.com appears in BOTH chromes and
+     * one destination behaving two ways reads as a bug. */
     return (
-      <a href={item.href} rel="noreferrer">
+      <a href={item.href} target="_blank" rel="noopener noreferrer">
         {item.label}
+        <span className="external-arrow" aria-hidden="true">
+          ↗
+        </span>
+        <span className="sr-only"> (opens in a new tab)</span>
       </a>
     );
   }

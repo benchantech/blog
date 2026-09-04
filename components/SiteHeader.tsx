@@ -33,9 +33,20 @@ import styles from "./SiteHeader.module.css";
 
 function NavLink({ item }: { item: NavItem }) {
   if (item.external) {
+    /* External nav destinations open in a new tab and say so. The arrow is
+     * decorative (aria-hidden); the spoken cue is the visually-hidden span, so
+     * a screen-reader user is told before activating the link rather than
+     * discovering it afterwards. `noopener` is added alongside the preserved
+     * `noreferrer` because the link now carries target="_blank".
+     * NEW — the handoff README's glyph set is the arrow, check and play only;
+     * see docs/facelift-unapproved.md. */
     return (
-      <a href={item.href} rel="noreferrer">
+      <a href={item.href} target="_blank" rel="noopener noreferrer">
         {item.label}
+        <span className="external-arrow" aria-hidden="true">
+          ↗
+        </span>
+        <span className="sr-only"> (opens in a new tab)</span>
       </a>
     );
   }

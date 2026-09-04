@@ -2732,3 +2732,31 @@ checked rather than trusted.
   they are named again here so a reader of this file does not conclude no
   preserved copy changed: `/privacy` and `/ai-disclosure` each gained the word
   **"server-side"**, because the unqualified sentence was false.
+
+---
+
+## Visual-review pass (browser, 1280px) — NEW deviations
+
+Found by reading the running site page by page rather than by reading the
+artboards. Each is a change to what the approved artboards draw, so each needs
+your eye.
+
+| # | Change | Why | Artboard status |
+|---|---|---|---|
+| V1 | External nav links (`YY Method™` in the header; the four property links in the footer) now open in a new tab and carry a `↗` mark plus visually-hidden "(opens in a new tab)". | You asked for it directly. It also removes a real inconsistency: `yymethod.com` appears in both chromes and behaved as a same-tab link in each. | **NEW.** The handoff README's glyph set is `▶ → ✓`; `↗` is a fourth glyph. The header link previously carried `rel="noreferrer"` and no `target` (plan §3.3); it now carries `target="_blank" rel="noopener noreferrer"`. |
+| V2 | Hero columns top-aligned (`align-items: start`). | Was `center`, which floated the demo card ~112px above the badge pill at 1280. | Restores `4a`. Not a deviation. |
+| V3 | Hero demo choice rows render white with a 1.5px border. | They were using the grey `5a`/`5b` resting fill. `4a` draws the hero demo's rows white. | Restores `4a`. Not a deviation. |
+| V4 | `.moveGrid` (Watch/Try/Judge/Carry) list reset. | The `<ul>` had no reset, so UA disc markers and 40px padding rendered **outside** the four cards. `4a` draws no bullets. | Restores `4a`. Not a deviation. |
+
+### Still open, deliberately not changed
+
+**The double provenance line.** Under the hero demo's scenario text two mono
+lines stack: "Implementation placeholder — not Ben's words" (the computed
+provenance label, a NEW string this build added) and "scenario: draft ·
+implementation placeholder" (the approved artboard mark). Artboard `4a` draws
+**neither** there — its two mono lines are white-on-dark inside the post-commit
+judgment card. Collapsing the two into one is a change to `ProvenanceMarks`,
+which renders on every surface, so it is a provenance-semantics decision rather
+than a visual one. R9 forbids removing a provenance marker; deduplicating two
+markers of the same fact is arguably not removal, but that is your call and not
+the build's. The Phase 8 gate reached the same conclusion independently.

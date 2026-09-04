@@ -88,7 +88,8 @@ export function JudgeCard({
   continueHref,
   continueLabel,
   breakpoint = "desktop",
-  persist = true
+  persist = true,
+  fill = "grey"
 }: {
   /** A declared scenario id. Storage drops anything else (plan §7.2). */
   scenarioId: string;
@@ -111,6 +112,8 @@ export function JudgeCard({
   continueHref?: string;
   continueLabel?: string;
   breakpoint?: "desktop" | "mobile";
+  /** `4a`'s hero demo uses white rows with a 1.5px border; `5a`/`5b` use the grey fill. */
+  fill?: "white" | "grey";
   /** Off for a replay that must not overwrite the kept judgment (WYS §14). */
   persist?: boolean;
 }) {
@@ -168,7 +171,7 @@ export function JudgeCard({
             <ChoiceRow
               key={choice.key}
               letter={choice.key}
-              fill="grey"
+              fill={fill}
               breakpoint={breakpoint}
               selected={state.selected === choice.key}
               locked={!reveal.choicesEnabled}

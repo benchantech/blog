@@ -140,6 +140,9 @@ export function HeroDemo({ breakpoint = "desktop" }: { breakpoint?: "desktop" | 
 
       {runnable ? (
         <JudgeCard
+          /* `4a` draws the hero demo's rows white with a 1.5px border, not the
+           * grey `5a`/`5b` resting fill (handoff README, Home > hero). */
+          fill="white"
           scenarioId={scenario.id}
           choices={scenario.choices.map((choice) => ({
             key: choice.key,

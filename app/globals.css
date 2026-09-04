@@ -1255,3 +1255,16 @@ main {
     transition-duration: 0.01ms !important;
   }
 }
+
+/* External-link arrow, used by SiteHeader and SiteFooter (NEW — the handoff
+ * README's glyph set is ▶ → ✓; see docs/facelift-unapproved.md). One global
+ * definition because both chromes link the same external destinations and one
+ * destination must not behave two ways. Decorative: the spoken cue is the
+ * adjacent .sr-only text. */
+.external-arrow {
+  display: inline-block;
+  margin-left: 4px;
+  font-size: 0.82em;
+  line-height: 1;
+  vertical-align: baseline;
+}
