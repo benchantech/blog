@@ -1,0 +1,94 @@
+/* ==========================================================================
+   /standing-orders (plan Phase 9, §5.2; mockup `5d`, dc.html:239-252).
+
+   Scoped to this route. The pill, the nine cards and the mono line are
+   `components/ui` / `components/wys` / `components/provenance` primitives and
+   are NOT restated here: `.order`, `.orderLead`, `.orderNumber`, `.orderTitle`
+   and `.orderGloss` already carry the artboard's 16/18 padding, its 18px
+   radius, its ink lead card and its `--accent-on-dark` numeral. This file
+   carries only the four things the shared set has no primitive for — the page
+   shell, the header rhythm, the keel link and the desktop headline size.
+
+   THE ARTBOARD IS A PHONE. `5d` draws this screen at 390x844 and nothing draws
+   it at 1280, so the desktop rendering is the extrapolation Phase 9 requires:
+   the 390 reading column widened inside the 1280 shell, centred, with a larger
+   headline and no new information architecture. Recorded in
+   docs/facelift-unapproved.md with the other fifteen.
+
+   VERTICAL GEOMETRY DIFFERS FROM THE ARTBOARD BY DESIGN. `5d` pads 70px at the
+   top because the phone frame has no site chrome; here the root layout mounts
+   a header above and the disclosure strip plus footer below (§5.6, Q9), so the
+   top pad is smaller and the artboard's 60px bottom clearance grows to leave
+   the strip room to breathe.
+   ========================================================================== */
+
+.page {
+  width: min(calc(100% - 2 * var(--gutter)), 720px);
+  margin-inline: auto;
+  padding-block: 48px 72px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Header — pill, h1, keel citation (dc.html:239-241)                         */
+/* -------------------------------------------------------------------------- */
+
+/*
+ * The pill is a `<span>` from `Pill`, so it needs a block wrapper to sit on its
+ * own line. Margin lives on the title below it, exactly as the artboard sets it.
+ */
+.pillRow {
+  margin: 0;
+}
+
+.title {
+  margin: 16px 0 10px;
+  font: 600 40px / 1.06 var(--sans);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.lead {
+  margin: 0 0 20px;
+  font: 400 17px / 1.5 var(--sans);
+  color: var(--body);
+  text-wrap: pretty;
+}
+
+/*
+ * The keel, teal and 500 as the artboard paints it (dc.html:241). It is an
+ * anchor rather than a bare span because the keel has a canonical home and a
+ * governance page that names its source without reaching it is a dead
+ * transparency claim. `--accent` is safe here: this is 17px text on white
+ * (4.74:1), not on `--tint-teal` — the pairing Q23 measured at 4.45:1.
+ */
+.keel {
+  color: var(--accent);
+  font-weight: 500;
+  text-decoration: none;
+}
+
+.keel:hover {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+}
+
+/* Renders only once a digest exists to cite; nothing is printed today. */
+.keelHash {
+  margin: -12px 0 20px;
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding-block: 28px 56px;
+  }
+
+  .title {
+    font-size: 32px;
+    line-height: 1.1;
+  }
+
+  .lead {
+    font-size: 15px;
+  }
+}

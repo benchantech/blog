@@ -192,3 +192,41 @@ export const quartersHistoryNote = {
 
 /** Every quarters record carrying provenance fields, for the governance arrays. */
 export const quartersRecords = [quartersIntro, ...quartersTiles, quartersHistoryNote];
+
+/* -------------------------------------------------------------------------- */
+/* The three slots this page renders (mockup 5d)                              */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The portrait, the 60-second audio and Selected history are LABELLED EMPTY
+ * SLOTS, defined once in `content/watch-your-step/sources.ts` and referenced
+ * here so `/ben` and the home instructor band cannot describe the same slot two
+ * ways (§6.4, §6.8).
+ *
+ * The audio slot is deliberately the same record the home band and the WYS
+ * landing render: one 60-second recording, one slot, three surfaces. The
+ * portrait is a different record from the home page's, because the geometry
+ * differs (300 px hero here, 300x340 band there) and reserved geometry is part
+ * of what a slot promises.
+ *
+ * NOTHING FILLS THESE. `components/provenance/*` accepts a label and an
+ * awaited-asset descriptor and declares `children` / `text` / `body` as
+ * `never`, so no generated sentence and no stand-in image can occupy one.
+ */
+export const QUARTERS_SLOT_IDS = [
+  "slot-portrait-quarters",
+  "slot-hear-ben-60s",
+  "slot-quarters-selected-history"
+] as const;
+
+export const quartersSlots = QUARTERS_SLOT_IDS.map(wysBenSlotById);
+
+export const quartersPortraitSlot = wysBenSlotById("slot-portrait-quarters");
+export const quartersAudioSlot = wysBenSlotById("slot-hear-ben-60s");
+export const quartersHistorySlot = wysBenSlotById("slot-quarters-selected-history");
+
+/**
+ * The grid's eyebrow, verbatim from the artboard. Pinned here rather than typed
+ * into the page for the same reason as the Bridge's three section labels.
+ */
+export const quartersGridLabel = "WORK & PROPERTIES";

@@ -1551,3 +1551,665 @@ centred 720px reading column at 1280px; the card stack, the row rhythm and the
 three full-width pills are unchanged. No new information is exposed in the
 margin and the IA is not redefined. **Unapproved, like the other fourteen
 desktop extrapolations.**
+
+---
+
+# Phase 9 — ship and governance content (`content/ship/*`)
+
+The five ship surfaces as data. The pages that render them are recorded
+separately; everything below is a decision about the CONTENT — what the objects
+say, where each string comes from, and which of them no artboard settles.
+
+## SHC1. The Crew Manifest is NEW in full — no artboard exists at any width
+
+`/crew` is the only ship surface with no artboard in the approved set, and it
+cannot be deferred: the disclosure strip on every page links to it, so a missing
+manifest is a dead link out of a transparency claim.
+
+Three of its strings are copy **this build authored** (plan §2.1 permits "Crew
+Manifest system descriptions"), and they are the header the page needs:
+
+| Field | Ships as |
+|---|---|
+| pill | "Crew Manifest · current" — mirrors the Bridge's "The Bridge · current" |
+| h1 | "Every system that touched this site" |
+| intro | "What each one does, what it can reach, and what it is not allowed to decide. Build crew act once, at build time; runtime crew act while you are on a page." |
+| role headings | "Build crew — acted before this page existed" / "Runtime crew — act while you are on the site" |
+
+All of it is `origin: "IMPLEMENTATION_PLACEHOLDER"`, so it renders **with** the
+label that says it is not Ben's words — the honest state for a page whose whole
+subject is who wrote what. The header references Standing Order 06 by id
+(`orderTags: ["order-06"]`) instead of restating it, so the same order-tag check
+that guards the Ship's Log guards this too.
+
+The five per-system fields themselves are the packet's, not this build's.
+**Status: NEW. Unapproved. Needs Ben's stamp — the wording and the fact that a
+governance page ships with no approved design.**
+
+## SHC2. The Ship's Log h1 is in Ben's first person, and this build did not write it
+
+Artboard `5d` heads the Log *"I may change my mind. I won't rewrite the record."*
+and the plan's Appendix A records it as a string that must survive verbatim, so
+R1 puts it on the page and R8 forbids quietly rewording it. It is still the one
+string on these five surfaces that R10 would forbid if this build had authored
+it.
+
+Rather than leave that tension in a comment, it is **data**: `shipsLogIntro`
+carries `firstPerson: true`, and `tests/ship-content.test.ts` asserts it is the
+only first-person string anywhere in `content/ship/` — a second one is a test
+failure, not a review catch. The page can withhold or relabel it on a one-line
+change.
+
+**Escalated to Ben: keep the sentence in his voice, or replace it with a
+third-person line the build may author.**
+
+## SHC3. Q25's supersession machinery is built, and this is what it costs
+
+The Bridge intro ships *"Always current; every earlier state lives in the Log"*.
+Q25's ratified default makes that true in architecture rather than in copy:
+
+- `supersedePosition()` (`content/ship/bridge.ts`) is the only sanctioned way to
+  replace a Bridge position; it returns the old record as `historical` with
+  `supersededBy` and `canonical: false` (plan §6.2 rule 4).
+- `supersededPositionItems()` and `shipsLogTimeline()`
+  (`content/ship/ships-log.ts`) are where the Log picks it up — entries and
+  superseded positions in one sequence, newest first.
+- The Log renders it through the `archive` surface, so `renderPolicyFor` returns
+  `marked`, never `canon`. A superseded position can appear on the Log and can
+  never read as a current one.
+- A `historical` record missing `supersededBy` **throws** rather than being
+  skipped. Silently dropping it would empty the Log of exactly the state the
+  Bridge claims lives there.
+
+`bridgePositions` is empty today, because Ben has written no position — so the
+Bridge renders the slot and the Log shows two entries. The machinery is
+exercised by tests, not by shipped data. **If Ben would rather not carry it in
+v0, the intro sentence becomes a fourth SC-11 copy escalation.**
+
+## SHC4. The Studio tile ships unlinked (Q5)
+
+`href: null` — the data form of an open question. Not `""`, which a renderer
+would turn into a link to the current page, and not `/studio`, which is the
+preserved Violin for Parents stakeholder page and cannot be relabelled.
+**Awaiting Ben's answer: where should "Studio / rented laboratory" point?**
+
+## SHC5. The authority chain does not render publicly, and that is a consequence, not a choice
+
+`content/authority-chain.ts` is `draft` / `IMPLEMENTATION_PLACEHOLDER`, because
+the planning packet is not stamped (R5) and its descriptive lines were drafted
+during implementation. Under Q21's ratified default (`RENDER_MARKED_DRAFT ===
+false`) that means **the four-link chain — keel → Standing Orders → current
+state → Ship's Log and snapshots — is not shown to a visitor.** Phase 1 asked
+Phase 9 to report the consequence rather than soften the origin, so: it is
+reported, and the origin is unchanged. What the ship surfaces do show is the
+keel cited by name and link on the Standing Orders page, and the Bridge's mono
+state block. Flipping Q21, or Ben stamping the packet, makes the chain public
+with no code change.
+
+## SHC6. The keel is cited with no digest, on purpose
+
+The Standing Orders intro renders "Derived from " + `approvalState.keel.name` +
+". This site cites it; it doesn't rewrite it." — the middle third is state, not
+copy, so a new keel version is one typed value. `citesHash` is a field, and it is
+`false` while `approvalState.keel.sha256` is null: (packet: hashing) is freeze →
+SHA-256 of the canonical Markdown → publish on yymethod.com/work → **then** cite.
+No v2.3 hash is printed anywhere on these surfaces.
+
+## SHC7. Section labels and the date form are pinned in content, not typed into pages
+
+The Bridge's three eyebrows ("WORKING ON", "EXPERIMENT UNDERWAY", "OPEN
+QUESTIONS") and the Quarters grid label ("WORK & PROPERTIES") are the artboard's
+own words, held once in `content/ship/*` so a surface cannot end up with two
+names for one section (§6.8). `formatLogDate()` renders the artboard's
+"3 Sep 2026" from the ISO date by parsing the string rather than constructing a
+`Date` — `new Date("2026-09-03")` is UTC midnight, and a build machine west of
+Greenwich would print the previous day. A log date that moves with the renderer's
+timezone is a rewritten record, which is what Standing Order 08 forbids.
+**Not a Ben decision; recorded because it is a departure from the obvious
+implementation.**
+
+## SHC8. Ben's own material on these surfaces is four labelled empty slots
+
+The Bridge position, the Captain's Quarters portrait, the 60-second audio and
+Selected history are slot records in `content/watch-your-step/sources.ts`, each
+referenced (never re-typed) by the ship modules. All four are `draft` /
+`BEN_AUTHORED`, which `renderPolicyFor` blocks on every public surface, and
+`components/provenance/*` accepts no body — so nothing generated can occupy one.
+The 60-second audio is deliberately the **same record** the home band and the
+WYS landing render: one recording, one slot, three surfaces.
+
+---
+
+# Phase 9 — the `/standing-orders` page
+
+The content decisions for these objects are recorded above under SHC1–SHC8.
+Everything below is a decision about the RENDERED PAGE: what a visitor sees that
+no approved artboard draws.
+
+## SO1. Desktop is extrapolated
+
+`5d` draws Standing Orders at 390px only, and no artboard renders it at 1280.
+The page takes the 390 reading column widened to a centred 720px measure inside
+the 1280 shell, with the headline at 40px instead of 32px. Nothing is exposed in
+the margin, no section is added, dropped or reordered, and the IA is not
+redefined. **Unapproved, like the other fourteen desktop extrapolations.**
+
+## SO2. The vertical geometry is not the artboard's
+
+`5d` pads `70px 22px 60px` because the phone frame carries no site chrome. Here
+the root layout mounts the header above and the disclosure strip plus the footer
+below (§5.6, Q9 at its ratified default), so the page takes 48px (desktop) /
+28px (mobile) of top padding and leaves more room at the foot for the strip. The
+horizontal gutter is the artboard's. Same deviation, and the same cause, as
+every course screen.
+
+## SO3. The keel is a LINK, where the artboard draws a coloured span
+
+dc.html:241 paints "YY Method Professional v2.3" teal and 500 with no `href`.
+The page renders the same words, the same colour and the same weight as an
+anchor to `approvalState.keel.url` (`https://yymethod.com/work`).
+
+Reported because it is a change to an approved artboard, and taken because R8
+puts a transparency claim's truth in the architecture: a governance page that
+names its source without reaching it is a citation the reader cannot check.
+Safe-direction under R9 — it adds a route to the source, it removes nothing. The
+URL is not typed on the page; it is `standingOrdersIntro.keelHref`, which is
+`approvalState.keel.url`, so the keel moves in one place.
+
+## SO4. A hash line exists in the page and renders nothing
+
+`standingOrdersIntro.citesHash` is `false` while `approvalState.keel.sha256` is
+null, so **no digest is printed** — this phase's exit criterion, and (packet:
+hashing)'s order of operations (freeze → SHA-256 → publish on yymethod.com/work
+→ **then** cite). The branch that would render `keelHashLine()` is kept live
+rather than left out, so that publishing the digest is a data change and not a
+component change (WYS §35: "the code should make these content/config changes
+cheap"). Nothing about it is visible today. **Not a Ben decision; recorded
+because a reader diffing the page against the artboard will find a branch the
+artboard has no counterpart for.**
+
+## SO5. Nothing on this page can render short and look complete
+
+Every string the page paints goes through `gateProse("general", record, …)` and
+is released only at `canon`. A Standing Order whose status stopped resolving
+would **fail `next build`** rather than disappear from the list. That is a
+deliberate departure from the course screens, which render the provenance label
+in place of withheld prose: a scenario that says "not Ben's words" is honest,
+whereas a list of the rules the site runs on that silently drops its fourth rule
+is not. **Not a Ben decision; recorded as a behavioural choice a later phase
+should not quietly reverse.**
+
+## BR1. `/bridge` at 1280 is an extrapolation — no artboard draws it
+
+`5d` is a 390px phone. Turn `2d` draws a Bridge desktop, but `2d` is a
+superseded register and R1 forbids taking a visual from it. So the desktop
+Bridge is this build's, not Ben's: the reading column widens from
+`min(100% − 2·gutter, 680px)` to 720px, the h1 goes 32px → 40px, the lead 15px →
+17px, the question rows 15px → 16px, and the section labels take
+`SectionEyebrow`'s **desktop** ramp (15px/500, no tracking) instead of its
+mobile one (12px/600). Nothing moves, nothing regroups, no margin metadata is
+added — the IA is the artboard's at both widths, per the plan's own limit on
+desktop extrapolation ("must not redefine the IA"). One of the fifteen surfaces
+Phase 9 requires recorded here.
+
+## BR2. The state block renders six lines, not the artboard's two
+
+dc.html:235 paints four facts on two wrapped lines: "captain's round: none yet ·
+snapshot: 0 pending" / "stamp: not yet stamped · governed by YY Method v2.3".
+`bridgeStateLines()` (plan §6.6, built in Phase 1) returns **six** — the four
+above plus `status: current` and `sha256: pending publication` — and the page
+renders them one per line rather than joining them with middots.
+
+Three deviations in one, all reported:
+
+1. **Six lines, not four.** Both extra lines are approval state, and dropping
+   them at the renderer would put the page's presentation back in the page and
+   out of `lib/approval-state.ts`, which §6.6 exists to prevent. `sha256:
+   pending publication` is not a digest and prints none (Phase 9 exit).
+2. **Stacked, not joined.** The artboard's pairing holds only while all the
+   lines are short; the moment Ben stamps, four of them change length together
+   and the two-line pairing breaks. A joined form would be a layout that is
+   true only of the unstamped state.
+3. **"captain's stamp:" where the artboard says "stamp:".** That prefix is
+   `stampStateLine()`'s, and it is data. It is not retyped here.
+
+Ben's call: whether the Bridge's foot should read as the artboard's two dense
+lines. Changing it is a change to `lib/approval-state.ts`, not to this page.
+
+## BR3. The three section labels are `<h2>`, where the artboard has styled text
+
+`5d` draws WORKING ON / EXPERIMENT UNDERWAY / OPEN QUESTIONS as 12px/600 teal
+divs. The page renders them at the same size, weight, colour and tracking, as
+headings, so the document has an outline under its one h1 and a screen-reader
+user can reach the three sections (plan §11.4, WYS §27). Visually identical;
+semantically different. Caps stay typed in the copy, never `text-transform`.
+
+## BR4. The EXPERIMENT slab is `CardShell fill="ink"` — 20px padding, not 18px
+
+dc.html:229 gives that one card 18px of padding. `CardShell`'s ink fill is 20px,
+which is the padding every other ink card in the approved set carries. Restating
+the geometry locally to win 2px would fork a shared primitive from a route file.
+Deviation reported, not resolved.
+
+## BR5. The Ben-position slot has a second branch nothing can reach today
+
+`currentBridgePosition()` returns `null`, so the page renders the dashed teal
+`BenSlot` — the artboard's state, and the state R10 requires. The other branch,
+which renders a position Ben has written, is live in the file and gated at
+`canon`: a position at any other status renders the slot instead. **Not a Ben
+decision; recorded because the page contains a rendering path the artboard has
+no counterpart for, and because a reader must be able to confirm that path
+cannot be reached by a draft.**
+
+---
+
+# Phase 9 — the Crew Manifest page (`/crew`)
+
+The page half of SHC1. Everything below is a decision about the SURFACE — how
+`content/ship/crew-manifest.ts` is drawn — and every one of them is a decision no
+artboard settles, because no artboard for this route exists at any width.
+
+## CRW1. The entire visual is NEW, composed from `5d`, and it is the only such ship page
+
+`/crew` is the one ship surface with no approved artboard. It also cannot be
+deferred: `components/DisclosureStrip.tsx` links here from the footer of every
+page, so a missing manifest is a dead link out of a transparency claim.
+
+Nothing on the page is transcribed. Every value is borrowed from an approved
+`5d` surface, and the borrowing is recorded line by line in
+`app/crew/crew.module.css`:
+
+| Element | Register borrowed from |
+|---|---|
+| status pill | the Bridge's tint-teal "The Bridge · current" (dc.html:217) |
+| h1 | 600 32px/1.1 at −.025em, margins 16/10 (dc.html:218, :241) |
+| intro | 15px/1.5 in `--body` (dc.html:219, :242) |
+| section label | 12px/600 accent (dc.html:221, :227) |
+| crew card | grey at radius 22, via the shared `CardShell` (dc.html:262, :268) |
+| card title | 17px/600 at −.01em (dc.html:264) |
+| field value | 14px/1.45 (dc.html:265) |
+| order tag | the Ship's Log's small tag pill (dc.html:266) |
+
+**Status: NEW. Unapproved. Needs Ben's stamp — both the composition and the fact
+that a governance page ships with no approved design.**
+
+## CRW2. Provenance is marked once per record, which means five marks on one page
+
+The content phase left this to the page (build notes, Phase 9 decision 6): one
+provenance mark per record, or one per section? Every record here is `published`
++ `IMPLEMENTATION_PLACEHOLDER`, so `renderPolicyFor` resolves each to `marked`
+and each one owes a §23 label and a mono draft mark.
+
+It is marked **once per record, which is once per card.** A crew member is one
+content object with five fields; `ProvenanceMarks` exists because "one record's
+provenance is one line, not one line per paragraph"; and a per-section mark would
+detach the label from the body it qualifies, which §6.2 forbids. So five cards
+carry five identical pairs of mono lines, plus a sixth under the header record.
+
+That is repetitive by construction, and it is the honest form on a page whose
+whole subject is who wrote what. **Recorded because a later phase reading it as
+visual noise might be tempted to collapse it to one page-level statement — which
+would be the exact separation of label from body the substrate exists to
+prevent.**
+
+## CRW3. The Standing Order tag is inert, not a link
+
+`crewIntro.orderTags` is `["order-06"]`, and the page renders it through
+`standingOrderTag()` as a small pill — the same presentation the Ship's Log gives
+an order tag, so one referenced order has one presentation across the two
+surfaces that reference orders (§6.8).
+
+It is **not** a link. Two reasons: the Standing Orders page carries no per-order
+anchor to land on, so a link would deposit a reader at the top of a nine-card
+list and leave them to find 06 themselves; and an interactive tag owes a 44px
+touch target (plan §4.6) that a 12px pill has no room for without becoming a
+button. Standing Orders is one tap away in the site header either way. **Not a
+Ben decision; recorded because "make the tag a link" is the obvious later
+change and it has a cost.**
+
+## CRW4. Desktop is extrapolated — one of the fifteen
+
+`/crew` is on the plan's list of fifteen surfaces with no rendering at 1280 (and
+it is the only one on that list with no rendering at 390 either). The 390 reading
+column widens to the same 720px measure every course screen uses, centred; the IA
+is identical at both breakpoints and nothing moves into the margin. **Status:
+NEW. Unapproved.**
+
+## CRW5. The role headings are real headings, in the eyebrow register
+
+`SectionEyebrow` renders a `<p>`. This page's two role labels are the only thing
+naming its two sections, and a page of sections needs headings a screen reader
+can list and `aria-labelledby` can point at — so `.sectionHeading` is an `<h2>`
+carrying the eyebrow's 12px/600 accent register locally. Same shape, same
+reasoning and same escalation as the Data page's `.eyebrowOnInk` (DM11): the
+request for a heading level on the shared primitive is recorded in
+docs/facelift-build-notes.md rather than made from a route file.
+
+The labels are sentence case, because the content module writes them that way;
+caps are typed in copy on this site and never applied with `text-transform`.
+
+## CRW6. A withheld record loses its whole card, and a withheld header fails the build
+
+Two behaviours no artboard could show:
+
+1. **Card level.** Four of the five packet fields are plain string arrays on the
+   record. A card that gated only the lead sentence and then printed
+   "What it cannot access" underneath would publish exactly the prose its own
+   label said was withheld. So the gate is read once per member and the card
+   renders either all of it, marked, or the provenance label alone.
+2. **Header level.** The pill, the h1 and the intro are three fields of one
+   record. If that record ever stops being renderable the page throws rather than
+   printing a title whose body has been withheld — the direction
+   `app/watch-your-step/(shell)/data` and `shipsLogTimeline()` both take.
+
+No record on this page is blocked today. Both branches exist so a later status
+change cannot open the hole quietly. **Not a Ben decision; recorded as a
+behavioural choice a later phase should not reverse to "render what we can".**
+
+## SL1. `/ships-log` at 1280 is an extrapolation — no artboard draws it
+
+`5d` is a 390px phone and no approved artboard renders the Log at any other
+width. The desktop page is therefore this build's: the reading column is the 390
+column widened to a centred 720px measure inside the 1280 shell, the h1 goes
+32px → 40px and the lead 15px → 17px. Everything else is the artboard's — the
+pill, the h1, the lead, the 12px card stack, the entry geometry, the outlined
+chip, the white order tags and the ink card, in that order. Nothing is exposed
+in the margin, nothing is regrouped, and the IA is identical at both widths (the
+plan's own limit on desktop extrapolation: "must not redefine the IA"). One of
+the fifteen surfaces Phase 9 requires recorded here.
+
+## SL2. The vertical geometry is not the artboard's
+
+`5d` pads `70px 22px 60px` because the phone frame carries no site chrome. The
+root layout mounts the header above and the disclosure strip plus the footer
+below (§5.6), so the page takes 48px (desktop) / 28px (mobile) at the top and
+leaves more room at the foot. The horizontal gutter is the artboard's. Same
+deviation, same cause and same values as the other ship surfaces and every
+course screen.
+
+## SL3. Every log entry carries two mono lines the artboard does not draw
+
+dc.html:265-277 draws each entry as date · chip · title · body · order tags, and
+nothing else. The entries are `published` + `IMPLEMENTATION_PLACEHOLDER` —
+shipped build records, not Ben's words — so `renderPolicyFor` resolves them to
+`marked`, and §6.2 rule 2 makes the provenance label **and** the draft mark
+non-optional for that origin. So each card is followed by:
+
+```
+Implementation placeholder — not Ben's words
+draft · implementation placeholder · not Ben's words
+```
+
+Safe-direction under R9: adding a provenance marker an artboard omits is
+permitted and required; removing one is not. The same pair renders inside the
+ink `NEXT · CAPTAIN'S ROUND` card, in `--muted-on-dark`. **Not a Ben decision on
+whether to show them — they are required. What IS worth Ben's eye is that they
+say nearly the same thing twice**, and the second line opens with the word
+"draft" while the record's status is `published`: the draft mark is selected by
+ORIGIN, not by status (`requiresDraftMark()`), so a published record that is not
+Ben's words is marked "draft". That is a substrate string, shared with the whole
+course, and this page did not change it — see the build note for the same
+observation.
+
+## SL4. The marks sit under the card, not inside it
+
+`LogEntryCard` (Phase 4) renders its body as a `<p>` and exposes no provenance
+slot, so a mono line passed as its children would nest `<p>` inside `<p>`. The
+label and draft mark are therefore siblings of the card, 8px beneath it inside
+the same `<li>`. Visually the pair reads as one object; structurally it is a
+card plus two lines. The ink card has no such problem — `GatedText` is a child
+of `CardShell` there, so its marks are inside the slab. A `provenance` slot on
+`LogEntryCard` would make both cases identical, and that shared-component change
+is recorded in `docs/facelift-build-notes.md` rather than made in this phase.
+
+## SL5. A superseded Bridge position renders with no order tag and the default chip
+
+Q25's machinery is wired all the way through: `shipsLogTimeline()` merges
+`supersededPositionItems()` with the entries, and a superseded position is gated
+on the `"archive"` surface, which can return `marked` but never `canon`. Two
+consequences a reader should see:
+
+- **No order tag.** The item carries none, and the page authors nothing, so the
+  row has no `Order NN` pill where a written entry would. Tagging it would mean
+  typing a Standing Order reference that is not in the record.
+- **The chip is the site-wide default.** `BridgePosition` declares no
+  `approvedBy` / `approvedAt`, so there is no per-record stamp to read; the chip
+  renders `entryApprovalLabel()` with no argument. §6.6 asks for per-object
+  approval fields on content records, and this record type has none.
+
+`bridgePositions` is empty today, so this branch renders nothing at all. It is
+built because the Bridge's claim ("every earlier state lives in the Log") is
+made now, and the first supersession must not require a page change to honour it.
+
+## SL6. The h1 has a withheld branch that can never fire today
+
+`shipsLogIntro` is `published` + `BEN_APPROVED`, so its h1 resolves to `canon`
+and the words render alone. The page still routes it through the gate, and if
+the record's status ever changed the page would lose its `<h1>` rather than
+print a heading the gate had emptied. **A Log with no h1 is the intended alarm**,
+not a regression to fix by un-gating the heading. Recorded because a reader
+diffing the page against the artboard will find a branch the artboard has no
+counterpart for. (The sentence itself is Ben's first person and is escalated at
+SHC2; this build did not write it.)
+
+---
+
+# Phase 9 (page) — Captain's Quarters (`/ben`, artboard `5d`)
+
+`5d` draws this screen at 390px and the handoff README lists its copy as
+approved. Nothing approved was reworded and nothing was added to the page that
+`content/ship/quarters.ts` does not define. What follows is every place the
+built page differs from the artboard, plus the four blocks that are empty by
+rule.
+
+## BQ1. Ben's own material here is four empty slots, and one of them is the page
+
+The portrait, the 60-second recording and Selected history are labelled slots
+(`slot-portrait-quarters`, `slot-hear-ben-60s`,
+`slot-quarters-selected-history`), and the Studio tile has no target. So the
+page **about Ben** carries no sentence about Ben that this build wrote: the one
+paragraph on it is the artboard's own sentence about how the page is populated.
+That is R10 and §6.4 working as specified — `MediaSlot`, `AudioSlotPill` and
+`BenSlot` have no prose-bearing prop — but it is worth Ben seeing what the
+surface looks like in that state before launch. Nothing here can be filled by
+this build; every one of the four needs Ben.
+
+## BQ2. The portrait carries a pill AND a mono line; the artboard has one mono line
+
+`5d` puts a single 11px mono line ("portrait — Ben-supplied") at the top-left of
+the stripe. `MediaSlot` — the shared primitive, and the only thing permitted to
+draw a media placeholder — renders the slot's label in a white overlay pill and
+its awaited-asset descriptor as a mono line beneath. Two ways to reconcile that:
+
+- restyle the pill to look like the artboard's mono line, which puts the IBM
+  Plex Mono face outside `ProvenanceMono`, the one component §4.8 permits it to;
+- keep the primitive's treatment and move its mono line to the top-left, under
+  the pill.
+
+The second was taken. On screen: a small white "portrait — Ben-supplied" pill,
+"300px Captain's Quarters hero" in mono under it, the name reversed out
+bottom-left. **A visual deviation from the artboard, in the safe direction — it
+adds a provenance marker rather than removing one (R9) — but it is a deviation
+and it is the most visible one on the page.**
+
+## BQ3. The 26px portrait radius is restored with an element selector
+
+`MediaSlot` paints `--radius-card-lg` (22px); `5d` draws the portrait at 26px,
+which is `--radius-portrait-lg` — a different radius family that §4.2 keeps
+deliberately un-normalised. The page re-points it with a rule scoped to
+`.portrait`, because the primitive exposes no class hook and takes no children
+by rule. **Request recorded for the gate: a `variant="portrait"` or `radius`
+prop on `MediaSlot`.**
+
+## BQ4. The eyebrow over the stripe is a local class, not the shared primitive
+
+`SectionEyebrow` paints `--accent-text-on-tint`, which is unreadable on ink;
+`5d` uses `--accent-on-dark` (#7FC8D6) for "CAPTAIN'S QUARTERS". The page uses a
+local `.eyebrowOnInk` rather than widening a shared primitive from a route file
+— identical to DM11 on the Data page, and the same standing request for a `tone`
+prop.
+
+## BQ5. The intro renders at the artboard's 15px, through a structural selector
+
+The shared `GatedText` body is 16px/1.45 ink; `5d`'s intro is 15px/1.5
+`--body`. The page restores the artboard measure with `.intro > p:first-child`,
+which can only ever reach the gated body element — never the 11px mono line a
+`marked` or `blocked` record would render beside it, which must keep the
+provenance voice at whatever measure the screen uses. **NEW as a technique on
+this route; the underlying request (a size variant on `GatedText`) is already
+recorded by Progress and Data.**
+
+## BQ6. Selected history: the artboard's line is passed as the awaited-asset descriptor
+
+`5d`'s dashed card is a bold teal "Selected history" and one sentence. `BenSlot`
+draws exactly that shape, so the heading is the slot's label (the record derives
+it, so the card and the slot cannot be named two different things) and the
+sentence is `quartersHistoryNote.body`, which describes what is awaited and
+states the packet's selection rule. **The card is still an unfillable slot** —
+the component has no `children`, `text` or `body` prop — and the sentence is
+gated first: unless the record resolves to `canon`, the slot falls back to its
+own build-language descriptor rather than printing unlabelled prose inside a Ben
+slot. The rejected alternative was to render the slot descriptor and the note as
+two lines, which puts two near-identical sentences on screen.
+
+## BQ7. Desktop is extrapolated
+
+`5d` draws `/ben` at 390px only; it is one of the ten surfaces with a mobile
+artboard and no 1280 rendering. The page takes the same centred 720px reading
+column every course screen uses, keeps the artboard's 2-column tile grid (six
+tiles fall into 2 × 3 at both widths), and exposes **no** new information in the
+margin. The portrait keeps its reserved 300px height and the name its 34px
+setting at both widths. The IA is not redefined. **Unapproved, like the other
+fourteen desktop extrapolations.**
+
+## BQ8. Vertical geometry moves, because the page is not alone on the screen
+
+`5d` is `padding: 70px 22px 60px` with no site header, footer or disclosure
+strip. Plan §5.6 mounts all three on every route, so the page takes 48px of top
+padding (28px at ≤700px) and the artboard's own top figure is not reproduced.
+Same reason, same direction and already flagged under Q9 for every course
+screen; recorded here so `/ben` is not read as an exception.
+
+## BQ9. The tab title stays "Ben" while the page is headed "Ben Chan"
+
+`metadata.title` is unchanged from the Phase 5 stub ("Ben - BenChanTech"),
+because `shipNav` labels this node "Ben" and a renamed title would be a renamed
+surface. The h1 is the name the artboard reverses out over the portrait. The
+artboard's own eyebrow supplies the third name for the same node — "CAPTAIN'S
+QUARTERS" — which is the surface's name in the packet and in this plan. Three
+labels, one node: **flagged rather than collapsed**, since collapsing them means
+either renaming a nav link or editing approved artboard copy.
+
+---
+
+# Phase 9 (gate) — the machine surfaces, and the roster of fifteen
+
+## GT1. The fifteen desktop extrapolations, in one place
+
+The plan requires every one of the fifteen surfaces with no 1280 rendering to be
+listed here. They were recorded by the builder of each surface, which is the
+right place for the reasoning and the wrong place to count them. The roster:
+
+| # | Surface | Artboard at 390 | Artboard at 1280 | Recorded at |
+|---|---|---|---|---|
+| 1 | Lesson Zero (`/watch-your-step/start`) | `5a` | none | LZ10 |
+| 2 | Today | `5b` | none | Phase 7 (Today view), §T |
+| 3 | Plan | `5b` | none | Phase 7 (Plan view), §P |
+| 4 | Progress | `5b` | none | Phase 7 (Progress view), §R |
+| 5 | Practice | `5c` | none | R9 |
+| 6 | Data | `5c` | none | DM12 |
+| 7 | Bridge | `5d` | none (`2d` is a superseded register) | BR1 |
+| 8 | Standing Orders | `5d` | none | SO1 |
+| 9 | Ship's Log | `5d` | none | SL1 |
+| 10 | Captain's Quarters (`/ben`) | `5d` | none | BQ7 |
+| 11 | `/watch-your-step` landing | `4a` phone | none | **NOT YET — the surface is still a Phase 5 stub. See GT7.** |
+| 12 | `/crew` | none at any width | none | CRW1, CRW4 |
+| 13 | `/watch-your-step/stop/[stopId]` | none | none | Phase 7 (shell), §I |
+| 14 | `/watch-your-step/end` | none | none | G4 |
+| 15 | `/not-found` | — | none | A (whole layers), and unchanged since Phase 5 |
+
+Fourteen of the fifteen are drawn and recorded. Row 11 is the one the plan calls
+"the highest-stakes one in the set", and it cannot be extrapolated to desktop
+because it has not been built at either width.
+
+## GT2. Four machine surfaces exist that no artboard draws, and no artboard could
+
+`/sitemap.xml`, `/robots.txt`, `/llms.txt` and `/author-ship/state.json` are NEW
+in full. They are not visual, so there is nothing to compare them to and nothing
+for Ben to look at — but they publish text to the open web with no visual
+review, which is why the gate added `tests/machine-surfaces.test.ts` rather than
+leaving them to inspection. What they say is derived, never authored: every URL
+comes from `content/canonical-surfaces.ts`, every governance line from
+`lib/approval-state.ts`, every claim from `content/claims.ts`, and the agent
+bootstrap from `content/ship/agent-bootstrap.ts`.
+
+## GT3. `state.json` states no mission, because the site has not stated one
+
+The packet's key set opens with `mission`. No canonical record holds one: the
+`/watch-your-step` landing is the human node that will own it (Q3) and that
+surface is still a stub. Writing a mission sentence into a JSON file would be
+this build authoring the site's purpose in a place nobody reviews — the exact
+inversion of R10. So the key renders as an `awaiting` descriptor with a pointer
+to the human node, and the JSON says so in band. **When the landing is built,
+the mission belongs on that page first and in this file second.**
+
+## GT4. `resolved_decisions` renders the Ship's Log, and `deprecated_assumptions` is empty
+
+There is no separate decision register in this repo, and creating one would be a
+second canonical node for something the Ship's Log already is. So
+`resolved_decisions` renders the Log's entries with their order tags and their
+approval chips — which are all "approval pending", so a machine reader is told
+that nothing in the list is stamped.
+
+`deprecated_assumptions` renders superseded Bridge positions through the Q25
+machinery and is `[]`, because nothing has been superseded yet. Empty and true,
+not empty and unimplemented — the same list fills the moment
+`supersedePosition()` is used.
+
+## GT5. Two keys are additions to the packet's list
+
+`claims` and `agent_bootstrap`. The first is required by the plan's own
+instruction that `state.json`'s claim strings come from `content/claims.ts` and
+are never hand-typed; there is no key in the packet's set that would hold them.
+The second is there so an agent that fetches only this file still reads the
+instruction that stops it treating a superseded decision as current. Both are
+additive, both are derived, and both are named here so the divergence from the
+packet's key set is Ben's to accept or drop.
+
+## GT6. The sitemap carries no `lastModified`, `priority` or `changeFrequency`
+
+All three are optional, and all three would be assertions this build cannot
+support: there is no per-page modification record, so any date would be
+generated. On a site whose subject is provenance, an invented freshness date is
+the worst kind of small lie. The sitemap carries URLs and nothing else.
+
+`/robots.txt` adds no `disallow` rule for the same reason — every rule it could
+add would describe a surface that does not exist.
+
+## GT7. `/watch-your-step` is still a Phase 5 stub — and it is the canonical owner of the pitch
+
+Not a Phase 9 deviation; a Phase 7 task that did not land (plan Phase 7,
+"Landing: centred hero, mobile demo card, dark instructor pill…"). It matters
+here because Phase 9's surfaces point at it: the nav's first item, the sitemap,
+`llms.txt` and `state.json`'s `mission` key all name `/watch-your-step` as a
+canonical node, and today that URL renders "in build". Nothing is dead and
+nothing claims otherwise, but the highest-traffic entry in the ship nav is a
+placeholder. **Flagged for the next phase, not patched here** — writing the
+landing at the gate would be writing the pitch, which is exactly the copy R10
+reserves.
+
+## GT8. Three headings in `llms.txt` are authored group names
+
+"The Author Ship", "Watch Your Step", "Ecosystem and infrastructure", "Legal and
+disclosure", "Machine mirrors", "Home". They are markdown headings over lists of
+links the site already names, not claims, and they are pinned in
+`content/canonical-surfaces.ts` so a group cannot end up with two names. Listed
+because they are strings this build wrote and nobody approved.
+
+## GT9. `AGENTS.md` gains a section
+
+The four-sentence bootstrap, quoted, plus four pointers to where the things it
+names actually live. `AGENTS.md` is a repo file rather than a public surface, so
+this is a build-facing addition — but it is copy, it was added by this build,
+and `tests/machine-surfaces.test.ts` binds it to
+`content/ship/agent-bootstrap.ts` so the two can never disagree.

@@ -9,11 +9,12 @@
  * describes, where an unregistered module escapes every check silently.
  */
 
+import { agentBootstrap } from "./agent-bootstrap";
 import { bridgeRecords } from "./bridge";
-import { crewManifest } from "./crew-manifest";
+import { crewIntro, crewManifest } from "./crew-manifest";
 import { quartersRecords } from "./quarters";
-import { captainsRoundNote, shipsLogEntries } from "./ships-log";
-import { standingOrders } from "./standing-orders";
+import { captainsRoundNote, shipsLogEntries, shipsLogIntro } from "./ships-log";
+import { standingOrders, standingOrdersIntro } from "./standing-orders";
 
 export interface ShipGovernedObject {
   id: string;
@@ -32,11 +33,21 @@ export interface ShipRegistryGroup {
 }
 
 export const shipRegistry: readonly ShipRegistryGroup[] = [
-  { module: "content/ship/standing-orders.ts", records: standingOrders },
-  { module: "content/ship/ships-log.ts", records: [...shipsLogEntries, captainsRoundNote] },
+  { module: "content/ship/standing-orders.ts", records: [standingOrdersIntro, ...standingOrders] },
+  {
+    module: "content/ship/ships-log.ts",
+    records: [shipsLogIntro, ...shipsLogEntries, captainsRoundNote]
+  },
   { module: "content/ship/bridge.ts", records: bridgeRecords },
-  { module: "content/ship/crew-manifest.ts", records: crewManifest },
-  { module: "content/ship/quarters.ts", records: quartersRecords }
+  { module: "content/ship/crew-manifest.ts", records: [crewIntro, ...crewManifest] },
+  { module: "content/ship/quarters.ts", records: quartersRecords },
+  /**
+   * The agent bootstrap is a governance object like any other: it carries
+   * status, origin and its source reference, and it is registered here so the
+   * eight checks in `tests/canonical-text.test.ts` see it. An unregistered
+   * module escapes all of them silently (docs/facelift-build-notes.md §7.5).
+   */
+  { module: "content/ship/agent-bootstrap.ts", records: [agentBootstrap] }
 ];
 
 export const shipContentObjects: readonly ShipGovernedObject[] = shipRegistry.flatMap(

@@ -1,0 +1,165 @@
+/* ==========================================================================
+   The Ship's Log (mockup `5d`, dc.html:255-283).
+
+   Scoped to this route. `Pill`, `CardShell`, `LogEntryCard`, `GatedText`,
+   `ProvenanceMarks` and `ProvenanceMono` carry the chip, the ink card, the
+   entry geometry and every provenance line, so none of that is restated here.
+   What this file carries is the four things the shared set has no primitive
+   for: the page's reading column, the 12px append-only stack, the ink card's
+   eyebrow, and the withheld-entry row that no artboard draws because under the
+   approved data no entry is withheld.
+
+   DESKTOP IS AN EXTRAPOLATION (plan Phase 9, "Desktop extrapolation for
+   fifteen surfaces"). The artboard exists only at 390. The reading column is
+   widened inside the 1280 shell and the type steps up; the IA is untouched —
+   same order, same objects, nothing moved to a margin. Recorded in
+   docs/facelift-unapproved.md by the desktop-extrapolation entry.
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------- */
+/* The reading column                                                         */
+/* -------------------------------------------------------------------------- */
+.page {
+  width: min(calc(100% - 2 * var(--gutter)), 720px);
+  margin-inline: auto;
+  padding-block: 48px 72px;
+}
+
+.pillRow {
+  margin: 0;
+}
+
+/* 5d: 600 32/1.1, -.025em, margin 16px 0 10px. Stepped up on desktop only. */
+.title {
+  margin: 16px 0 10px;
+  font: 600 40px / 1.08 var(--sans);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+/*
+ * The lead is `GatedText`, so its inner element is not this file's to name.
+ * `> p:first-child` is deliberate and not `p`: the body paragraph is the only
+ * direct-child `p` in the canon/marked state, while the BLOCKED state renders a
+ * wrapped mono label instead — and a bare descendant `p` would out-specify
+ * `.mono` and print a provenance label at body size, which is exactly the
+ * "provenance styled decoratively" failure (WYS §23).
+ */
+.lead {
+  margin: 0 0 20px;
+}
+
+.lead > p:first-child {
+  font: 400 17px / 1.5 var(--sans);
+  color: var(--body);
+}
+
+/* -------------------------------------------------------------------------- */
+/* The append-only stack (dc.html:264, gap 12)                               */
+/* -------------------------------------------------------------------------- */
+.timeline {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/*
+ * A record and its provenance are one item, not two.
+ *
+ * `LogEntryCard` has no provenance slot — its body is a `<p>`, so a mono line
+ * passed as its children would nest `<p>` inside `<p>` and the browser would
+ * close the card body early. The label and draft mark therefore sit directly
+ * beneath the card inside the same `<li>`, at the card's own left edge and 8px
+ * under it, so the pairing reads as one object. The request for a `provenance`
+ * slot on the shared component is recorded in docs/facelift-build-notes.md
+ * rather than made here.
+ */
+.item {
+  display: grid;
+  gap: 8px;
+  padding: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The withheld entry — no artboard draws it, and it must still be right      */
+/* -------------------------------------------------------------------------- */
+/*
+ * Reachable only if an entry's status or origin changes so that its prose may
+ * not render (§6.2). Today every entry is `published` +
+ * IMPLEMENTATION_PLACEHOLDER, which resolves to `marked`, so this renders for
+ * nothing. It exists because the alternative — passing a blocked record's title
+ * straight into the card — would publish the words the label says are missing.
+ * Same geometry as the card it stands in for, minus the prose.
+ */
+.withheld {
+  padding: 18px;
+  border-radius: var(--radius-card-lg);
+  background: var(--tint-grey);
+}
+
+.withheldMeta {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 8px;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* -------------------------------------------------------------------------- */
+/* The forward-looking ink card (dc.html:279-282)                             */
+/* -------------------------------------------------------------------------- */
+/*
+ * Outside the timeline and 12px under it — the artboard's own stack rhythm.
+ * Its provenance marks DO sit inside the card: `GatedText` is a child of
+ * `CardShell` here, so the body, the label and the draft mark share one ink
+ * slab.
+ */
+.note {
+  margin-top: 12px;
+}
+
+/*
+ * `SectionEyebrow` paints `--accent-text-on-tint`, which is correct on a tint
+ * and unreadable on ink; the artboard uses `--accent-on-dark` here. Rather than
+ * widen a shared primitive from a route file, the eyebrow is local — the same
+ * route `app/watch-your-step/(shell)/data` took, and the standing request for a
+ * `tone` prop on `SectionEyebrow` is recorded with it.
+ */
+.noteEyebrow {
+  margin: 0 0 6px;
+  color: var(--accent-on-dark);
+  font: 600 12px / 1.3 var(--sans);
+  letter-spacing: 0.04em;
+}
+
+/* Same `> p:first-child` reasoning as `.lead`: the mono label and the draft
+   mark under this body keep their own 11px register. */
+.noteBody > p:first-child {
+  font: 400 15px / 1.45 var(--sans);
+  color: var(--body-on-dark);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 700px — back to the artboard's own measurements                            */
+/* -------------------------------------------------------------------------- */
+@media (max-width: 700px) {
+  .page {
+    width: calc(100% - 2 * var(--gutter));
+    padding-block: 28px 56px;
+  }
+
+  .title {
+    font-size: 32px;
+    line-height: 1.1;
+  }
+
+  .lead > p:first-child {
+    font-size: 15px;
+  }
+}

@@ -2627,3 +2627,704 @@ and three. Anything asserting a length, or diffing the panels, sees it.
 **3 · The `no-measurement-id` card-2 branch is unchanged in kind.** A later
 phase that diffs prerendered HTML between builds must hold
 `NEXT_PUBLIC_GA_MEASUREMENT_ID` constant across both sides.
+
+---
+
+# Phase 9 (content) — the ship and governance objects
+
+Phase 6 built the first pass of `content/ship/*`. This phase finished it against
+the Phase 9 task table: the page-level records the five surfaces need, the Q25
+supersession machinery wired all the way through to the Log, and the checks that
+keep every governance string reading from `lib/approval-state.ts`.
+
+## What shipped
+
+| File | What was added |
+|---|---|
+| `content/ship/standing-orders.ts` | `standingOrdersIntro` + `standingOrdersIntroLine()` — the `5d` h1 and the keel citation, name and URL read from `approvalState.keel`, `citesHash: false` |
+| `content/ship/ships-log.ts` | `shipsLogIntro` (with `firstPerson`), `formatLogDate()`, `supersededPositionItems()`, `shipsLogTimeline()` |
+| `content/ship/bridge.ts` | `bridgeSectionLabels`, `BRIDGE_POSITION_SLOT_ID`, `currentBridgePosition()` |
+| `content/ship/crew-manifest.ts` | `crewIntro` (NEW copy, `orderTags: ["order-06"]`), `CREW_ROLE_LABELS`, `crewByRole()` |
+| `content/ship/quarters.ts` | `QUARTERS_SLOT_IDS`, `quartersSlots`, the three named slot accessors, `quartersGridLabel` |
+| `content/ship/index.ts` | the three new header records registered — an unregistered record escapes every governance check (§7.5) |
+| `content/source-refs.ts` | `packet-historical-machine-readable`, cited by the supersession machinery |
+| `tests/ship-content.test.ts` | 16 assertions specific to these five surfaces |
+
+## Decisions this phase made, with reasons
+
+**1 · The pills that are approval state are NOT in content.** `standingOrdersIntro`
+deliberately carries no pill: "Standing Orders · draft" renders from
+`standingOrdersPill()`, and the Log's chip from `entryApprovalLabel()`. A new test
+greps every module in `content/ship/` (comments stripped) for `Not yet stamped`,
+`approval pending`, `Standing Orders · draft` and `captain's round:` and fails on
+a typed copy — the content-side twin of `tests/governance-strings.test.ts`, which
+only scans `app/` and `components/`. `NEXT · CAPTAIN'S ROUND` is exempt by
+construction: the check matches the state form `captain's round:` with its colon,
+because the ink card is artboard copy and the state line is data.
+
+**2 · The keel sentence is three fields, not one string.** "Derived from " +
+`approvalState.keel.name` + ". This site cites it; it doesn't rewrite it." The
+artboard paints the middle third teal, and it is the third that is governance
+state — splitting it is what lets the page style it and lets one typed value move
+it. It also keeps `canonical-text.test.ts`'s "no content object cites a keel
+version other than the recorded one" satisfiable by construction: no ship module
+types a version numeral at all.
+
+**3 · `supersededPositionItems()` throws on a malformed record.** A `historical`
+position missing `supersededBy` / `canonical: false` is blocked by
+`renderPolicyFor` anyway — but blocking it silently would drop it from the Log,
+which is precisely the state the Bridge intro claims lives there. The Q25
+machinery only makes the sentence true if the failure is loud.
+
+**4 · The Log's superseded items are presentations, not second nodes.** A
+`SupersededPositionItem` carries a derived id (`log-superseded-<positionId>`) and
+is NOT registered in `shipRegistry` — the record it wraps is already registered
+through `bridgeRecords`. Registering both would be two canonical nodes for one
+concept, which check 5 exists to catch.
+
+**5 · `formatLogDate()` parses the ISO string instead of building a `Date`.**
+`new Date("2026-09-03")` is UTC midnight; a renderer west of Greenwich prints
+"2 Sep 2026". A log date that moves with the machine is a rewritten record
+(Standing Order 08).
+
+**6 · The Crew Manifest header is `IMPLEMENTATION_PLACEHOLDER`, like its rows.**
+No artboard approved it, so it renders `marked` with
+"Implementation placeholder — not Ben's words" and its default draft mark. H4's
+open presentation question — one mark per record or one per section — is still
+the page's to answer; nothing here changed an origin to make the page quieter.
+
+## What the page half needs from this half
+
+- **Bridge:** `bridgeIntro`, `bridgeSectionLabels`, `bridgeWorkItems`,
+  `bridgeExperiment`, `bridgeOpenQuestions`, `BRIDGE_POSITION_SLOT_ID`,
+  `currentBridgePosition()`, and `bridgeStateLines()` from `lib/approval-state.ts`
+  for the mono footer.
+- **Standing Orders:** `standingOrdersPill()` for the pill, `standingOrdersIntro`
+  for the h1 and the keel citation (link it with `keelHref`), `standingOrders`
+  for the nine cards — `emphasis` is `"ink"` on 01 and `"grey"` on 02–09, as data.
+- **Ship's Log:** `shipsLogIntro`, `shipsLogTimeline()` for the cards (render a
+  `superseded-position` item through `renderPolicyFor(..., "archive")`),
+  `formatLogDate()` for the date, `entryApprovalLabel(entry)` for the chip,
+  `standingOrderTag(id)` for the order pills, and `captainsRoundNote` as a
+  separate ink card that is not an entry.
+- **Crew:** `crewIntro`, `crewByRole("build" | "runtime")`, `CREW_ROLE_LABELS`,
+  `CREW_FIELD_LABELS` for the five row labels in the packet's order.
+- **Ben:** `quartersIntro`, `quartersPortraitSlot`, `quartersAudioSlot`,
+  `quartersGridLabel`, `quartersTiles` (six; `href: null` renders as text, not a
+  link), `quartersHistoryNote` + `quartersHistorySlot`.
+- **`/author-ship/state.json`:** `standing_orders_version` is
+  `approvalState.standingOrders.version`; `open_questions` are
+  `bridgeOpenQuestions`; `last_captains_round` and `last_approved_snapshot` are
+  `approvalState.lastCaptainsRound` / `latestSnapshot` (both null); claim strings
+  come from `content/claims.ts` `machine` variants, never re-typed here.
+
+## Hazards this phase creates for later phases
+
+- **A new record in `content/ship/` must be added to `shipRegistry`.** The
+  registry group for a module is now sometimes a composed array
+  (`[intro, ...records]`); adding an export without adding it there compiles,
+  ships, and escapes all eight build checks silently.
+- **A second first-person string in `content/ship/` fails the suite.**
+  `tests/ship-content.test.ts` exempts exactly one literal — the `5d` Log h1. That
+  is deliberate: R10's rule is now enforced rather than remembered.
+- **`shipsLogTimeline()` throws if a Bridge position is malformed.** A page that
+  calls it at module scope will fail the build rather than render a short Log.
+  That is the intended direction.
+- **`crewIntro.orderTags` is checked by the same test as the Log's tags.**
+  Renumbering a Standing Order breaks the Crew Manifest, not only the Log.
+
+---
+
+# Phase 9 (page half) — `/standing-orders`
+
+`app/standing-orders/page.tsx` (replacing the Phase 5 stub) and
+`app/standing-orders/standing-orders.module.css`. Nothing else was written or
+edited: the content half's records were read and imported, not changed.
+
+## What it renders, and where each string comes from
+
+| On screen | Source | Never typed in `app/` |
+|---|---|---|
+| grey pill | `standingOrdersPill()` | the literal it produces is banned from `app/` by `tests/governance-strings.test.ts` |
+| h1 | `standingOrdersIntro.title` | — |
+| keel sentence | `standingOrdersIntro.derivedFrom` — three fields, the middle one `approvalState.keel.name` | the keel's name, version and URL |
+| keel link target | `standingOrdersIntro.keelHref` (= `approvalState.keel.url`) | — |
+| nine cards | `standingOrders`, through `NumberedOrderCard` / `OrderList` | every order title and the 01 gloss |
+| ink vs grey fill | `order.emphasis`, as data | — |
+| digest | nothing renders; `citesHash` is `false` | no v2.3 hash is printed |
+
+`emphasis` and `gloss` are read as fields, so an order can change fill or gain a
+gloss with no component edit (WYS §35). `standingOrders` is widened through
+`StandingOrder` before the map, the way the Progress screen widens `wysWeeks`:
+the `as const` tuple is a union whose members have different shapes, so `gloss`
+does not exist on it.
+
+## The one thing that failed at the gate, and was NOT fixed here
+
+`tests/class-contract.test.ts` mode 2 asserts a TOTAL number of CSS-Module
+imports across `app/` and `components/` — "update deliberately", re-measured at
+the gate, never averaged. This page adds **exactly one**: `page.tsx` imports
+`app/standing-orders/standing-orders.module.css`, so the figure moves 51 → 52
+for this page alone.
+
+**The bump was not made here on purpose.** Four ship pages are being built
+against the same working tree in this phase, and each adds its own module import
+to the same single assertion; four independent edits to one line is precisely the
+merge the file's own note warns about ("a merge that takes one builder's figure
+and drops another's will fail here rather than silently lose a stylesheet from
+coverage. Re-measure at the gate; do not average"). So: **+1 from
+`/standing-orders`. The gate re-measures and sets the total once, after all four
+pages land.** Until it does, `npm test` fails on that one assertion and on
+nothing else.
+
+## Decisions this half made, with reasons
+
+**1 · Every string passes `gateProse("general", record, …)` and is released only
+at `canon`.** §6.2's rule is that the renderer takes the object, not a string.
+All ten records here are `published` + `BEN_APPROVED`, so all ten resolve to
+`canon` today and render bare — canon material carries no label, which is why
+the page shows no provenance marks and matches the artboard exactly.
+
+**2 · A non-canon record throws instead of rendering marked or short.** The
+course screens render a withheld label in place of blocked prose; this page
+cannot. A page whose claim is "the rules this site runs on" that quietly renders
+eight of nine rules is false while looking complete, so a status change fails
+`next build`. Recorded as SO5 in `docs/facelift-unapproved.md`.
+
+**3 · The throw's message is deliberately short.** A double-quoted literal of
+twelve words or more in a `.tsx` is prose typed outside `content/`, and
+`tests/canonical-text.test.ts`'s no-raw-curriculum-prose check catches it — an
+error string is not exempt. The explanation lives in the doc comment, which the
+scanner strips.
+
+**4 · The hash branch is live and renders nothing.** See SO4. `citesHash` was
+typed as data by the content half rather than as a comment; a page that ignored
+it would make it decorative.
+
+**5 · No shared file was touched.** `NumberedOrderCard`, `OrderList`, `Pill` and
+`ProvenanceMono` already carry the artboard's geometry (16/18 padding, 18px
+radius, the ink lead card, the `--accent-on-dark` numeral, the grey nowrap pill),
+so the route stylesheet holds only the page shell, the header rhythm, the keel
+link and the desktop headline size. **No change request for a shared file.**
+
+## Hazards this half creates for later phases
+
+- **The mode-2 total is +1 and unapplied.** Whoever reconciles it must count all
+  four ship pages, not increment from the last one they saw.
+- **`/standing-orders` fails the build rather than degrading.** That is intended
+  (SO5). A later phase that flips a Standing Order's status to `draft` will find
+  out at `next build`, not in review.
+- **The page reads `standingOrdersIntro.derivedFrom` as three fields.** Merging
+  them back into one string in `content/ship/standing-orders.ts` would silently
+  drop the teal keel span and the link with it.
+
+# Phase 9 (the Bridge page) — `app/bridge/page.tsx`
+
+The `5d` Bridge, replacing the Phase 5 stub. Two files, both new to this phase:
+`app/bridge/page.tsx` and `app/bridge/bridge.module.css`. No content module was
+edited — every string on the page is imported from `content/ship/bridge.ts`,
+`content/watch-your-step/sources.ts` or `lib/approval-state.ts`.
+
+## How the page is assembled
+
+| Artboard element | What renders it |
+|---|---|
+| "The Bridge · current" pill | `Pill variant="status"` + `bridgeIntro.pill` |
+| h1 + lead | `bridgeIntro.title` / `.body`, the body through `gateProse` |
+| dashed teal position card | `BenSlot` + `wysBenSlotById(BRIDGE_POSITION_SLOT_ID)` |
+| WORKING ON rows | `KvList` / `KvRow variant="filled"` (already the artboard's 14/16 padding, radius 14, `--tint-grey`, muted value) |
+| EXPERIMENT UNDERWAY | `CardShell fill="ink"` + `bridgeExperiment` |
+| OPEN QUESTIONS rows | local `.question` — 12px/16px padding and no value half, so `.kvOutlined` is the wrong row |
+| mono state block | `bridgeStateLines()`, one `ProvenanceMono size="12"` per line |
+
+Every prose string passes through `gateProse("general", record, text)` and is
+released only when `renderPolicyFor` allows it. Today every Bridge record is
+`published` + `BEN_APPROVED`, so every gate is `canon`, `ProvenanceMarks`
+renders nothing, and the prerendered DOM is the artboard's. A row that ever
+resolved to `blocked` is dropped, not emptied; the intro throws instead, because
+a Bridge with no lead is not a shorter page, it is a different claim.
+
+## Shared-file changes this page NEEDS but did NOT make
+
+1. **`tests/class-contract.test.ts`, `modulesChecked`.** This page adds exactly
+   **one** CSS Module import (`app/bridge/page.tsx` → `./bridge.module.css`).
+   The figure is a TOTAL across `app/` and `components/` and four other Phase 9
+   surfaces are landing in parallel, so it is **re-measured at the gate**, never
+   incremented from one builder's count. Measured with the four peer routes at
+   their Phase 5 stubs and only this page landed: 51 → 52.
+2. **`SectionEyebrow` needs an `as` / heading prop.** The Bridge has three
+   sections under one h1 and `SectionEyebrow` renders a `<p>`, so the page
+   carries a local `.sectionHead` `<h2>` that repeats the primitive's mobile and
+   desktop ramps exactly. Same route `app/watch-your-step/(shell)/data` took for
+   its ink eyebrow: record the request rather than widen a shared primitive from
+   a route file. If the prop lands, this page deletes six lines of CSS.
+3. **`ProvenanceMarks` and `GatedText` live under `components/wys/`, but they
+   are provenance-generic.** The Bridge imports `components/wys/ProvenanceMarks`
+   — a ship page reaching into the course's directory. Nothing breaks and no
+   test forbids it, but the honest home for both is `components/provenance/`.
+   That is a **rename**, which the deletion contract does not allow on a
+   builder's own authority; a re-export from `components/provenance/` would add
+   a second name for one component and fails §6.8 for the same reason. Left as
+   is, recorded for Phase 12.
+4. **`GatedText` was NOT used for the lead.** Its `.gatedBody` is 16px/1.45 ink;
+   the `5d` lead is 15px/1.5 `--body`. The page therefore renders the gated text
+   in its own paragraph and follows it with `ProvenanceMarks`, which is the same
+   pair `GatedText` composes — the label stays inseparable from the body. A
+   `size`/`tone` variant on `GatedText` would remove the duplication; Progress
+   already asked for one.
+
+## Hazards
+
+- **The state block is the whole governance surface of this page.** Anything
+  added to `bridgeStateLines()` appears here with no edit, which is the point;
+  anything *typed* here would be caught by `tests/governance-strings.test.ts`,
+  which greps this file for the five literals including its comments. Do not
+  write those literals into a comment in `app/bridge/page.tsx`.
+- **Every string ≥ 12 words in this file fails `no-raw-curriculum-prose`** —
+  including a `throw` message. The intro's throw is deliberately nine words.
+- **A blocked Bridge row disappears silently.** That is `renderPolicyFor`'s
+  rule, not a rendering choice, but it means a status change in
+  `content/ship/bridge.ts` shortens the page without failing a test. The intro
+  is the only record whose loss is loud.
+
+## Observed while building — NOT this page's to fix
+
+`npx tsc --noEmit` and `PORT=3999 npm run build` both fail on a **peer's**
+in-flight Phase 9 file, `app/ships-log/page.tsx:153`:
+`entryApprovalLabel(item.position)` — `BridgePosition` has no
+`approvedAt`/`approvedBy`, so it shares no properties with the parameter type.
+`/bridge` was verified against a clean tree instead: an isolated copy with the
+four peer ship routes reset to their Phase 5 stubs builds all 36 routes and
+prints `○ /bridge` (static), and the prerendered `bridge.html` carries the `5d`
+copy in the artboard's order with all six state lines. `npm test` passes 455
+with the only failures in `tests/class-contract.test.ts` — the module-count
+total above and a peer's not-yet-written `app/crew/crew.module.css`.
+
+---
+
+# Phase 9 (page half) — Captain's Quarters, `/ben`
+
+`app/ben/page.tsx` (replacing the Phase 5 stub) and `app/ben/ben.module.css`.
+Nothing else was written or edited: the content half's records in
+`content/ship/quarters.ts` were read and imported, never changed.
+
+## What it renders, and where each string comes from
+
+| On screen | Source | Never typed in `app/` |
+|---|---|---|
+| portrait stripe, its overlay label and its mono line | `quartersPortraitSlot` (= `slot-portrait-quarters`), through `MediaSlot` | both strings, and the reserved 300px height |
+| "CAPTAIN'S QUARTERS" eyebrow | `quartersIntro.eyebrow` | — |
+| h1 "Ben Chan" | `quartersIntro.name` | — |
+| intro paragraph | `quartersIntro.body`, through `gateProse("general", …)` + `GatedText` | the sentence, and its policy |
+| "Hear Ben, 60 seconds" pill | `quartersAudioSlot` (= `slot-hear-ben-60s`), through `AudioSlotPill` | both lines |
+| "WORK & PROPERTIES" | `quartersGridLabel` | — |
+| six tiles | `quartersTiles`, through `GridTile` / `GridTiles` | every label, every sub-line, every href |
+| "v2.3 · the keel" | `quartersTiles[0].subLabel`, whose version half is `approvalState.keel.version` | the version numeral |
+| the tint-teal current tile | `tile.current`, as data | — |
+| the Studio tile's missing target | `tile.href === null` → a `div`, not an `a` (Q5) | — |
+| Selected history card | `quartersHistoryNote.heading` + `.body`, through `BenSlot` | the heading and the line |
+
+`quartersTiles` is widened through `QuartersTile` before the map, the way
+`/standing-orders` widens `standingOrders` and Progress widens `wysWeeks`: the
+`as const` tuple is a union whose members have different shapes, so `current`
+does not exist on it.
+
+## Decisions this half made, with reasons
+
+**1 · The Selected history line is passed as the slot's awaited-asset
+descriptor, and only as canon.** `5d` draws ONE dashed teal card: a bold teal
+"Selected history" and a sentence describing what will fill it. `BenSlot` draws
+exactly that shape — teal label, muted line — and `quartersHistoryNote.body` is
+a statement of what is awaited plus the packet's selection rule ("nothing
+inferred or pulled in automatically"), which is what an awaited-asset descriptor
+is for. The alternative was to render the slot's own build-language descriptor
+AND the note beneath it, which puts two near-identical sentences on screen and
+is the drift §6.8 exists to prevent. The card is still an unfillable slot: the
+component has no `children`, `text` or `body` prop, so nothing generated can
+reach it. The line is gated first and the page falls back to the slot's own
+descriptor unless the record resolves to `canon` — an unlabelled sentence inside
+a Ben slot is the one failure this card must not have.
+
+**2 · The portrait keeps `MediaSlot`'s treatment and moves its mono line.** The
+artboard draws one 11px mono line top-left and no pill; `MediaSlot` draws the
+slot label in a white overlay pill and the awaited descriptor as a mono line.
+Making the pill LOOK like the artboard's mono line would put the mono face
+outside `ProvenanceMono`, which §4.8 makes the only component permitted it, so
+the pill stays a pill and the mono line moves under it. Recorded as a visual
+deviation (BQ2).
+
+**3 · The h1 is the name, and the tab title stays "Ben".** `metadata.title` is
+unchanged from the Phase 5 stub — `shipNav` labels this node "Ben", so the tab
+and the nav agree, and nothing was renamed. The h1 is `quartersIntro.name`: a
+proper noun is not a claim, and it is the only heading on the page.
+
+## Requests for the gate — shared files this half did NOT edit
+
+1. **`tests/class-contract.test.ts`, `modulesChecked`.** This page adds exactly
+   **one** CSS Module import (`app/ben/page.tsx` → `./ben.module.css`). The
+   figure is a TOTAL and all five Phase 9 ship pages landed in parallel, so it is
+   re-measured at the gate, never incremented from one builder's count.
+   **Measured with all five present: 51 → 56.** Every other assertion in that
+   file passes, including mode 2's per-key resolution for `ben.module.css`.
+2. **`SectionEyebrow` needs a `tone` prop.** The portrait eyebrow is reversed out
+   on an ink stripe, where the primitive's `--accent-text-on-tint` is unreadable
+   and `5d` uses `--accent-on-dark`. The page carries a local `.eyebrowOnInk`
+   instead — the same trade `app/watch-your-step/(shell)/data` made (DM11) and
+   the same request. If the prop lands, this page deletes seven lines of CSS.
+3. **`GatedText` needs a measure/size variant.** `.gatedBody` is 16px/1.45 ink;
+   the `5d` intro is 15px/1.5 `--body`. Rather than add a third local prose
+   renderer (`DataText`, `GatedLine`) from a page that is scoped to two files,
+   the module carries `.intro > p:first-child` — a rule that can only reach
+   `GatedText`'s body element and never the 11px mono a marked or blocked record
+   would render beside it. Progress and Data have both asked for this variant.
+4. **`MediaSlot` exposes no class hook and no radius family.** Placing its mono
+   line and giving it the artboard's 26px portrait radius (it paints the 22px
+   card radius) needs two element selectors scoped to `.portrait`. A
+   `variant="portrait"` or a `radius` prop would remove both. Same precedent as
+   `today.module.css`'s `.watchMedia p`.
+
+## Hazards this half creates for later phases
+
+- **Do not type the five governance literals into `app/ben/page.tsx`, comments
+  included.** `tests/governance-strings.test.ts` greps the raw source. This page
+  renders no approval state directly — the keel version reaches it inside
+  `quartersTiles[0].subLabel` — so there is nothing here that a builder should
+  be tempted to spell out.
+- **Every string ≥ 12 words in this file fails `no-raw-curriculum-prose`,
+  including a `throw` message.** The portrait's guard message is deliberately
+  seven words.
+- **`metadata` must not gain a `description`.** `tests/preserved-surfaces.test.ts`
+  greps this file for that key by regex over the whole source, comments
+  included, for all seven new routes.
+- **The portrait's reserved geometry comes from the slot record.** `medium` and
+  `height` are optional on `WysBenSlot`, so the page throws at build if
+  `slot-portrait-quarters` loses either. Changing that record's height changes
+  this page's layout, which is the intended direction — reserved geometry is
+  part of what the slot promises Ben.
+
+# Phase 9 (page) — the Crew Manifest (`/crew`)
+
+The page half of Phase 9's Crew Manifest row. `app/crew/page.tsx` replaces the
+Phase 5 stub; `app/crew/crew.module.css` is its only stylesheet. No other file
+was touched — the four shared-file changes this surface wanted are requests
+below, not edits.
+
+## What shipped
+
+| File | What it is |
+|---|---|
+| `app/crew/page.tsx` | server component; header record + two role sections + five crew cards |
+| `app/crew/crew.module.css` | page column, header block, role heading, the five-field definition list |
+
+The page types **no copy and no governance string**. `crewIntro`,
+`CREW_ROLE_LABELS`, `CREW_FIELD_LABELS`, `crewByRole()` and `standingOrderTag()`
+supply every word on screen; `CardShell`, `Pill`, `GatedText`, `ProvenanceMarks`
+and `ProvenanceMono` supply every primitive. `metadata` is title-only plus
+`alternates.canonical: "/crew"`, matching §5.2's pinned convention and the stub
+it replaces.
+
+## Decisions this half made, with reasons
+
+**1 · One gate per record, read once, at the top of the card.** The five packet
+fields are four plain `readonly string[]`s plus `does`. Gating only `does` and
+printing the rest underneath would publish the prose the label said was withheld
+— the leak `withoutBlockedProse` closes for `GatedContent` and cannot close for
+a bare array. So `gateProse("general", member, member.does)` is read once and
+the card renders all of it (marked) or the label alone (blocked).
+
+**2 · The provenance mark is per record, not per section.** Answers the question
+Phase 9 (content) decision 6 left open. Five cards, five marks, plus the
+header's. Rationale and the reason not to collapse it are recorded in
+docs/facelift-unapproved.md CRW2.
+
+**3 · The header throws rather than degrades.** Pill, h1 and intro are one
+record; a title rendered over a withheld body is a worse surface than a failed
+build. Same direction as the Data page and `shipsLogTimeline()`.
+
+**4 · The order tag is a pill, not a link** (CRW3). One presentation for one
+referenced order across the Log and the manifest, and no 44px touch target owed
+by a 12px chip.
+
+## Shared-file changes this surface wanted and did NOT make
+
+- **`content/ship/crew-manifest.ts` — key `CREW_FIELD_LABELS` by field name.**
+  It is an ordered `readonly string[]`, so the page zips it positionally against
+  `[does, canAccess, cannotAccess, hasAuthorityTo, hasNoAuthorityTo]`. A
+  reordering of one list and not the other would mislabel a disclosure row. The
+  page guards the length and throws, which catches a resize but not a reorder.
+  A `Record<keyof-ish, string>` would make both impossible.
+- **`components/ui/SectionEyebrow.tsx` — a heading level.** It renders a `<p>`.
+  A page of sections needs `<h2>`s for `aria-labelledby` and for a screen
+  reader's heading list, so `/crew` carries `.sectionHeading` locally in the
+  eyebrow register (CRW5). Second request for this primitive after the Data
+  page's tone request (DM11).
+- **`components/wys/GatedText.tsx` — a size/tone variant.** `.gatedBody` is
+  16px/`--ink`; the `5d` intro register is 15px/`--body`. The page accepts the
+  shared 16px rather than overriding a primitive's type from a route file. Third
+  request after Progress's.
+- **`tests/class-contract.test.ts` — mode 2's module count.** `/crew` adds
+  exactly ONE CSS-module import. The pinned total (51) predates Phase 8/9, and
+  the Bridge, Standing Orders, Ship's Log and Captain's Quarters pages each add
+  their own in parallel with this one, so the number must be **re-measured at
+  the phase gate, not incremented** — the merge note already in that file. At
+  the time of writing the suite reports 55 against a pinned 51, and every one of
+  the four extra imports is a Phase 9 page stylesheet.
+
+## Hazards this half creates
+
+- **A sixth crew member appears with no page edit.** The two sections render
+  `crewByRole()`, so a new record lands in the right group automatically — and a
+  record with a `role` value that is neither `build` nor `runtime` would render
+  nowhere at all. The type prevents it today; a widened union would not.
+- **Changing a crew record's `status` to `draft` empties its card**, leaving the
+  provenance label alone, rather than dropping the row. That is deliberate: a
+  manifest that silently loses a system is worse than one that says a system's
+  description is withheld.
+- **The page has no Ben slot and must not gain one.** Nothing here is Ben's
+  material; a slot on this surface would imply the manifest is waiting on him
+  when it is waiting on nothing.
+
+# Phase 9 (page) — `/ships-log`
+
+The Phase 5 stub is replaced by the `5d` Ship's Log. Two files:
+`app/ships-log/page.tsx` and `app/ships-log/ships-log.module.css`. Nothing else
+in the repo was touched by this half of the phase — no content module, no shared
+component, no test file.
+
+## What the page is
+
+A renderer, and only that. Every string it paints comes from
+`content/ship/ships-log.ts`, `content/ship/standing-orders.ts` or
+`lib/approval-state.ts`:
+
+| On screen | Source |
+|---|---|
+| teal pill | `shipsLogIntro.pill` |
+| h1 | `shipsLogIntro.title`, through `gateProse("general", …)` |
+| lead | `shipsLogIntro.body`, same gate |
+| entry order | `shipsLogTimeline()` — entries and superseded Bridge positions in one sequence |
+| date | `formatLogDate(entry.date)` |
+| chip | `entryApprovalLabel(entry)` — **never typed** |
+| title / body | `gateProse("general", entry, …)`, one policy and one provenance line per record |
+| order tags | `standingOrderTag(id)` — resolves against the Standing Orders module or throws |
+| ink card | `captainsRoundNote`, outside the timeline: it records nothing and cannot be stamped |
+
+`tests/governance-strings.test.ts` passes with no exemption: the file contains
+none of the five governance literals, in code or in comments.
+
+## Decisions this half made, with reasons
+
+**1 · The marks are siblings of the card, not children of it.** `LogEntryCard`
+renders its body as a `<p>` and takes `date`, `status`, `title`, `children` and
+`orderTags` — there is no provenance slot, so a `ProvenanceMono` passed as
+children would nest `<p>` in `<p>` and the browser would close the card body
+early. The label and draft mark therefore sit 8px beneath the card inside the
+same `<li>` (`.item` is a grid with an 8px gap). The ink card has no such problem
+— `GatedText` is a child of `CardShell` there, so its marks are inside the slab.
+
+**2 · The withheld branch exists although it cannot fire.** Every entry is
+`published` + `IMPLEMENTATION_PLACEHOLDER`, which resolves to `marked`, so no
+entry is withheld today. The branch is built because the alternative — passing a
+blocked record's title into `LogEntryCard`'s string prop — would publish the
+words the label says are missing. `gateProse` has already emptied `text` by
+then, so the failure would be a card with an empty heading rather than a leak;
+the withheld row is the honest form of the same state.
+
+**3 · `entryApprovalLabel()` is called bare for a superseded position.**
+`BridgePosition` declares no `approvedBy` / `approvedAt`, so `entryApprovalLabel(position)`
+does not type-check (TS2559: no properties in common) and there is no per-record
+stamp to read. See the requested content change below.
+
+**4 · Two local restyles of `GatedText`, both written `> p:first-child`.** The
+lead and the ink-card body need the artboard's size and ink, and `GatedText`'s
+inner element is not this file's to name. A bare descendant `p` selector would
+out-specify `.mono` (0,1,1 vs 0,1,0) and print the provenance label at body
+size — the exact "provenance styled decoratively" failure WYS §23 forbids, and
+the shape `components/wys/practice.module.css:185` (`.appetiteBody p`) already
+has, harmlessly there only because that record is canon and renders no marks.
+`> p:first-child` matches the body in the canon/marked state and matches nothing
+in the blocked state, where the first child is a wrapper div.
+
+**5 · One local eyebrow on the ink card.** `SectionEyebrow` paints
+`--accent-text-on-tint`, which is unreadable on ink; the artboard uses
+`--accent-on-dark`. Same local `.noteEyebrow` the Data page took, for the same
+reason, and the same standing request for a `tone` prop on `SectionEyebrow`.
+
+**6 · Vertical rhythm follows the other ship pages, not `RouteStub`.** 48px
+(desktop) / 28px (mobile) at the top, matching the note the Standing Orders half
+recorded (`SO2`), because the root layout mounts the header, the disclosure
+strip and the footer that the 390px phone frame has none of.
+
+## Shared-file changes this half needs but did NOT make
+
+1. **`tests/class-contract.test.ts:310` — `assert.equal(modulesChecked, 51)`.**
+   This page adds exactly ONE `.module.css` import (`app/ships-log/page.tsx` →
+   `./ships-log.module.css`), so the correct figure is 51 + one per Phase 9 page
+   module. Measured on the shared working tree with all five ship pages present:
+   **56**. It is a TOTAL — re-measure at the gate, do not increment one
+   builder's figure by another's. Mode 2 itself passes: every `styles.<key>` on
+   this page resolves.
+2. **`components/wys/LogEntryCard.tsx` — a `provenance?: ReactNode` slot.** With
+   it, the label and draft mark would sit inside the card next to the body they
+   describe, on both the entry cards and any future one, and decision 1 above
+   would be unnecessary. Not made here: it is a Phase 4 primitive shared with
+   whatever else renders log rows.
+3. **`content/ship/bridge.ts` — `approvedBy?` / `approvedAt?` /
+   `standingOrdersVersion?` on `BridgePosition`.** §6.6 asks for per-object
+   approval so "missing approval" is answerable per record; every other ship
+   record type carries the fields and this one does not, which is why decision 3
+   above exists.
+
+## Observations for the gate (not this page's to fix)
+
+- **The draft mark says "draft" about a `published` record.**
+  `requiresDraftMark()` selects the mark by ORIGIN, so every
+  `IMPLEMENTATION_PLACEHOLDER` record gets `draft · implementation placeholder ·
+  not Ben's words` regardless of status. On this page that is two mono lines per
+  entry saying nearly the same thing, the second one opening with a word the
+  record's status contradicts. It is substrate behaviour shared with the whole
+  course and correct under §6.2 rule 2; whether the mark should read from status
+  as well as origin is a substrate question. Recorded at `SL3`.
+- **`h1` → `h3` heading gap.** `LogEntryCard` renders `<h3>`, and the page has no
+  `<h2>` because the artboard has no section heading to carry one. No hidden
+  heading was invented to fill the gap. A `headingLevel` prop on `LogEntryCard`
+  would close it.
+
+---
+
+# Phase 9 — gate
+
+Five implementers ran in parallel (the content half plus the `/bridge`,
+`/standing-orders`, `/ships-log`, `/crew` and `/ben` pages). This section
+records what the gate verified with evidence, what it fixed, and what it hands
+forward.
+
+## What was verified, and with what evidence
+
+| Exit criterion | Evidence |
+|---|---|
+| No dead links from nav, disclosure strip or governance chips | Every `href="/…"` in all 18 prerendered `.html` files extracted and diffed against the build's own route table: **32 distinct internal hrefs, zero unresolved.** `/about`, `/lab` and `/posts` still resolve through the frozen `next.config.ts` redirects, confirmed in `.next/routes-manifest.json`. |
+| No Ben-position slot contains generated text | `BenSlot` types `children` / `text` / `body` as `never`, so a filled slot is a compile error. All five call sites reviewed. The Bridge slot renders "BEN'S POSITION · SLOT / Awaiting Ben. No draft AI text is shown here, by rule." from `slot-bridge-position`; the `/ben` Selected-history slot renders approved artboard text (`BEN_APPROVED`, `artboard-5d-quarters`) as its awaited-asset descriptor, gated at `canon` — approved copy, not generated (BQ6). |
+| Every governance string reads from `approvalState` | `tests/governance-strings.test.ts` greps all `.ts`/`.tsx` under `app/` and `components/` for the five literals and passes with no exemption. The rendered Bridge state block, the Standing Orders pill and both log chips were read out of the prerendered HTML and match the functions. |
+| Every Ship's Log order tag resolves to a real Standing Order | `orderTags` are `StandingOrderId`, so a bad tag is a compile error; `standingOrderTag()` throws on an unknown id; `tests/ship-content.test.ts` and `tests/wys-content.test.ts` both assert resolution. Rendered: `Order 03`, `Order 04`, `Order 05`, `Order 08` on the Log and `Order 06` on `/crew`. |
+| No v2.3 hash printed | `approvalState.keel.sha256 === null`; a 64-hex scan over `app/`, `components/`, `lib/` and `content/` finds no undeclared digest; the same scan over the prerendered HTML, `llms.txt` and `state.json` finds none. `/bridge` prints `sha256: pending publication`, which is `keelHashLine()`. |
+| One canonical human node per concept; every new route exports `metadata.alternates.canonical` | All 14 new routes export it; the 11 preserved routes do not, correctly. `tests/machine-surfaces.test.ts` asserts the roster and the `app/` tree describe the same site, that no path is listed twice, and that no redirect is listed as a surface. |
+| `llms.txt` and `state.json` build `○`, not `ƒ` | Route table: `○ /llms.txt`, `○ /author-ship/state.json`, `○ /sitemap.xml`, `○ /robots.txt`. **Zero `ƒ` anywhere; 40 static pages.** |
+| `/system`, `/about → /system`, `/lab → /neon`, `/posts` all still work | `○ /system` in the route table; all three redirects present in `.next/routes-manifest.json` with the same destinations as on `main`. |
+| Deletion contract | `scripts/check-no-deletions.sh` exits 0; `git diff --diff-filter=D main...HEAD`, `--diff-filter=R`, and the same two against the working tree are all empty. All ten byte-frozen files are byte-identical to `main`. |
+
+## What the gate FIXED
+
+Five of the seven Phase 9 task rows had no implementer. They are built here.
+
+1. **`app/sitemap.ts` and `app/robots.ts`** — did not exist. Both are
+   `force-static`, both read `content/canonical-surfaces.ts`, neither invents a
+   date, a priority or a `disallow` rule.
+2. **`/llms.txt`** — did not exist. Built as `app/llms.txt/route.ts` with
+   `export const dynamic = "force-static"` (the plan's second option; the
+   `public/` generator would have required editing `package.json`'s build script
+   and would never appear in the route table the exit criterion is phrased
+   against). The body is `lib/llms-txt.ts`: a map of URLs and the names those
+   URLs already carry, no curriculum prose, plus the agent bootstrap and the
+   superseded-material instruction.
+3. **`/author-ship/state.json`** — did not exist. Built as
+   `app/author-ship/state.json/route.ts`, also `force-static`, over
+   `lib/author-ship-state.ts`. Carries the packet's eleven keys plus
+   `canonical_human_node` (in band, per key, as the plan requires) and two
+   recorded additions. **Every sentence in it passes `gateProse`**, so a record
+   that must not render publicly arrives as `{"withheld": true, "provenance": …}`
+   and never as words — the RSC-leak rule applied to a surface with no visual
+   review.
+4. **The agent bootstrap** — `AGENTS.md` had no such section. Added, quoting the
+   packet's four sentences, which are now stored once in
+   `content/ship/agent-bootstrap.ts` (registered in `shipRegistry`, so all eight
+   governance checks see it) and rendered by three surfaces.
+5. **The roster of fifteen desktop extrapolations** — recorded per surface by
+   five different builders and never counted. Consolidated in
+   `docs/facelift-unapproved.md` §GT1, which is also how the one gap was found
+   (row 11).
+
+Three shared-file changes every builder correctly refused to make, resolved once:
+
+6. **`tests/class-contract.test.ts` `modulesChecked` 51 → 56.** Re-measured on
+   the merged tree, as the file's own merge note requires. The five Phase 9 page
+   modules account for all five; the four machine surfaces import no stylesheet
+   and move it by zero.
+7. **`tests/ship-content.test.ts`** registry-group count 5 → 6, for the new
+   `agent-bootstrap` module.
+8. **`tests/canonical-text.test.ts`** — `surfaceFiles` now walks `.ts` as well
+   as `.tsx` under `app/`. Without it the four machine surfaces would have been
+   the only files in `app/` exempt from the no-raw-prose and no-undeclared-digest
+   scans, purely because of a file extension — the least-reviewed surfaces the
+   least governed.
+
+`tests/machine-surfaces.test.ts` is new: 20 flat tests covering the roster
+against the real route tree, `force-static` on all four handlers, the origin
+bound to the preserved `metadataBase` literal, no digest, no unlabelled prose in
+the JSON, source-ref resolution, and `AGENTS.md` agreeing with the module.
+
+## Decisions this gate made, with reasons
+
+1. **Route handlers, not `public/` files.** The plan prefers build-time
+   generation under `public/`, but that needs a new step in `package.json`'s
+   build script (the guard script beside it is byte-frozen) and would produce
+   files that either go stale in git or dirty the tree on every build. More
+   decisively, the exit criterion is written as a MARKER check — "`llms.txt` and
+   `state.json` build as `○`, not `ƒ`" — and a `public/` file has no marker at
+   all. The plan's stated fallback (`force-static`, no request-dependent code)
+   is what makes that criterion checkable, so it is what shipped. Asserted in
+   `tests/machine-surfaces.test.ts`.
+2. **No `machine` variants were added to `content/claims.ts`.** The plan says
+   the claim strings come from the `machine` variants and are never hand-typed.
+   `resolveVariant(record, "machine")` is that instruction executed: the
+   declared fallback chain is `machine → full`, never to a shorter form. Where
+   `full` is still an `AwaitingCopy` descriptor — which is seven of the nine
+   claims until Phase 11 — the JSON emits the descriptor, not prose. **Adding
+   machine wordings here would have been this build writing privacy claims three
+   phases early**, which is the exact failure §8b.1 exists to prevent. Phase 11
+   fills them by writing `full`; this file needs no edit when it does.
+3. **`mission` renders `awaiting`.** See `docs/facelift-unapproved.md` §GT3.
+4. **`source_refs` declares a `null` canonical human node.** A source ref cites
+   something outside this site; naming an on-site node for it would be a false
+   pointer. The test asserts `source_refs` is the ONLY key allowed to be null.
+5. **The origin literal is bound, not moved.** `app/layout.tsx` is preserved
+   verbatim, so `https://benchantech.com` cannot be relocated into
+   `content/canonical-surfaces.ts`. `SITE_ORIGIN` is a second literal and the
+   test asserts it equals the one in the preserved `metadataBase` — two
+   literals, one checked equality, rather than a silent second definition.
+6. **`entryApprovalLabel` was NOT widened.** The `/ships-log` builder asked for
+   `approvedBy?` / `approvedAt?` on `BridgePosition`, and this gate hit the same
+   weak-type error from the `as const` log entries. The fix is a type annotation
+   at the call site (`shipsLogEntries.map((entry: ShipsLogEntry) => …)`), not a
+   looser signature on a shared governance function. The request is still open
+   for a later phase if a superseded position needs a real chip (SL5).
+
+## Hazards this gate hands to the next phase
+
+1. **`/watch-your-step` is still a Phase 5 stub** (`docs/facelift-unapproved.md`
+   §GT7). Phase 10 owns `/`, and the WYS landing is the other half of `4a`. Four
+   Phase 9 surfaces now name that URL as canonical — the nav, the sitemap,
+   `llms.txt` and `state.json`'s `mission` key — so building it also settles
+   §GT3. **It should be the first thing Phase 10 does**, before `/`.
+2. **`content/canonical-surfaces.ts` is now load-bearing for three surfaces.**
+   Adding a route without adding a roster entry fails
+   `tests/machine-surfaces.test.ts` rather than silently dropping the route out
+   of the sitemap — which is the point, but it means Phase 10 and 11 must add
+   their routes there. Removing an entry is a deletion and is forbidden.
+3. **`tests/canonical-text.test.ts` now scans `.ts` under `app/`.** Any future
+   route handler with a 12-word string literal fails the no-raw-prose check.
+   Put the text in `content/` and the serialisation in the route file, as
+   `/llms.txt` and `/author-ship/state.json` do.
+4. **`modulesChecked` is 56.** Phase 10's home module and any Phase 11 stylesheet
+   move it again. Re-measure at that gate; do not increment from one builder's
+   figure.
+5. **The Phase 0 baseline comparison should gain the four machine surfaces.**
+   `docs/facelift-baseline.md` §2.1 is a route table with markers and it now
+   describes 12 of 40 routes. Phase 12's §5.3 regression check is the natural
+   place to restate it; the gate did not rewrite the baseline document, because
+   a baseline that is edited to match the present is not a baseline.
+6. **`state.json` and `llms.txt` are public and uncredentialed.** Anything added
+   to `content/ship/*` or `content/claims.ts` from now on is published to them
+   automatically. That is the design — one definition, many presentations — but
+   it means a draft record added carelessly is visible as a withheld object with
+   its id and its provenance label, and its id is a disclosure of its own.

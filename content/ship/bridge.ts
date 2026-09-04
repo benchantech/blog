@@ -209,3 +209,54 @@ export const bridgeRecords = [
   ...bridgeOpenQuestions,
   ...bridgePositions
 ];
+
+/* -------------------------------------------------------------------------- */
+/* Section eyebrows and the slot the page renders (mockup 5d)                 */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The three teal eyebrows the artboard draws, pinned here rather than typed
+ * into the page, so the Bridge cannot end up with two names for one section
+ * (§6.8). They are surface labels, not claims, so they are not canonical
+ * records — the same treatment `wysLabels` gives the course's short strings.
+ *
+ * (packet: Voice Constitution 3.7) rations the nautical metaphor: these are the
+ * artboard's own words and the metaphor is not extended into any sub-heading or
+ * button label this build adds.
+ */
+export const bridgeSectionLabels = {
+  workingOn: "WORKING ON",
+  experiment: "EXPERIMENT UNDERWAY",
+  openQuestions: "OPEN QUESTIONS"
+} as const;
+
+/**
+ * Ben's position is a slot record, defined once in
+ * `content/watch-your-step/sources.ts` and referenced here. The label
+ * ("BEN'S POSITION · SLOT") and the awaited-asset line ("Awaiting Ben. No draft
+ * AI text is shown here, by rule.") live on that record; `components/provenance/*`
+ * accepts no body, so nothing can fill it (§6.4, R10).
+ */
+export const BRIDGE_POSITION_SLOT_ID = "slot-bridge-position";
+
+/**
+ * The current position, if Ben has written one.
+ *
+ * `null` today, and that is why the page renders the slot. Anything superseded
+ * is excluded here by construction and is picked up by
+ * `supersededPositionItems()` in `./ships-log.ts` — the two halves of the Q25
+ * machinery, so the same record cannot be both current and historical.
+ */
+export function currentBridgePosition(
+  positions: readonly BridgePosition[] = bridgePositions
+): BridgePosition | null {
+  const current = positions.filter(
+    (position) => position.status !== "historical" && position.status !== "superseded"
+  );
+  if (current.length > 1) {
+    throw new Error(
+      `The Bridge states one position at a time; found ${current.length} current records (plan §6.8, one canonical node).`
+    );
+  }
+  return current[0] ?? null;
+}

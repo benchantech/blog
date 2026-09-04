@@ -1,0 +1,186 @@
+/*
+ * The Crew Manifest (plan Phase 9; packet: Crew Manifest; Standing Order 06).
+ *
+ * NO ARTBOARD EXISTS FOR THIS PAGE at any width, so nothing below is
+ * transcribed. Every value is borrowed from an approved `5d` surface and named
+ * with the line it came from:
+ *
+ *   - the tint-teal status pill                          (dc.html:217)
+ *   - the 32px/600 h1 at -.025em with 16px/10px margins  (dc.html:218, :241)
+ *   - the 15px/1.5 body in `--body`                       (dc.html:219, :242)
+ *   - the 12px/600 accent section label                   (dc.html:221, :227)
+ *   - grey rounded cards at radius 22                     (dc.html:262, :268)
+ *   - the 17px/600 card title at -.01em                   (dc.html:264)
+ *   - the 14px/1.45 card body                             (dc.html:265)
+ *   - the small tag pill                                  (dc.html:266)
+ *
+ * `CardShell`, `Pill`, `ProvenanceMono`, `DraftMark` and `GatedText` carry the
+ * cards, the two pills, the mono provenance lines and the gated intro, so none
+ * of that geometry is restated here. What this file adds is the four things the
+ * shared set has no primitive for: the page column, the header block, the
+ * role-section heading, and the definition list that renders the packet's five
+ * fields per system.
+ *
+ * ONE DELIBERATE LOCAL EYEBROW, for the same reason the Data page has one.
+ * `SectionEyebrow` renders a `<p>`, and this page's role labels are the only
+ * thing naming its two sections — a page of sections needs real headings for
+ * `aria-labelledby` and for a screen reader's heading list, so `.sectionHeading`
+ * below is an `<h2>` in the eyebrow register. The request for a heading level on
+ * `SectionEyebrow` is recorded in docs/facelift-build-notes.md rather than made
+ * from a route file.
+ *
+ * DESKTOP IS EXTRAPOLATED (plan Phase 9, desktop-spillover). The 390 reading
+ * column widens to the same 720px measure every course screen uses; the centred
+ * reading column stays canonical and the IA does not change between breakpoints.
+ * Recorded in docs/facelift-unapproved.md (CRW4).
+ */
+
+/* -------------------------------------------------------------------------- */
+/* The page column                                                            */
+/* -------------------------------------------------------------------------- */
+/*
+ * 48px of top pad rather than the artboard's 70px: `5d` draws no site header,
+ * and this build mounts one on every route (§5.6, flagged NEW under Q9), so the
+ * artboard's top clearance is already supplied above the page. The 72px bottom
+ * pad is clearance before the disclosure strip, which is not on the artboard
+ * either.
+ */
+.page {
+  width: min(calc(100% - 2 * var(--gutter)), 720px);
+  margin-inline: auto;
+  padding-block: 48px 72px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The header block — pill, h1, gated intro, order tag                        */
+/* -------------------------------------------------------------------------- */
+.head {
+  margin-bottom: 4px;
+}
+
+.pillRow {
+  margin: 0;
+}
+
+.title {
+  margin: 16px 0 10px;
+  font: 600 32px / 1.1 var(--sans);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+/* `GatedText` sets its own type on the paragraph it renders; this wrapper owns
+   only the rhythm between the intro and its provenance marks and the section
+   below. */
+.lead {
+  margin: 0 0 14px;
+}
+
+/*
+ * The Standing Order tag. Rendered the SAME WAY the Ship's Log renders one — a
+ * small pill, not a link — so one referenced order has one presentation across
+ * the two surfaces that reference orders (§6.8). It is inert on purpose: the
+ * Standing Orders page carries no per-order anchor to land on, and an
+ * interactive tag would also owe a 44px touch target it has no room for.
+ */
+.tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin: 0 0 8px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The two role sections                                                      */
+/* -------------------------------------------------------------------------- */
+/*
+ * The role split is load-bearing rather than cosmetic: a visitor's exposure to
+ * build crew is zero by construction, and a manifest that mixed the two would
+ * overstate what runs while they read.
+ */
+.section {
+  margin-top: 26px;
+}
+
+/*
+ * `--accent-text-on-tint`, not `--accent`, matching `SectionEyebrow`'s own
+ * decision (Q23). The labels are sentence case because the content module
+ * writes them that way; caps are typed in copy on this site, never applied with
+ * `text-transform`.
+ */
+.sectionHeading {
+  margin: 0 0 10px;
+  font: 600 12px / 1.35 var(--sans);
+  letter-spacing: 0.04em;
+  color: var(--accent-text-on-tint);
+}
+
+.cards {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+/* -------------------------------------------------------------------------- */
+/* One crew member — a card, five fields, one provenance mark                 */
+/* -------------------------------------------------------------------------- */
+.crewName {
+  margin: 0 0 12px;
+  font: 600 17px / 1.3 var(--sans);
+  letter-spacing: -0.01em;
+  color: var(--ink);
+}
+
+.fields {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+}
+
+.field {
+  margin: 0;
+}
+
+.fieldLabel {
+  margin: 0 0 4px;
+  font: 600 12px / 1.35 var(--sans);
+  letter-spacing: 0.04em;
+  color: var(--accent-text-on-tint);
+}
+
+/*
+ * A field may hold one line or several. Several stack as separate values of the
+ * same term rather than merging into a sentence, because "what it cannot
+ * access" is a list of separate refusals and running them together would let a
+ * reader take them as one hedge.
+ */
+.fieldValue {
+  margin: 0;
+  font: 400 14px / 1.45 var(--sans);
+  color: var(--body);
+}
+
+.fieldValue + .fieldValue {
+  margin-top: 4px;
+}
+
+/* The label-and-draft-mark pair that closes every card (§6.2 rule 2). */
+.cardMarks {
+  margin-top: 14px;
+  padding-top: 12px;
+  border-top: 1px solid var(--border-nav);
+}
+
+@media (max-width: 700px) {
+  .page {
+    padding-block: 40px 56px;
+  }
+
+  .title {
+    font-size: 30px;
+  }
+}

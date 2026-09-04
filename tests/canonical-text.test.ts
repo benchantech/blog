@@ -54,8 +54,18 @@ function walk(dir: string, extensions: string[], out: string[] = []): string[] {
 }
 
 const contentFiles = walk(path.join(repoRoot, "content"), [".ts"]);
+/**
+ * `.ts` under `app/` is included, not only `.tsx`.
+ *
+ * Phase 9 added four surfaces that are route files rather than components —
+ * `app/sitemap.ts`, `app/robots.ts`, `app/llms.txt/route.ts` and
+ * `app/author-ship/state.json/route.ts`. They publish text to the open web with
+ * no visual review at all, so exempting them from the no-raw-prose and
+ * no-undeclared-digest scans purely because of a file extension would leave the
+ * least-reviewed surfaces the least governed.
+ */
 const surfaceFiles = [
-  ...walk(path.join(repoRoot, "app"), [".tsx"]),
+  ...walk(path.join(repoRoot, "app"), [".tsx", ".ts"]),
   ...walk(path.join(repoRoot, "components"), [".tsx"])
 ];
 

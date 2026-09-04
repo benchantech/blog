@@ -1,0 +1,154 @@
+/* ==========================================================================
+   Captain's Quarters (`/ben`) — mockup `5d`, dc.html:281-296.
+
+   The page is composed almost entirely from the shared primitives: `MediaSlot`
+   for the portrait, `AudioSlotPill` for "Hear Ben, 60 seconds", `GridTile` /
+   `GridTiles` for WORK & PROPERTIES, `SectionEyebrow` for its caps label and
+   `BenSlot` for Selected history. What is left for this file is the four
+   things the shared set has no primitive for:
+
+     1. the page's own reading column and vertical rhythm;
+     2. the caption block reversed out over the portrait stripe — an eyebrow
+        and the name, bottom-left, which no slot component may carry because a
+        slot takes a label and an awaited-asset descriptor and nothing else
+        (plan §6.4);
+     3. the artboard's 26px portrait radius, which is a different radius family
+        from `MediaSlot`'s default 22px card radius (§4.2 keeps both, and does
+        not normalise them to one ramp);
+     4. the 15px intro measure, where the shared gated body is 16px.
+
+   TWO ELEMENT SELECTORS, BOTH SCOPED AND BOTH DELIBERATE. `MediaSlot` exposes
+   no class hook and accepts no children by rule, so the only way to place its
+   mono line and change its radius is a rule that cannot escape `.portrait` —
+   the same trade `app/watch-your-step/(shell)/today/today.module.css` makes for
+   the WATCH card's disc. Widening a frozen shared prop shape from a route file
+   would be the worse direction.
+
+   NO NEW INK, NO NEW RADIUS, NO NEW SHADOW. Every value below is a token.
+   ========================================================================== */
+
+/* --------------------------------------------------------------------------
+   The reading column.
+
+   `5d` draws a 390px phone with `padding: 70px 22px 60px` and no site header.
+   Plan §5.6 mounts the root header, footer and disclosure strip on every route,
+   so the top pad is smaller here than on the artboard for the same reason every
+   course screen's is (Q9, already flagged). Horizontally this is the same
+   centred column `.screen` uses, which is what plan Phase 9 asks for on the
+   five surfaces with no 1280 rendering: widen the 390 column inside the 1280
+   shell, keep the centred reading column canonical, do not redefine the IA.
+   -------------------------------------------------------------------------- */
+.page {
+  width: min(calc(100% - 2 * var(--gutter)), 720px);
+  margin-inline: auto;
+  padding-block: 48px 24px;
+}
+
+/* --------------------------------------------------------------------------
+   The portrait (dc.html:283)
+   -------------------------------------------------------------------------- */
+.portrait {
+  position: relative;
+  margin-bottom: 18px;
+}
+
+/*
+ * The artboard's 26px portrait radius. `MediaSlot` paints --radius-card-lg
+ * (22px), which is the card family; the portrait belongs to the portrait
+ * family, and §4.2 keeps the two ramps separate on purpose.
+ */
+.portrait > div:first-child {
+  border-radius: var(--radius-portrait-lg);
+}
+
+/*
+ * `MediaSlot` centres its mono line in the flow. Here the flow is a 300px
+ * stripe whose bottom half carries the name, so the line moves under the
+ * overlay pill at the top-left, where `5d` draws its one mono line.
+ *
+ * It stays a `ProvenanceMono` — the only component permitted the mono face
+ * (§4.8) — so this rule moves a provenance line and does not restyle one.
+ */
+.portrait p {
+  position: absolute;
+  top: 44px;
+  left: 14px;
+  margin: 0;
+  text-align: left;
+}
+
+/*
+ * The reversed-out caption: 12px teal eyebrow, then the name, bottom-left with
+ * the artboard's 20px inset. Text, not a control — it takes pointer events so
+ * the name can be selected and copied.
+ */
+.portraitCaption {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  padding: 20px;
+}
+
+/*
+ * A LOCAL eyebrow, not `SectionEyebrow`, for the reason card 3 of the Data page
+ * carries its own: the shared primitive paints --accent-text-on-tint, which is
+ * unreadable on an ink stripe, and `5d` uses --accent-on-dark here. The request
+ * for a `tone` prop on `SectionEyebrow` is recorded for the gate rather than
+ * answered by widening a shared primitive from a route file.
+ */
+.eyebrowOnInk {
+  margin: 0 0 4px;
+  color: var(--accent-on-dark);
+  font: 600 12px / 1.3 var(--sans);
+  letter-spacing: 0.04em;
+}
+
+.name {
+  margin: 0;
+  font: 600 34px / 1.1 var(--sans);
+  letter-spacing: -0.03em;
+  color: var(--white);
+}
+
+/* --------------------------------------------------------------------------
+   Intro, audio slot, grid, Selected history
+   -------------------------------------------------------------------------- */
+.intro {
+  margin: 0 0 20px;
+}
+
+/*
+ * `5d` sets the intro at 15px/--body; the shared gated body is 16px/--ink.
+ *
+ * `> p:first-child` and not `p`, deliberately: `GatedText` renders the prose as
+ * its first child and any provenance line AFTER it, and the blocked state
+ * renders no direct `p` at all. So this rule can only ever reach the body copy
+ * — never the 11px mono a marked or withheld record would carry, which must
+ * keep the provenance voice whatever the surrounding screen's measure is.
+ */
+.intro > p:first-child {
+  font: 400 15px / 1.5 var(--sans);
+  color: var(--body);
+}
+
+.audio {
+  margin: 0 0 22px;
+}
+
+.gridHead {
+  margin: 0 0 10px;
+}
+
+.tiles {
+  margin: 0 0 22px;
+}
+
+/* --------------------------------------------------------------------------
+   Mobile — the artboard's own width, where the column is the gutter
+   -------------------------------------------------------------------------- */
+@media (max-width: 700px) {
+  .page {
+    padding-block: 28px 20px;
+  }
+}

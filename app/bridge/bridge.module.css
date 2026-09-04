@@ -1,0 +1,199 @@
+/*
+ * The Bridge (mockup `5d`, dc.html:215-235).
+ *
+ * Scoped to this route, per the §4.1 CSS Modules boundary: `.section`,
+ * `.title`, `.lead` and `.state` are all names the legacy layer already owns or
+ * could plausibly own, and a global rule here would restyle preserved pages.
+ *
+ * WHAT THIS FILE DOES NOT RESTATE. `Pill` carries the teal status badge,
+ * `KvRow`/`KvList` the WORKING ON rows (the artboard's 14px/16px padding,
+ * radius 14, `--tint-grey` fill and muted right-hand value are already the
+ * `.kvFilled` geometry), `CardShell fill="ink"` the EXPERIMENT slab, `BenSlot`
+ * the dashed teal position slot and `ProvenanceMono` the state block's type.
+ * What is left is this page's own four things: the reading column, the heading
+ * stack, the outlined OPEN QUESTIONS rows (12px/16px padding — a different row
+ * from `.kvOutlined`'s 14px, and it carries no value half) and the grey box the
+ * mono state lines sit in.
+ *
+ * ONE DELIBERATE LOCAL EYEBROW, and it is a SEMANTIC upgrade, not a visual one.
+ * `SectionEyebrow` renders a `<p>`; this page has three sections under one h1
+ * and no other heading, so its section labels are `<h2>` here and `.sectionHead`
+ * repeats the mobile eyebrow's 12px/600 and the desktop eyebrow's 15px/500
+ * exactly. The request for an `as` prop on `SectionEyebrow` is recorded for the
+ * gate — the same route `app/watch-your-step/(shell)/data` took for its ink
+ * eyebrow rather than widening a shared primitive from a route file.
+ *
+ * DESKTOP IS AN EXTRAPOLATION. `5d` is a 390px artboard and no artboard renders
+ * the Bridge at 1280 (turn `2d` is a superseded register and is not consulted
+ * for visuals, R1). The desktop block below widens the reading column and lifts
+ * the type ramp; it moves nothing, groups nothing differently and adds no
+ * margin metadata, so the IA is the artboard's. Recorded in
+ * docs/facelift-unapproved.md.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* The reading column                                                         */
+/* -------------------------------------------------------------------------- */
+.bridge {
+  width: min(calc(100% - 2 * var(--gutter)), 680px);
+  margin-inline: auto;
+  padding-block: 48px 40px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The heading stack (dc.html:217-219)                                        */
+/* -------------------------------------------------------------------------- */
+.pillRow {
+  margin: 0;
+}
+
+.title {
+  margin: 16px 0 10px;
+  font: 600 32px / 1.1 var(--sans);
+  letter-spacing: -0.025em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.lead {
+  margin: 0 0 20px;
+  font: 400 15px / 1.5 var(--sans);
+  color: var(--body);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Ben's position (dc.html:220)                                               */
+/* -------------------------------------------------------------------------- */
+/*
+ * Today this holds `BenSlot` and nothing else. `.position` styles the other
+ * branch — the paragraph the page renders once Ben has written a position and
+ * `renderPolicyFor` returns `canon` for it. It is ordinary body prose in ink:
+ * a position that stayed inside a dashed outline would keep reading as an empty
+ * slot, and the dashed teal border is the "awaiting Ben" ink specifically.
+ */
+.positionSection {
+  margin: 0 0 20px;
+}
+
+.position {
+  margin: 0;
+  font: 400 16px / 1.5 var(--sans);
+  color: var(--ink);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Sections                                                                   */
+/* -------------------------------------------------------------------------- */
+.section {
+  margin: 0 0 20px;
+}
+
+.sectionHead {
+  margin: 0 0 10px;
+  color: var(--accent-text-on-tint);
+  font: 600 12px / 1.3 var(--sans);
+  letter-spacing: 0.04em;
+}
+
+/*
+ * A row's provenance line, when it has one. Nothing renders here while every
+ * Bridge record is published Ben-approved material — `ProvenanceMarks` returns
+ * null for `canon` — so today's DOM is the artboard's. The class exists so a
+ * record whose status changes cannot quietly lose its label for want of a
+ * place to put it.
+ */
+.rowMarks {
+  margin: 4px 0 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* EXPERIMENT UNDERWAY (dc.html:229)                                          */
+/* -------------------------------------------------------------------------- */
+.experiment {
+  margin: 0;
+  font: 400 15px / 1.45 var(--sans);
+  color: var(--white);
+}
+
+/* -------------------------------------------------------------------------- */
+/* OPEN QUESTIONS (dc.html:231-234)                                           */
+/* -------------------------------------------------------------------------- */
+/*
+ * Outlined rows carrying Ben's questions. §4.8's "filled = system-recorded
+ * fact, outlined = learner-authored" encoding is authored guidance for the
+ * learner surfaces, and this is one of the three places the approved set
+ * contradicts it; where an artboard disagrees, the artboard wins (R1).
+ */
+.questions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.question {
+  padding: 12px 16px;
+  border: 1.5px solid var(--border-row);
+  border-radius: var(--radius-row);
+  font: 400 15px / 1.4 var(--sans);
+  color: var(--ink);
+}
+
+/* -------------------------------------------------------------------------- */
+/* The state block (dc.html:235)                                              */
+/* -------------------------------------------------------------------------- */
+/*
+ * Every line comes from `bridgeStateLines()`. The artboard paints four facts on
+ * two wrapped lines; the state module returns six, each a discrete fact, so
+ * they are stacked one per line rather than joined with a middot. Joining them
+ * would fix a pairing that only holds while all six lines are short — and the
+ * moment Ben stamps, four of them change length together. Recorded as a
+ * deviation from `5d`.
+ */
+.state {
+  padding: 14px 16px;
+  border-radius: var(--radius-row);
+  background: var(--tint-grey);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Desktop (>=901px) — the same page, wider                                   */
+/* -------------------------------------------------------------------------- */
+@media (min-width: 901px) {
+  .bridge {
+    width: min(calc(100% - 2 * var(--gutter)), 720px);
+    padding-block: 72px 64px;
+  }
+
+  .title {
+    margin: 18px 0 12px;
+    font-size: 40px;
+  }
+
+  .lead {
+    margin-bottom: 26px;
+    font-size: 17px;
+  }
+
+  .positionSection,
+  .section {
+    margin-bottom: 26px;
+  }
+
+  .sectionHead {
+    margin-bottom: 14px;
+    font: 500 15px / 1.3 var(--sans);
+    letter-spacing: normal;
+  }
+
+  .experiment {
+    font-size: 16px;
+  }
+
+  .question {
+    padding: 14px 18px;
+    font-size: 16px;
+  }
+}

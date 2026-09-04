@@ -30,6 +30,7 @@
 
 import type { ContentOrigin, ContentStatus } from "@/lib/content-status";
 import type { StandingOrderId } from "./standing-orders";
+import { type BridgePosition, bridgePositions } from "./bridge";
 
 export type ShipsLogEntryId = "log-wys-website-first" | "log-planning-packet";
 
@@ -121,3 +122,170 @@ export const SHIPS_LOG_ENTRY_FIELDS: readonly string[] = [
   "whether the Standing Orders changed",
   "what Ben approved"
 ];
+
+/* -------------------------------------------------------------------------- */
+/* The page header (mockup 5d, dc.html:261-263)                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * THE H1 IS IN BEN'S FIRST PERSON AND IT IS NOT THIS BUILD'S SENTENCE.
+ *
+ * "I may change my mind. I won't rewrite the record." is drawn on approved
+ * artboard `5d` and is listed verbatim in the plan's Appendix A, so R1 puts it
+ * on the page and R8 forbids quietly rewording it. It is still the one string
+ * on the ship surfaces that R10 would forbid if this build had written it, so
+ * `firstPerson` records that fact AS DATA — the page can withhold or relabel it
+ * on a one-line change, `tests/ship-content.test.ts` asserts it is the only
+ * such string in `content/ship/`, and docs/facelift-unapproved.md escalates the
+ * sentence to Ben rather than leaving the tension in a comment.
+ *
+ * The pill and the "approval pending" chip are approval state and are not typed
+ * here; `entryApprovalLabel()` renders the chip (§6.6).
+ */
+export interface ShipsLogIntro {
+  id: string;
+  status: ContentStatus;
+  origin: ContentOrigin;
+  pill: string;
+  title: string;
+  /** True where the string is written in Ben's voice. R10 escalation flag. */
+  firstPerson: boolean;
+  body: string;
+  sourceIds: readonly string[];
+}
+
+export const shipsLogIntro = {
+  id: "ships-log-intro",
+  status: "published",
+  origin: "BEN_APPROVED",
+  pill: "Ship's Log · append-only",
+  title: "I may change my mind. I won't rewrite the record.",
+  firstPerson: true,
+  body: "What was attempted, what changed, which rule governed it, what Ben approved.",
+  sourceIds: ["artboard-5d-ships-log", "packet-ships-log"]
+} as const satisfies ShipsLogIntro;
+
+/* -------------------------------------------------------------------------- */
+/* Dates are data; "D MMM YYYY" is a presentation                             */
+/* -------------------------------------------------------------------------- */
+
+const MONTH_ABBREVIATIONS: readonly string[] = [
+  "Jan",
+  "Feb",
+  "Mar",
+  "Apr",
+  "May",
+  "Jun",
+  "Jul",
+  "Aug",
+  "Sep",
+  "Oct",
+  "Nov",
+  "Dec"
+];
+
+/**
+ * "2026-09-03" -> "3 Sep 2026", the form artboard `5d` draws.
+ *
+ * Parsed from the string rather than through `new Date()`: `new Date("2026-09-03")`
+ * is UTC midnight, and a build machine west of Greenwich would render the
+ * previous day. A log date that moves with the renderer's timezone is a
+ * rewritten record, which is the one thing Standing Order 08 forbids.
+ */
+export function formatLogDate(iso: string): string {
+  const match = /^(\d{4})-(\d{2})-(\d{2})$/.exec(iso);
+  if (!match) throw new Error(`Ship's Log dates are ISO 8601 (YYYY-MM-DD); got "${iso}".`);
+  const [, year, month, day] = match;
+  return `${Number(day)} ${MONTH_ABBREVIATIONS[Number(month) - 1]} ${year}`;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Superseded Bridge positions render HERE (Q25, ratified)                    */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The Bridge intro claims "every earlier state lives in the Log". This is the
+ * code that makes the claim true rather than the wording that would have made
+ * it false (R8).
+ *
+ * `supersedePosition()` in `./bridge.ts` produces the `historical` record;
+ * this function is where the Log picks it up. The item is a PRESENTATION of a
+ * Bridge record, not a second canonical node — it carries a derived id, it is
+ * not in `shipRegistry` a second time, and the record it wraps is already
+ * registered through `bridgeRecords` (§6.8, and the registry rule in
+ * docs/facelift-build-notes.md §7.5).
+ *
+ * Rendering is the caller's job and it must ask for the `archive` surface:
+ * `renderPolicyFor(position, "archive")` returns `marked`, never `canon`, so a
+ * superseded position can appear on the Log and can never read as a current
+ * one.
+ *
+ * A malformed record THROWS rather than being skipped. Silently dropping a
+ * `historical` position that is missing `supersededBy` would empty the Log of
+ * exactly the state the Bridge claims lives here — the failure this machinery
+ * exists to prevent.
+ */
+export interface SupersededPositionItem {
+  /** Derived from the position's id. A presentation, not a canonical node. */
+  id: string;
+  positionId: string;
+  /** The date the superseded position was taken. */
+  date: string;
+  /** Build language. Never a Ben sentence — the position itself carries those. */
+  heading: string;
+  position: BridgePosition;
+}
+
+export function supersededPositionItems(
+  positions: readonly BridgePosition[] = bridgePositions
+): readonly SupersededPositionItem[] {
+  const items: SupersededPositionItem[] = [];
+
+  for (const position of positions) {
+    if (position.status !== "historical" && position.status !== "superseded") continue;
+    if (!position.supersededBy || position.canonical !== false) {
+      throw new Error(
+        `Bridge position "${position.id}" is ${position.status} without supersededBy / canonical: false, so the Log cannot record it (plan §6.2 rule 4).`
+      );
+    }
+    items.push({
+      id: `log-superseded-${position.id}`,
+      positionId: position.id,
+      date: position.takenAt,
+      heading: "Bridge position superseded",
+      position
+    });
+  }
+
+  return items;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The rendered order                                                         */
+/* -------------------------------------------------------------------------- */
+
+export type ShipsLogItem =
+  | { kind: "entry"; date: string; entry: ShipsLogEntry }
+  | { kind: "superseded-position"; date: string; item: SupersededPositionItem };
+
+/**
+ * Everything the Log renders, newest first, entries and superseded Bridge
+ * positions in one sequence. The forward-looking `captainsRoundNote` is NOT in
+ * it: it records nothing and has no date, which is why it is a different kind
+ * of object.
+ */
+export function shipsLogTimeline(
+  entries: readonly ShipsLogEntry[] = shipsLogEntries,
+  positions: readonly BridgePosition[] = bridgePositions
+): readonly ShipsLogItem[] {
+  const items: ShipsLogItem[] = [
+    ...entries.map((entry) => ({ kind: "entry" as const, date: entry.date, entry })),
+    ...supersededPositionItems(positions).map((item) => ({
+      kind: "superseded-position" as const,
+      date: item.date,
+      item
+    }))
+  ];
+
+  return items.sort((a, b) => (a.date === b.date ? 0 : a.date < b.date ? 1 : -1));
+}

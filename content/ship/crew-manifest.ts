@@ -22,6 +22,7 @@
  */
 
 import type { ContentOrigin, ContentStatus } from "@/lib/content-status";
+import type { StandingOrderId } from "./standing-orders";
 
 export type CrewMemberId =
   | "crew-claude-build-session"
@@ -160,3 +161,59 @@ export const CREW_FIELD_LABELS: readonly string[] = [
   "What authority it has",
   "What authority it does not have"
 ];
+
+/* -------------------------------------------------------------------------- */
+/* The page header — NEW, no artboard exists                                  */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * COMPOSED, NOT TRANSCRIBED. There is no `5d` artboard for `/crew`, so this
+ * header is copy THIS BUILD AUTHORED under plan §2.1 ("Crew Manifest system
+ * descriptions") and it is flagged NEW in docs/facelift-unapproved.md — both
+ * the visual and these three strings.
+ *
+ * `origin: "IMPLEMENTATION_PLACEHOLDER"` for the same reason every row below
+ * carries it: nobody but this build wrote it. Under the two-axis policy that
+ * resolves to `marked`, so the page renders it WITH the label that says it is
+ * not Ben's words. That is the honest state of a page whose whole subject is
+ * who wrote what.
+ *
+ * `orderTags` is not decoration. The manifest exists because Standing Order 06
+ * requires it, so the header REFERENCES that record rather than restating it —
+ * the same rule the Ship's Log entries follow, checked by the same test.
+ */
+export interface CrewIntro {
+  id: string;
+  status: ContentStatus;
+  origin: ContentOrigin;
+  pill: string;
+  title: string;
+  body: string;
+  orderTags: readonly StandingOrderId[];
+  sourceIds: readonly string[];
+}
+
+export const crewIntro = {
+  id: "crew-intro",
+  status: "published",
+  origin: "IMPLEMENTATION_PLACEHOLDER",
+  pill: "Crew Manifest · current",
+  title: "Every system that touched this site",
+  body: "What each one does, what it can reach, and what it is not allowed to decide. Build crew act once, at build time; runtime crew act while you are on a page.",
+  orderTags: ["order-06"],
+  sourceIds: ["packet-crew-manifest", "artboard-4a-disclosure-strip"]
+} as const satisfies CrewIntro;
+
+/**
+ * The two roles, as row groupings. The distinction is load-bearing rather than
+ * cosmetic: a visitor's exposure to build crew is zero by construction, and a
+ * manifest that mixed the two would overstate what runs while they read.
+ */
+export const CREW_ROLE_LABELS = {
+  build: "Build crew — acted before this page existed",
+  runtime: "Runtime crew — act while you are on the site"
+} as const satisfies Record<CrewMember["role"], string>;
+
+export function crewByRole(role: CrewMember["role"]): readonly CrewMember[] {
+  return crewManifest.filter((member) => member.role === role);
+}

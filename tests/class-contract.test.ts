@@ -307,7 +307,15 @@ test("mode 2: every styles.<key> resolves to a class in its sibling .module.css"
   // app/watch-your-step/(shell)/progress/progress.module.css. The page imports
   // no stylesheet — every state-dependent mark on that screen is inside the one
   // client component, so there is nothing for the server half to style.
-  assert.equal(modulesChecked, 51, "CSS Module imports across app/ and components/ — update deliberately");
+  // Phase 9 (ship surfaces) adds FIVE, re-measured at the gate with all five
+  // route builders merged rather than summed from any one of them, exactly as
+  // the merge note above requires: /bridge, /standing-orders, /ships-log,
+  // /crew and /ben each import one page-level module and nothing else. The
+  // four machine surfaces this phase also added — app/sitemap.ts,
+  // app/robots.ts, app/llms.txt/route.ts and
+  // app/author-ship/state.json/route.ts — import no stylesheet at all and
+  // therefore move this figure by zero.
+  assert.equal(modulesChecked, 56, "CSS Module imports across app/ and components/ — update deliberately");
 });
 
 /* -------------------------------------------------------------------------- */

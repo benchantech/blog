@@ -92,9 +92,15 @@ export const externalSourceRefs = [
   { id: "packet-quarters-selection-rule", kind: "packet", locator: "packet: quarters-selection-rule" },
   { id: "packet-ships-log", kind: "packet", locator: "packet: Ship's Log, what an entry records" },
   { id: "packet-bridge", kind: "packet", locator: "packet: Bridge, always current" },
+  { id: "packet-historical-machine-readable", kind: "packet", locator: "packet: historical-machine-readable — superseded objects carry supersededBy and canonical: false" },
   { id: "packet-corpus", kind: "packet", locator: "packet: raw voice corpus front matter" },
   { id: "packet-hashing", kind: "packet", locator: "packet: hashing — freeze, digest, publish, then cite" },
   { id: "packet-voice-constitution", kind: "packet", locator: "packet: Voice and Reasoning Constitution" },
+  { id: "packet-agent-bootstrap", kind: "packet", locator: "packet: agent-bootstrap — the four sentences an agent reads first" },
+  { id: "packet-crawl-surfaces", kind: "packet", locator: "packet: crawl-surfaces — sitemap and robots as a map of current canonical surfaces" },
+  { id: "packet-llms-txt-role", kind: "packet", locator: "packet: llms-txt-role — a map, never a corpus dump" },
+  { id: "packet-state-json", kind: "packet", locator: "packet: state.json — the machine mirror and its key set" },
+  { id: "packet-canonical-node", kind: "packet", locator: "packet: canonical-node rule — one canonical human node per concept" },
 
   /* The live repo */
   { id: "app-privacy-page", kind: "repo-page", locator: "app/privacy/page.tsx, preserved verbatim" },

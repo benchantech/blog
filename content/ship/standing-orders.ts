@@ -22,6 +22,7 @@
  */
 
 import type { ContentOrigin, ContentStatus } from "@/lib/content-status";
+import { approvalState } from "@/lib/approval-state";
 
 export type StandingOrderId =
   | "order-01"
@@ -156,4 +157,58 @@ export function standingOrderById(id: StandingOrderId): StandingOrder {
 /** "Order 03" — the Ship's Log tag form of a record. One node, two presentations. */
 export function standingOrderTag(id: StandingOrderId): string {
   return `Order ${standingOrderById(id).number}`;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The page header (mockup 5d, dc.html:239-241)                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * THE PILL IS DELIBERATELY ABSENT FROM THIS RECORD. "Standing Orders · draft"
+ * is approval state, not copy, so the page renders it from
+ * `standingOrdersPill()` in `lib/approval-state.ts` (§6.6). Typing it here
+ * would be the second definition that module exists to prevent, and
+ * `tests/governance-strings.test.ts` is the reason it can stay that way.
+ *
+ * THE KEEL IS CITED, AND WITHOUT A HASH. The artboard draws "Derived from
+ * <keel>" with the keel name in teal; the name is a governance string, so it
+ * reads from `approvalState.keel.name` rather than being typed. `citesHash` is
+ * data rather than a comment, and it is `false` because (packet: hashing) is
+ * freeze -> SHA-256 -> publish on yymethod.com/work -> THEN cite, and Ben has
+ * published nothing. Phase 9's exit criterion is "no v2.3 hash printed", so the
+ * page shows the keel's name and link and no digest.
+ */
+export interface StandingOrdersIntro {
+  id: string;
+  status: ContentStatus;
+  origin: ContentOrigin;
+  title: string;
+  /** Three parts, because the middle one is state and the other two are copy. */
+  derivedFrom: { prefix: string; keelName: string; suffix: string };
+  /** Where the keel is canonical. Same value the authority chain's first link uses. */
+  keelHref: string;
+  /** False while `approvalState.keel.sha256` is null. Asserted, not assumed. */
+  citesHash: boolean;
+  sourceIds: readonly string[];
+}
+
+export const standingOrdersIntro = {
+  id: "standing-orders-intro",
+  status: "published",
+  origin: "BEN_APPROVED",
+  title: "The rules this site runs on",
+  derivedFrom: {
+    prefix: "Derived from ",
+    keelName: approvalState.keel.name,
+    suffix: ". This site cites it; it doesn't rewrite it."
+  },
+  keelHref: approvalState.keel.url,
+  citesHash: approvalState.keel.sha256 !== null,
+  sourceIds: ["artboard-5d-standing-orders", "packet-hashing"]
+} as const satisfies StandingOrdersIntro;
+
+/** The intro as one sentence, for surfaces that cannot style the keel span. */
+export function standingOrdersIntroLine(): string {
+  const { prefix, keelName, suffix } = standingOrdersIntro.derivedFrom;
+  return `${prefix}${keelName}${suffix}`;
 }
