@@ -86,11 +86,37 @@
 }
 
 .screenshotSlot {
-  min-height: 300px;
-  border: 1px dashed var(--muted);
-  background:
-    linear-gradient(135deg, rgba(22, 32, 43, 0.04), rgba(22, 32, 43, 0)),
-    var(--background);
+  position: relative;
+  display: block;
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border: 1px solid var(--line);
+  background: var(--background);
+}
+
+.screenshotMedia,
+.screenshotMedia img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.screenshotMedia img {
+  object-fit: cover;
+}
+
+.graduationBadge {
+  position: absolute;
+  top: clamp(10px, 4%, 18px);
+  right: clamp(28px, 5.5%, 36px);
+  width: clamp(118px, 28%, 190px);
+  filter: drop-shadow(0 14px 18px rgba(22, 32, 43, 0.22));
+}
+
+.graduationBadge img {
+  display: block;
+  width: 100%;
+  height: auto;
 }
 
 .upworkCopy {

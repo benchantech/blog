@@ -115,7 +115,21 @@ export default function Home() {
           </div>
         </div>
         <section className={styles.upworkFeature} aria-labelledby="upwork-feature-title">
-          <div className={styles.screenshotSlot} aria-label="Screenshot placeholder" />
+          <div className={styles.screenshotSlot}>
+            <picture className={styles.screenshotMedia}>
+              <source media="(max-width: 700px)" srcSet="/upwork-cto-mobile.webp" />
+              <img
+                src="/upwork-cto-desktop.webp"
+                alt="Upwork profile screenshot for the From Upwork to CTO feature"
+                width={1448}
+                height={1086}
+              />
+            </picture>
+            <picture className={styles.graduationBadge}>
+              <source media="(max-width: 700px)" srcSet="/leveled-up-badge-mobile.webp" />
+              <img src="/leveled-up-badge-desktop.webp" alt="Leveled Up!" width={360} height={312} />
+            </picture>
+          </div>
           <div className={styles.upworkCopy}>
             <p className={styles.upworkEyebrow}>Recent Graduate</p>
             <h2 id="upwork-feature-title">From Upwork to CTO</h2>

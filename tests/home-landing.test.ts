@@ -110,6 +110,10 @@ test("home renders the Upwork feature, and the course landing keeps the hero dem
   assert.ok(landingPage.includes('from "@/components/wys/HeroDemo"'), "/watch-your-step does not mount HeroDemo");
   assert.ok(landingPage.includes('<HeroDemo breakpoint="mobile" />'));
   assert.ok(homePage.includes('href="/upwork"'), "/ does not link to the Upwork redirect");
+  assert.ok(homePage.includes('srcSet="/upwork-cto-mobile.webp"'), "/ does not render the mobile Upwork screenshot");
+  assert.ok(homePage.includes('src="/upwork-cto-desktop.webp"'), "/ does not render the desktop Upwork screenshot");
+  assert.ok(homePage.includes('srcSet="/leveled-up-badge-mobile.webp"'), "/ does not render the mobile graduate badge");
+  assert.ok(homePage.includes('src="/leveled-up-badge-desktop.webp"'), "/ does not render the desktop graduate badge");
   assert.ok(homePage.includes('target="_blank"'), "feature links do not pop out");
   assert.ok(homePage.includes('aria-hidden="true">↗</span>'), "feature links do not show external arrows");
   assert.ok(
