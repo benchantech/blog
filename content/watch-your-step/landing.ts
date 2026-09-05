@@ -38,6 +38,7 @@
 import type { AnyCanonicalText } from "@/lib/canonical-text";
 import { lessonZeroCta, shipNav } from "@/content/nav";
 import { wysLabels } from "./copy";
+import { WYS_COURSE_STATUS } from "./config";
 
 /* -------------------------------------------------------------------------- */
 /* 1. Canonical records                                                       */
@@ -123,6 +124,25 @@ export const landingInstructorEyebrowText = {
   variants: {
     short: "Taught by Ben Chan, on the record",
     full: "Taught by one person, on the record"
+  }
+} as const satisfies AnyCanonicalText;
+
+export const landingCourseStatusText = {
+  id: "landing-course-status-under-development",
+  surfaceKind: "general",
+  status: "published",
+  origin: "IMPLEMENTATION_PLACEHOLDER",
+  sourceIds: ["code-wys-config"],
+  variantSources: {
+    short: ["code-wys-config"],
+    full: ["code-wys-config"],
+    machine: ["code-wys-config"]
+  },
+  variants: {
+    short: "Watch Your Step is under development.",
+    full:
+      "Watch Your Step is under development. The site is published, but the course itself is not open yet.",
+    machine: `course_status=${WYS_COURSE_STATUS}`
   }
 } as const satisfies AnyCanonicalText;
 

@@ -5,6 +5,7 @@ import { wysBenSlotById } from "@/content/watch-your-step/sources";
 import {
   landingAntiFeaturesMobile,
   landingBadgeText,
+  landingCourseStatusText,
   landingDataHref,
   landingDataLinkLabel,
   landingHeadlineText,
@@ -59,6 +60,7 @@ export default function WatchYourStepPage() {
   const badge = gatedCanonicalText(landingBadgeText, "short");
   const headline = gatedCanonicalText(landingHeadlineText, "short");
   const lead = gatedCanonicalText(landingLeadText, "short");
+  const courseStatus = gatedCanonicalText(landingCourseStatusText, "full");
   const instructor = gatedCanonicalText(landingInstructorEyebrowText, "short");
   const footnote = gatedCanonicalText(stopScaffoldFootnoteText, "short");
   const portrait = wysBenSlotById("slot-portrait-mobile-disc");
@@ -75,6 +77,12 @@ export default function WatchYourStepPage() {
         ) : null}
         {headline ? <h1 className={styles.headline}>{headline.text}</h1> : null}
         {lead ? <p className={styles.lead}>{lead.text}</p> : null}
+        {courseStatus ? (
+          <p className={styles.statusNotice}>
+            <span>{courseStatus.label}</span>
+            {courseStatus.text}
+          </p>
+        ) : null}
         <p className={styles.tryOne}>{landingLabels.tryOneMobile}</p>
       </header>
 

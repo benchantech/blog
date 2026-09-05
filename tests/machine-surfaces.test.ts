@@ -89,9 +89,9 @@ test("no surface is listed twice — one canonical node per concept", () => {
 });
 
 test("the roster lists no redirect and no historical alternative", () => {
-  // `/about`, `/lab` and `/posts` are preserved redirects in the frozen
+  // `/about`, `/lab`, `/posts` and `/upwork` are redirects in
   // next.config.ts. They keep working; they are not canonical URLs.
-  for (const redirect of ["/about", "/lab", "/posts"]) {
+  for (const redirect of ["/about", "/lab", "/posts", "/upwork"]) {
     assert.ok(!canonicalSurfacePaths().includes(redirect), `${redirect} is a redirect, not a surface`);
   }
   assert.ok(!canonicalSurfacePaths().includes("/watch-your-step/stop/[stopId]"));
@@ -151,7 +151,7 @@ test("llms.txt lists every current canonical surface and nothing else", () => {
   for (const surface of canonicalSurfaces) {
     assert.ok(text.includes(absoluteUrl(surface.path)), `llms.txt omits ${surface.path}`);
   }
-  for (const redirect of ["/about", "/lab", "/posts"]) {
+  for (const redirect of ["/about", "/lab", "/posts", "/upwork"]) {
     assert.ok(!text.includes(`${SITE_ORIGIN}${redirect}`), `llms.txt lists the ${redirect} redirect`);
   }
 });

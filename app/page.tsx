@@ -32,7 +32,6 @@ import { StruckPill } from "@/components/ui/StruckPill";
 import { MediaSlot } from "@/components/provenance/MediaSlot";
 import { cx } from "@/components/provenance/cx";
 import { AudioSlotPill } from "@/components/wys/AudioSlotPill";
-import { HeroDemo } from "@/components/wys/HeroDemo";
 import { StopCard, StopStrip } from "@/components/wys/StopCard";
 import { landingStopCells } from "@/components/wys/landing-stops";
 import styles from "./home.module.css";
@@ -115,7 +114,26 @@ export default function Home() {
             <p className={styles.heroTryOne}>{landingLabels.tryOneDesktop}</p>
           </div>
         </div>
-        <HeroDemo breakpoint="desktop" />
+        <section className={styles.upworkFeature} aria-labelledby="upwork-feature-title">
+          <div className={styles.screenshotSlot} aria-label="Screenshot placeholder" />
+          <div className={styles.upworkCopy}>
+            <p className={styles.upworkEyebrow}>Recent Graduate</p>
+            <h2 id="upwork-feature-title">From Upwork to CTO</h2>
+            <Link className={styles.upworkLink} href="/upwork" target="_blank" rel="noreferrer">
+              <span>benchantech.com/upwork</span>
+              <span aria-hidden="true">↗</span>
+            </Link>
+            <Link
+              className={styles.upworkLink}
+              href="https://www.linkedin.com/in/benchantech/"
+              target="_blank"
+              rel="noreferrer"
+            >
+              <span>linkedin.com/in/benchantech</span>
+              <span aria-hidden="true">↗</span>
+            </Link>
+          </div>
+        </section>
       </section>
 
       <div className={styles.section}>

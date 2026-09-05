@@ -142,3 +142,15 @@ export const POSTURE_OPTION_IDS: readonly string[] = POSTURE_OPTIONS.map((option
  * is the correct one. Adding a notice means adding its id here first.
  */
 export const WYS_NOTICE_IDS: readonly string[] = [];
+
+/* -------------------------------------------------------------------------- */
+/* Public course availability                                                 */
+/* -------------------------------------------------------------------------- */
+
+export type WysCourseStatus = "under_development" | "open";
+
+export const WYS_COURSE_STATUS: WysCourseStatus = "under_development";
+
+export function wysCourseIsOpen(status: WysCourseStatus = WYS_COURSE_STATUS): boolean {
+  return status === "open";
+}

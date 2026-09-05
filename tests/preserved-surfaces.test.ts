@@ -135,12 +135,14 @@ test("the 7 footer legal links and the 6 refreshed legal pages are not confused"
 /* Redirects                                                                  */
 /* -------------------------------------------------------------------------- */
 
-test("all three redirects survive in next.config.ts", () => {
+test("preserved redirects and launch redirects survive in next.config.ts", () => {
   const config = readRepoFile("next.config.ts");
   const redirects = [
     { source: "/lab", destination: "/neon" },
     { source: "/about", destination: "/system" },
-    { source: "/posts", destination: "https://benchanviolin.substack.com" }
+    { source: "/posts", destination: "https://benchanviolin.substack.com" },
+    { source: "/upwork", destination: "https://www.upwork.com/freelancers/~01a10f284f33009412" },
+    { source: "/watch-your-step/:path+", destination: "/watch-your-step" }
   ];
   for (const redirect of redirects) {
     assert.ok(
@@ -152,7 +154,7 @@ test("all three redirects survive in next.config.ts", () => {
       `redirect destination ${redirect.destination} was dropped from next.config.ts`
     );
   }
-  assert.equal(occurrences(config, "source:"), 3, "exactly three redirects exist today");
+  assert.equal(occurrences(config, "source:"), redirects.length, "redirect count changed without test coverage");
 });
 
 /* -------------------------------------------------------------------------- */

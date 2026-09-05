@@ -90,7 +90,7 @@ test("the preserved sections keep their ids, their labels and their order", () =
   const router = homePage.indexOf("<IntentRouter />");
   const stakeholders = homePage.indexOf('className="stakeholder-section"');
   assert.ok(foyer < doors && doors < router && router < stakeholders, "the preserved blocks were reordered");
-  assert.ok(homePage.indexOf("<HeroDemo") < foyer, "the 4a composition is no longer above the preserved foyer");
+  assert.ok(homePage.indexOf("upworkFeature") < foyer, "the 4a composition is no longer above the preserved foyer");
 });
 
 test("the two class-contract findings are resolved in the stylesheet, not in the markup", () => {
@@ -105,17 +105,24 @@ test("the two class-contract findings are resolved in the stylesheet, not in the
 /* Q3 — one component, one content object, two URLs                           */
 /* -------------------------------------------------------------------------- */
 
-test("both surfaces mount the same hero demo component", () => {
-  assert.ok(homePage.includes('from "@/components/wys/HeroDemo"'), "/ does not mount HeroDemo");
+test("home renders the Upwork feature, and the course landing keeps the hero demo", () => {
+  assert.ok(!homePage.includes('from "@/components/wys/HeroDemo"'), "/ still mounts HeroDemo");
   assert.ok(landingPage.includes('from "@/components/wys/HeroDemo"'), "/watch-your-step does not mount HeroDemo");
-  assert.ok(homePage.includes('<HeroDemo breakpoint="desktop" />'));
   assert.ok(landingPage.includes('<HeroDemo breakpoint="mobile" />'));
+  assert.ok(homePage.includes('href="/upwork"'), "/ does not link to the Upwork redirect");
+  assert.ok(homePage.includes('target="_blank"'), "feature links do not pop out");
+  assert.ok(homePage.includes('aria-hidden="true">↗</span>'), "feature links do not show external arrows");
+  assert.ok(
+    homePage.includes('href="https://www.linkedin.com/in/benchantech/"'),
+    "/ does not link to LinkedIn"
+  );
+  assert.ok(homePage.includes("From Upwork to CTO"), "/ does not render the Upwork feature");
 });
 
-test("neither page can choose the demo's scenario — the content object does", () => {
+test("the course landing cannot choose the demo's scenario — the content object does", () => {
   // A `scenarioId` prop would make "the same content object" a convention
   // rather than a fact. The component looks the record up itself.
-  for (const [name, source] of [["/", homePage], ["/watch-your-step", landingPage]] as const) {
+  for (const [name, source] of [["/watch-your-step", landingPage]] as const) {
     const mounts = [...source.matchAll(/<HeroDemo\b([^>]*)\/>/g)].map((match) => match[1]);
     assert.equal(mounts.length, 1, `${name} mounts the hero demo ${mounts.length} times`);
     assert.deepEqual(

@@ -17,6 +17,16 @@ const nextConfig: NextConfig = {
         source: "/posts",
         destination: "https://benchanviolin.substack.com",
         permanent: false
+      },
+      {
+        source: "/upwork",
+        destination: "https://www.upwork.com/freelancers/~01a10f284f33009412",
+        permanent: false
+      },
+      {
+        source: "/watch-your-step/:path+",
+        destination: "/watch-your-step",
+        permanent: false
       }
     ];
   }
