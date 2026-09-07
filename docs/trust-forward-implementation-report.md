@@ -70,18 +70,35 @@ legitimately changed (browser keys 2→3, CSS modules 59→68), never a dropped 
 
 ## Deliberately not done
 
-- **Five surfaces have no approved wording** and are `null` so nothing can render an invented
-  sentence: Case 4's opening callback, Case 5's AI explanation body, the landing FAQ answers, the
-  reveal's professional-summary block, and — found during the UI build — the SHIP bars' axis-END
-  captions. The four bars are two-ended and no approved source says what the two ends MEAN, so
-  they currently ship **unlabelled**. Honest, and incomplete. (`ROUTING_AND_SCORING.md` gives a
-  reading per BIT, but captioning a continuous lean with a threshold's reading would tell a learner
-  at 50.4% something their answers do not support.) All five live in `content/` and are listed in
-  `TRUST_FORWARD_UNSOURCED_SURFACES`; a test asserts each stays `null` and that no sixth appears
-  undeclared.
-  Two were initially set to descriptive strings, which is precisely the failure mode: one would
-  have printed inside the AI's own report, in the case whose subject is a confident claim
-  outrunning its evidence.
+- **All five once-unsourced surfaces are closed by layer 09** (`09_final-copy-completion-2026-09-07`,
+  6 files, manifest verified). Three were AUTHORED — the landing FAQ answers, the professional-summary
+  template, and Case 5's AI explanation body. Two were RULED ABSENT BY DESIGN:
+
+  - **Case 4 has no opening callback.** "Its cross-case resurfacing belongs at the Case 4 close.
+    Do not add an opening callback for symmetry."
+  - **The SHIP bars carry no endpoint captions.** The bars show a continuous lean while the
+    available 0/1 language describes thresholded bit outcomes, so captions "would imply
+    unsupported precision."
+
+  All five `TODO_` constants stay exported and `null` — a resolved one as a tombstone pointing at
+  where the copy went, a ruled one as a decision record. `TRUST_FORWARD_UNSOURCED_SURFACES` is now
+  empty, and the three lists partition cleanly.
+
+  **Both by-design rulings are now GUARDED, and they were not.** An adversarial review found that
+  either surface could be restored with the entire suite still green: adding a `caseNumber: 4`
+  record to `openingCallbacks`, or passing `axisEndLabels` from the composition root — the `TODO_`
+  constants stay `null` in both cases, so nothing noticed. Both are exactly the "fix" a well-meaning
+  reader reaches for, because the asymmetry looks like an oversight. Two tests now assert the
+  callback set is `[2, 3, 5]` and that no composition root supplies captions, and both were verified
+  by reversing each ruling and watching them fail.
+
+  One posture-vocabulary trap, caught before implementation: the approved summary template names
+  three postures differently from the canonical vocabulary — `bound` for `investigate`, `target`
+  for `sample`, `verify` for `prove`. Orderings and meanings agree, so it maps by position, but a
+  key lookup would have silently dropped **3 of 18 clauses** with no error. The clause table is
+  written in canonical terms, the composer throws rather than degrading, and a test asserts the
+  mapping against the source artifact.
+
 - **The aggregate A/B/C counter ships disabled** (`TF_AGGREGATE_ENABLED = false`) per Ben's Q-E
   ruling. The adapter is built and tested; nothing transmits, because there is no endpoint and no
   persistence layer, and the ruling forbids adding the repo's first backend to activate it.

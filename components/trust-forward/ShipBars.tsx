@@ -48,8 +48,8 @@ import styles from "./reveal.module.css";
  * can move a code.
  *
  * NO PROSE IS AUTHORED IN THIS FILE. The axis names come from Ben's own config
- * via `SHIP_AXIS_LABELS`; the end captions do not exist in `content/` yet and
- * this component will not invent them — see `TODO_SHIP_AXIS_END_LABELS`.
+ * via `SHIP_AXIS_LABELS`; the ends carry no captions at all, and as of layer 09
+ * that is a RULING rather than a gap — see `TODO_SHIP_AXIS_END_LABELS`.
  */
 
 /**
@@ -64,30 +64,32 @@ export interface ShipAxisEnds {
 }
 
 /**
- * THE GAP, named. `ROUTING_AND_SCORING.md` describes both ends of all four
- * axes — Scope's "Start from available scope" against "Stop / inspect /
- * clarify before committing", and the three like it. That wording is
- * learner-facing and no module under `content/trust-forward/` carries it, so
- * this component renders end captions only when a composition root passes them
- * through `endLabels`, and renders the bars without captions otherwise.
+ * NOT A GAP — A RULING. Layer 09 decided the bar ends carry NO CAPTIONS, BY
+ * DESIGN (`ship-axis-end-captions.BEN_APPROVED.json`, 2026-09-07), and the
+ * approved reason is the one this component was already giving:
+ * `ROUTING_AND_SCORING.md` describes both ends of all four axes — Scope's
+ * "Start from available scope" against "Stop / inspect / clarify before
+ * committing", and the three like it — but those sentences read a thresholded
+ * BIT while the bar renders a continuous lean, so captioning the ends with them
+ * "would imply unsupported precision". A learner at 50.4% would be told they
+ * stop and inspect before committing, which is not a claim their answers make.
  *
- * The captions are not typed into this file, and must not be: every
- * learner-facing string in this repository lives in `content/`, and eight
- * sentences typed into a component are eight sentences with no provenance tag,
- * no citation and no diff against the handoff they came from. The fix is to add
- * an axis-end record to `content/trust-forward/` (or, if they are judged labels
- * rather than prose, beside `SHIP_AXIS_LABELS`, which carries its own note
- * about why it sits in `lib/`), and then to pass it in. Until then the bars are
- * honest about being directionless rather than dishonest about who wrote the
- * directions.
+ * So `TODO_SHIP_AXIS_END_LABELS` stays `null` permanently rather than
+ * provisionally, and it is registered on `TRUST_FORWARD_ABSENT_BY_DESIGN`
+ * rather than on the unsourced list. Nothing here is waiting for copy: the next
+ * person to notice that a two-ended bar has unlabelled ends should read this
+ * comment and stop, not go looking for the eight sentences. The ruling's own
+ * future rule is the only way in — captions become possible if Ben later
+ * authors language for CONTINUOUS TENDENCIES rather than for bit meanings, and
+ * `endLabels` is the slot that would then be filled from `content/`, never from
+ * this file.
  */
 /*
- * DECLARED IN `content/`, NOT HERE. The gap is a missing CONTENT record, so it
- * is registered where the other four unsourced surfaces are and re-exported
- * here for the component that would consume it. A `null` in a component is a
- * component's business; a missing learner-facing string is the content
- * registry's, and `TRUST_FORWARD_UNSOURCED_SURFACES` is the one place "what is
- * still missing" gets answered.
+ * RE-EXPORTED FROM `content/`, NOT DECLARED HERE. The decision is about a
+ * learner-facing string, so it is recorded where the content registry answers
+ * "what is absent and why" — `TRUST_FORWARD_ABSENT_BY_DESIGN` — and re-exported
+ * here for the component the decision is about. A `null` in a component is only
+ * a component's business; this one is the registry's.
  */
 export { TODO_SHIP_AXIS_END_LABELS } from "@/content/trust-forward/copy";
 
@@ -111,7 +113,7 @@ export function ShipBars({
   ship: ShipResult;
   /** Defaults to the four `ship.axes[*].label` values from Ben's config. */
   axisLabels?: Readonly<Record<ShipAxis, string>>;
-  /** Absent until `content/` carries the eight end captions. See the TODO above. */
+  /** Ruled absent by design; the slot survives for the ruling's future rule. */
   endLabels?: Readonly<Record<ShipAxis, ShipAxisEnds>>;
 }) {
   return (

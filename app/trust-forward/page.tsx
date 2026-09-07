@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { LANDING_COMPLETE, LANDING_INCOMPLETE } from "@/content/trust-forward/copy";
+import { LANDING_COMPLETE, LANDING_FAQ, LANDING_INCOMPLETE } from "@/content/trust-forward/copy";
 import { ROUTES } from "@/content/trust-forward/stamp/v1-1-0";
 import { ActionPill } from "@/components/ui/ActionPill";
 import { CardShell } from "@/components/ui/CardShell";
@@ -61,12 +61,31 @@ import styles from "./trust-forward.module.css";
  * has published the claim without its limit — so there is no code path here
  * that can show one without the other.
  *
- * THE SIX INTENT QUESTIONS RENDER AS AN INDEX, NOT AS AN FAQ. The handoff
- * supplies the questions and no approved answers (`TODO_LANDING_FAQ_ANSWERS` is
- * `null` at its definition site, and `TRUST_FORWARD_UNSOURCED_SURFACES` names
- * it). Six plausible paragraphs would read as Ben answering six questions about
- * his own product, which is the relabelling `TRUST_FORWARD_PROVENANCE.md`
- * forbids. A list of questions is honest; six invented answers are not.
+ * THE SIX INTENT QUESTIONS NOW RENDER AS AN ANSWERED FAQ. They rendered as a
+ * bare index for as long as there were no approved answers to put under them;
+ * layer 09's `landing-faq-answers.BEN_APPROVED.json` supplied all six, and they
+ * reach this file as `LANDING_FAQ`. `TODO_LANDING_FAQ_ANSWERS` is now a
+ * tombstone, still `null` and still exported, and
+ * `TRUST_FORWARD_RESOLVED_SURFACES` records where the copy went. The index is
+ * gone rather than kept alongside: the same six questions printed twice on one
+ * page is a duplicate, not a summary.
+ *
+ * ANSWER-FIRST MEANS THE ANSWER IS IN THE SERVED HTML, and that is a stronger
+ * requirement than it sounds. `LandingCompletion` mounts the incomplete tree on
+ * the server and on the first client render, so this block is what a crawler
+ * receives — but only while nothing hides it. So: no `<details>`, no accordion,
+ * no `hidden` attribute, no client-side reveal. Layer 07's rule is that
+ * "personalized local summaries are not the crawlable SEO surface; use
+ * answer-first public Trust Forward landing/FAQ content", and the whole point
+ * of that rule is content a machine can read without executing anything.
+ *
+ * A HEADING AND A PARAGRAPH, INSIDE A LIST. The question is an `h2` because it
+ * is what a screen-reader user jumps between and what a crawler indexes, and a
+ * bolded paragraph is neither. The six sit in a `ul` so assistive technology
+ * announces how many there are before the reader commits to the first; the
+ * marker is removed in the stylesheet, not the semantics. `dl` was the other
+ * candidate and was not taken — a `dt` is not a heading, so it would cost the
+ * heading-navigation the FAQ exists to be reachable by.
  *
  * NO SECTION EYEBROWS. `SectionEyebrow` is a fine primitive and every label it
  * would carry here would have to be typed in this file — caps are typed in the
@@ -139,14 +158,17 @@ function IncompleteLanding() {
         <FullOffer offer={copy.fullOffer} />
       </div>
 
-      <div className={styles.wedge}>
+      <section className={styles.wedge}>
         <p className={styles.wedgeLead}>{copy.semanticWedge}</p>
-        <ul className={styles.questionList}>
-          {copy.intentQuestions.map((question) => (
-            <li key={question}>{question}</li>
+        <ul className={styles.faqList}>
+          {LANDING_FAQ.map((entry) => (
+            <li key={entry.question} className={styles.faqItem}>
+              <h2 className={styles.faqQuestion}>{entry.question}</h2>
+              <p className={styles.faqAnswer}>{entry.answer}</p>
+            </li>
           ))}
         </ul>
-      </div>
+      </section>
     </article>
   );
 }

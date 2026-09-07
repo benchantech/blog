@@ -337,6 +337,37 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* The professional summary — layer 09's deterministic template               */
+/* -------------------------------------------------------------------------- */
+
+/* THE TAKE-AWAY GROUP. This card and the export/copy row under it are one
+   thing: the ruling titles the block "A professional version you can keep", so
+   it is drawn as an artifact the learner leaves with rather than as another
+   passage of the reveal. `--tint-grey` and `--radius-card` are the same card
+   register `.copyPanel` and `.confirmRow` use a few rules down, which is what
+   makes the grouping read without a heading saying so.
+
+   NOT `--tint-teal`. That register belongs to the upsell, and this paragraph is
+   the learner's own summary, not an offer. */
+.summary {
+  gap: 10px;
+  padding: 22px;
+  background: var(--tint-grey);
+  border-radius: var(--radius-card);
+}
+
+/* Set for copying out, not for skimming: 16px at 1.6 with a comfortable
+   measure, because six clauses and a closing sentence run long and this is the
+   one paragraph on the page a learner may read twice before pasting it
+   somewhere. `user-select` is untouched — selecting it is the point. */
+.summaryBody {
+  margin: 0;
+  max-width: 62ch;
+  font: 400 16px / 1.6 var(--sans);
+  color: var(--ink);
+}
+
+/* -------------------------------------------------------------------------- */
 /* 4. The closing upsell                                                      */
 /* -------------------------------------------------------------------------- */
 .upsell {
@@ -455,14 +486,44 @@
   cursor: pointer;
 }
 
+/* Step two of the destructive confirmation: the export offer, then the two
+   controls. One panel, so the offer cannot be read as belonging to some other
+   part of the page. */
+.confirm {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 14px 16px;
+  background: var(--tint-grey);
+  border-radius: var(--radius-row-lg);
+}
+
+/* THE EXPLANATION SITS BENEATH THE ACTION IT EXPLAINS — a column, never a row.
+   "Saves your complete Lite record before this browser copy is reset" is the
+   sentence that makes the button's "(JSON)" mean something, and beside the
+   button it would be a caption a learner scans past on the way to `Start
+   over`. */
+.exportFirst {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+}
+
+.exportFirstNote {
+  margin: 0;
+  max-width: 52ch;
+  font: 400 13px / 1.45 var(--sans);
+  color: var(--muted);
+}
+
+/* The row inside `.confirm`: the reset and the way out of it. It keeps its own
+   name because the panel around it now carries the padding and the tint. */
 .confirmRow {
   display: flex;
   flex-wrap: wrap;
   align-items: center;
   gap: 10px;
-  padding: 14px 16px;
-  background: var(--tint-grey);
-  border-radius: var(--radius-row-lg);
 }
 
 /* -------------------------------------------------------------------------- */
@@ -531,6 +592,7 @@
   }
 
   .result,
+  .summary,
   .upsell {
     padding: 18px;
   }

@@ -91,23 +91,44 @@ export const TRUST_FORWARD_RECORD_FREE_MODULES: readonly string[] = [
 ];
 
 /**
- * The four surfaces the approved sources do not supply wording for.
+ * WHAT WAS MISSING, AND WHAT HAPPENED TO IT.
  *
- * Recorded as a named list rather than left as scattered `TODO_` constants so
- * that "what is still missing" is answerable in one place. Each is `null` at
- * its definition site, so nothing can render an invented sentence in its place
- * — the same mechanism `AwaitingCopy` uses elsewhere in this repo.
+ * Five surfaces had no approved wording at implementation time. Layer 09
+ * (2026-09-07) closed all five — three by authoring the copy, two by ruling
+ * that the surface should not exist. Both are answers; only one is content.
+ *
+ * The five `TODO_` constants all remain `null` and all remain exported. A
+ * resolved one is a TOMBSTONE — it points a reader who searches the old name at
+ * where the copy went — and a ruled one is a DECISION RECORD, which is the more
+ * durable of the two: without it, the next person to notice that Case 4 has no
+ * opening callback when cases 2, 3 and 5 do would reasonably "fix" it.
  */
-export const TRUST_FORWARD_UNSOURCED_SURFACES: readonly string[] = [
-  "cases.ts: TODO_C5_AI_EXPLANATION_BODY_UNSOURCED",
+export const TRUST_FORWARD_RESOLVED_SURFACES: readonly string[] = [
+  "cases.ts: TODO_C5_AI_EXPLANATION_BODY_UNSOURCED -> copy.ts C5_AI_EXPLANATION_BODY",
+  "copy.ts: TODO_LANDING_FAQ_ANSWERS -> copy.ts LANDING_FAQ",
+  "copy.ts: TODO_RESULT_PROFESSIONAL_SUMMARY -> copy.ts PROFESSIONAL_SUMMARY_CLAUSES"
+];
+
+/**
+ * Ruled absent BY DESIGN, not awaiting copy. Neither may be filled in without a
+ * superseding ruling, and each carries its reason at its definition site:
+ *
+ *  - Case 4's opening callback: its cross-case resurfacing belongs at the close.
+ *    "Do not add an opening callback for symmetry."
+ *  - The SHIP bars' end captions: the bars show a continuous lean while the
+ *    available 0/1 language describes thresholded bit outcomes, so captions
+ *    "would imply unsupported precision."
+ */
+export const TRUST_FORWARD_ABSENT_BY_DESIGN: readonly string[] = [
   "surfaces.ts: TODO_CASE_4_OPENING_CALLBACK_UNAUTHORED",
-  "copy.ts: TODO_LANDING_FAQ_ANSWERS",
-  "copy.ts: TODO_RESULT_PROFESSIONAL_SUMMARY",
-  /*
-   * FIVE, not four. Found during the UI build: the four SHIP bars are
-   * two-ended and no approved source names what the two ends MEAN, so they
-   * ship unlabelled. `ROUTING_AND_SCORING.md` gives a reading per BIT, but a
-   * bit's reading is not a lean's caption — see the constant's own note.
-   */
   "copy.ts: TODO_SHIP_AXIS_END_LABELS"
 ];
+
+/**
+ * Still missing, with no wording and no ruling. Empty as of layer 09.
+ *
+ * Kept as an exported constant rather than deleted: it is the list the next gap
+ * gets added to, and a name that exists is easier to find than one that has to
+ * be reinvented.
+ */
+export const TRUST_FORWARD_UNSOURCED_SURFACES: readonly string[] = [];

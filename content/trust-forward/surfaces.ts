@@ -296,6 +296,20 @@ export const openingCallbacks: readonly OpeningCallback[] = [
  * an opening for it, `openingCallbacks` has no Case 4 entry and a renderer must
  * show none. If Ben later authors one, delete this constant and add the record.
  */
+/**
+ * RULED 2026-09-07: **none by design.**
+ *
+ * Cases 2, 3 and 5 open by resurfacing the learner's exact prior choice; Case 4
+ * does not, and that is now a decision rather than an absence. The approved
+ * rule: "Case 4 opens directly on its variant/scenario. Its cross-case
+ * resurfacing belongs at the Case 4 close. Do not add an opening callback for
+ * symmetry."
+ *
+ * The last clause is the operative one. The pull to add one here is symmetry
+ * with the other three cases, and symmetry is not a reason — Case 4's contrast
+ * lands harder at the close, where the learner has just answered, than at the
+ * open, where they have not.
+ */
 export const TODO_CASE_4_OPENING_CALLBACK_UNAUTHORED = null;
 
 export function openingCallbackForCase(caseNumber: CaseNumber): OpeningCallback | null {

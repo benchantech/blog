@@ -4,7 +4,15 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 import { caseByNumber, decisionById, optionById } from "@/content/trust-forward/cases";
 import type { AiCompletionReport } from "@/content/trust-forward/cases";
-import { HANDLE, INFO_MARKERS, LITE_INTRO, PROGRESS, REFLECTION, RESULT } from "@/content/trust-forward/copy";
+import {
+  C5_AI_EXPLANATION_BODY,
+  HANDLE,
+  INFO_MARKERS,
+  LITE_INTRO,
+  PROGRESS,
+  REFLECTION,
+  RESULT
+} from "@/content/trust-forward/copy";
 import {
   caseCloseForCase,
   gatedCardById,
@@ -914,7 +922,23 @@ export function LiteSandbox({ children }: { children: ReactNode }) {
     </section>
   );
 
-  /** Case 5's completion report. It is meant to look competent, and does. */
+  /**
+   * Case 5's completion report. It is meant to look competent, and does.
+   *
+   * THE EXPLANATION BODY IS ONE STRING FOR ALL 27 VARIANTS
+   * (09_final-copy-completion-2026-09-07/case5-ai-explanation-body, BEN_APPROVED,
+   * scope `all_case5_variants`). The ruling forbids giving it framework,
+   * library, file or variant-specific detail, and that prohibition is the case
+   * rather than a copy preference: a report that named a real file, a real test
+   * name or the learner's own stack would be a report the learner could go and
+   * check, and checking it would settle the question the case exists to leave
+   * open. Case 5's whole subject is a claim that is competent, plausible and
+   * confidently incomplete — the learner has to decide what to do about it
+   * WITHOUT a detail they can verify. So this body is deliberately unfalsifiable
+   * from the outside, it is the same body on every path into Case 5, and it is
+   * read from content/ rather than composed here. Any future branch on variant,
+   * path or decision state would re-open the prohibition, not implement it.
+   */
   const renderAiReport = (report: AiCompletionReport) => (
     <section className={styles.report}>
       <p className={styles.line}>{report.lead}</p>
@@ -924,6 +948,7 @@ export function LiteSandbox({ children }: { children: ReactNode }) {
           <li key={claim}>{claim}</li>
         ))}
       </ul>
+      <p className={styles.reportBody}>{C5_AI_EXPLANATION_BODY}</p>
     </section>
   );
 

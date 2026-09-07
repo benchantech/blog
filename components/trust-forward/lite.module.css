@@ -600,6 +600,23 @@
   line-height: 1.8;
 }
 
+/* The report's explanation body, beneath the five claim lines and INSIDE the
+   same slab. It is one paragraph of the agent's own prose, so it keeps the
+   slab's register exactly — same mono face, same size, same on-ink colour as
+   the claims above it. No rule, no tint, no second surface: a divider or a
+   panel of its own would frame it as commentary ABOUT the report, and it is
+   part of the report. The only difference from `.reportClaims` is the top
+   margin that separates a list from a paragraph, and a slightly looser line
+   height, which is what running prose needs and a list of five short lines
+   does not. */
+.reportBody {
+  margin: 14px 0 0;
+  color: var(--body-on-dark);
+  font-family: var(--font-plex-mono), ui-monospace, monospace;
+  font-size: 0.8125rem;
+  line-height: 1.7;
+}
+
 /* --- Decisions ----------------------------------------------------------- */
 
 .decision {

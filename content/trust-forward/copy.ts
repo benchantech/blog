@@ -503,6 +503,11 @@ export const LANDING_COMPLETE = {
  * heading list, a FAQ index — and not as a question-and-answer block with six
  * empty answers.
  */
+/**
+ * RESOLVED 2026-09-07 — the answers are authored; see `LANDING_FAQ` below.
+ * Kept as a tombstone so a reader who searches for the old name finds where it
+ * went rather than concluding the FAQ was dropped.
+ */
 export const TODO_LANDING_FAQ_ANSWERS = null;
 
 /**
@@ -514,6 +519,10 @@ export const TODO_LANDING_FAQ_ANSWERS = null;
  * recovered 729-state deterministic narrative, which `profiles.ts` owns. This
  * constant exists so that a reader who searches this file for the summary finds
  * the reason it is absent instead of assuming it was forgotten.
+ */
+/**
+ * RESOLVED 2026-09-07 — the template is authored; see
+ * `PROFESSIONAL_SUMMARY_CLAUSES` below. Tombstone, as above.
  */
 export const TODO_RESULT_PROFESSIONAL_SUMMARY = null;
 
@@ -563,8 +572,153 @@ export type TrustForwardCopyGroup = keyof typeof COPY_PROVENANCE;
  * ship unlabelled: honest about being directionless rather than dishonest about
  * what a direction means.
  *
- * `null`, not a description of itself — the same rule as the other four
- * unsourced surfaces. Resolve by authoring four end-pairs under a Ben-approved
- * rule and passing them to `ShipBars` through `endLabels`.
+ * RULED 2026-09-07: **no endpoint captions, by design.** This is no longer a
+ * gap awaiting copy — it is a decision, and the approved reason is the one this
+ * comment already gave: the bars show a continuous lean while the existing 0/1
+ * language describes thresholded bit outcomes, so "endpoint captions would
+ * imply unsupported precision."
+ *
+ * `null` therefore stays, permanently rather than provisionally. Captions may
+ * be added only if Ben later authors language for continuous tendencies rather
+ * than for bit meanings.
  */
 export const TODO_SHIP_AXIS_END_LABELS = null;
+
+/* -------------------------------------------------------------------------- */
+/* Layer 09 — the final approved copy (2026-09-07)                            */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * The landing FAQ, answers included.
+ *
+ * These are the ANSWERS to the six approved intent clusters, and the reason
+ * they belong on the landing rather than the result is layer 07's own SEO rule:
+ * "Personalized local summaries are not the crawlable SEO surface. Use
+ * answer-first public Trust Forward landing/FAQ content." A personalised result
+ * lives in one learner's browser and is worth nothing to a reader arriving from
+ * a search for "how do you verify AI-generated code".
+ *
+ * Third-person site register, never Ben's first person — the same rule every
+ * other public surface here follows.
+ */
+export const LANDING_FAQ = [
+  {
+    question: "Can you trust AI-generated code?",
+    answer:
+      "AI-generated code can be trusted only to the extent that the parts that matter have been verified. The required evidence should scale with the consequence of being wrong, and the developer should understand enough of the implementation to know what still needs checking."
+  },
+  {
+    question: "How do you verify AI-generated code?",
+    answer:
+      "Start with the actual promise the code has to keep, then test the consequential paths against that promise. Review assumptions, inspect the parts that carry meaningful risk, and use deterministic evidence such as tests and observed behavior rather than treating a plausible implementation or an AI claim of completion as proof."
+  },
+  {
+    question: "How much work can AI safely own?",
+    answer:
+      "AI can carry a large share of execution. Accountability still needs an explicit human owner. More work can be delegated when scope is clear, consequences are bounded, verification is available, and someone remains responsible for deciding what evidence is enough before the work ships."
+  },
+  {
+    question: "Is my engineering team ready for AI?",
+    answer:
+      "AI readiness is less about access to AI tools than the judgment surrounding their use. A ready team can clarify ambiguous work, decide what to delegate, verify according to consequence, surface uncertainty, keep ownership visible, and recognize when generated work exceeds the team's ability to judge responsibly."
+  },
+  {
+    question: "AI readiness assessment",
+    answer:
+      "An AI readiness assessment should examine how a team handles scope, verification, promises, risk, delegation, and accountability as AI carries more execution. The goal is to expose where AI creates real leverage and where faster implementation could outrun the judgment needed to stand behind the result."
+  },
+  {
+    question: "AI fluency and judgment",
+    answer:
+      "AI fluency is more than knowing how to prompt or generate code. It includes knowing what to ask AI to do, what should remain human, how to test what comes back, when to challenge a plausible answer, and what responsibility still belongs to the person or team using the tool."
+  },
+]  as const;
+
+/**
+ * The professional summary — "A professional version you can keep".
+ *
+ * Deterministic template, NOT AI-generated: one clause per dimension selected
+ * by the learner's terminal posture, then a fixed closing sentence. It is the
+ * one place Lite writes something the learner might reuse elsewhere, which is
+ * exactly why it is composed from a fixed table rather than generated.
+ *
+ * THE KEYS ARE MAPPED BY POSITION, AND THAT IS LOAD-BEARING. The approved
+ * template names three postures differently from the six-dimension vocabulary:
+ * `bound` for `investigate`, `target` for `sample`, `verify` for `prove`. The
+ * orderings agree (low, middle, high) and the meanings agree, so the mapping is
+ * safe — but a key lookup would silently return `undefined` for three of the
+ * eighteen clauses and drop them from the paragraph with no error. The table
+ * below is written in the CANONICAL vocabulary, and
+ * `tests/trust-forward-content.test.ts` asserts every clause matches the
+ * approved artifact so the translation cannot drift.
+ *
+ * Forbidden inputs, per the ruling: the SHIP code, learner reflections, the
+ * recovered `market_copy` and `strongest_upsell` columns, and `profile_headline`.
+ */
+export const PROFESSIONAL_SUMMARY_CLAUSES = {
+  ambiguity: {
+    act: "When the scope is clear enough to move, I start with what I have.",
+    clarify: "If an unclear detail could change the work, I clarify it before I commit.",
+    /* approved template key: `bound` */
+    investigate: "I can move with some uncertainty when I make the unknowns and limits clear.",
+  },
+  verification: {
+    trust: "I rely on credible existing evidence when it already answers the question.",
+    /* approved template key: `target` */
+    sample: "I check the specific parts that still need evidence.",
+    /* approved template key: `verify` */
+    prove: "I do more verification when being wrong would have bigger consequences.",
+  },
+  promise: {
+    commit: "I make a clear commitment when I have enough evidence to stand behind it.",
+    qualify: "If important facts are still missing, I make clear what I can promise and what is still uncertain.",
+    renegotiate: "If new evidence changes what I can responsibly deliver, I revisit the commitment.",
+  },
+  risk: {
+    move: "I keep moving when a mistake would be easy to recover from.",
+    stage: "I break work into reversible steps and checkpoints when I need to limit risk.",
+    protect: "I add safeguards when a failure would be costly or hard to undo.",
+  },
+  ownership: {
+    transfer: "When I delegate work, I let ownership transfer when the new owner is clear.",
+    share: "I can share the work while keeping checkpoints and accountability clear.",
+    retain: "I can delegate the work and still keep final accountability when responsibility has not actually transferred.",
+  },
+  trust: {
+    task: "I stay focused on getting the agreed work delivered.",
+    relationship: "I consider both delivery and what the stakeholder needs to make informed decisions.",
+    stewardship: "I think beyond the immediate task and consider the long-term trust attached to what ships.",
+  },
+} as const;
+
+/** Closes every professional summary, whatever the six clauses were. */
+export const PROFESSIONAL_SUMMARY_CLOSING =
+  "As AI takes on more of the implementation, I stay clear on what still needs my judgment, what evidence I need, and what I am willing to stand behind.";
+
+/** The surface's own title, from the approved ruling. */
+export const PROFESSIONAL_SUMMARY_TITLE = "A professional version you can keep";
+
+/**
+ * Case 5's AI completion report explanation, beneath the five claim lines.
+ *
+ * ONE BODY FOR ALL 27 VARIANTS, per the ruling — and the ruling's second
+ * sentence is the interesting one: "Do not add framework, library, file, or
+ * variant-specific implementation details." A report that named real files
+ * would be a report a learner could check. This one cannot be checked, which is
+ * the whole point of the case: it is competent, plausible, and confidently
+ * incomplete.
+ */
+export const C5_AI_EXPLANATION_BODY =
+  "I updated the requested behavior, added checks around the affected path, and extended the tests to cover the expected flow and relevant edge cases. I also ran the existing test suite to check for regressions around the change. Everything is passing, and I found no remaining issues that would block deployment.";
+
+/**
+ * The Export-first offer shown to a completed learner before "Start over".
+ *
+ * JSON, not Markdown, and the ruling says why: JSON is the only artifact
+ * carrying the whole ledger, and the reset is what destroys it. Markdown stays
+ * available as the readable summary but is not a substitute for the backup.
+ */
+export const EXPORT_FIRST = {
+  primaryAction: "Download full backup (JSON)",
+  explanation: "Saves your complete Lite record before this browser copy is reset."
+} as const;

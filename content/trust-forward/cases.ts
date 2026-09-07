@@ -976,4 +976,9 @@ export const AUTHORING_NOTES: {
  * that outruns its evidence. The explanation belongs in this comment, where no
  * renderer can reach it. Same mechanism as `AwaitingCopy` elsewhere in the repo.
  */
+/**
+ * RESOLVED 2026-09-07 — the body is authored and lives in `./copy.ts` as
+ * `C5_AI_EXPLANATION_BODY`. Tombstone kept so a reader who searches for the old
+ * name finds where it went.
+ */
 export const TODO_C5_AI_EXPLANATION_BODY_UNSOURCED = null;
