@@ -1,0 +1,405 @@
+/* ==========================================================================
+   Trust Forward Lite — the case-run stylesheet
+   (plan §6.10, "one client island plus presentational components under
+   components/trust-forward/"; UX_COPY.md "## Global rule").
+
+   ONE STYLESHEET FOR FIVE COMPONENTS, on purpose. CaseScreen, DecisionRow,
+   InfoMarker, ReflectionBox and TeaserCard are one screen — the case run —
+   drawn in five files because they have five different reasons to change, not
+   because they are five surfaces. Five sibling `.module.css` files would put
+   the case screen's vertical rhythm in five places and guarantee it drifts.
+   The precedent is `components/wys/wys-primitives.module.css`, which four
+   course primitives share for the same reason.
+
+   WHY CSS MODULES AND NOT `app/globals.css` (§4.1). `.card`, `.option-grid`,
+   `.primary`, `.secondary`, `.compact`, `.eyebrow` and `.section-heading` are
+   already taken by the legacy layer, whose class names are that stylesheet's
+   public API. A new surface reusing one of those names inherits blueprint
+   geometry with no compile error and no test failure, so every NEW surface is
+   scoped. `tests/class-contract.test.ts` mode 2 checks each `styles.<key>`
+   against this file.
+
+   NO COLOUR, RADIUS, SHADOW OR DASH IS SPELLED OUT HERE. Every value is a
+   token from `app/globals.css` §1a, because the token comments there are the
+   design ruling — in particular:
+
+     · Selection is a 2px INK ring on a pale-teal fill, never teal.
+       DecisionRow does not implement that itself; it composes
+       `components/ui/ChoiceRow`, which already carries `--tint-teal` +
+       `--ink` + the compensating inset shadow so that SELECTING A ROW DOES
+       NOT REFLOW THE ROWS BELOW IT (§4.7.1, Q18). This file adds only the
+       two-line stack INSIDE that row.
+     · `--accent` never carries body text and never draws a selection ring.
+       Text on a tint is `--accent-text-on-tint` (Q23, the AA correction).
+     · The only glyphs in this build are ▶ → ↓ ✓ ≠ · — so the InfoMarker's
+       disclosure affordance is the literal `↓` character, not an icon.
+
+   MOBILE-FIRST, and the base block IS the phone (`@media (min-width: 701px)`
+   for the desktop enhancement, matching `components/wys/practice.module.css`
+   and `app/watch-your-step/(shell)/landing.module.css`). iPhone Safari at
+   ~390 CSS px is this repo's primary QA target and the plan names it twice;
+   the run must also survive 320px, which is why nothing here is a fixed width,
+   every option row wraps, and the InfoMarker panel is in normal flow rather
+   than an absolutely positioned popover that a 320px viewport would clip.
+
+   TOUCH TARGETS. Every interactive element in this file declares
+   `min-height: 44px` (§4.6). That is not decoration on the InfoMarker: the
+   global rule makes tap/click the PRIMARY way to open a disclosure and hover
+   an enhancement only, so a marker that is hard to tap has no primary
+   interaction at all.
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------- */
+/* CaseScreen — the container one case is run inside                          */
+/* -------------------------------------------------------------------------- */
+
+.screen {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  max-width: 720px;
+  margin: 0 auto;
+}
+
+/* Progress sits ABOVE the title and is deliberately quiet: `Case n of 5` is a
+   position in a fixed sequence, never a score. UX_COPY.md "## Progress" gives
+   the number of the case the learner is ON and no count of cases completed. */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.caseLabel {
+  margin: 0;
+  font: 500 12px / 1 var(--sans);
+  letter-spacing: 0.04em;
+  color: var(--accent-text-on-tint);
+}
+
+/* The case title and its one-word job. `showOnlyReachedTitles` is enforced by
+   the caller passing `title: null`; this row simply collapses when it does,
+   because an unreached title is a spoiler (Case 5 is TAKE THE WHEEL, and a
+   learner who reads that before Case 1 answers Case 1 differently). */
+.titleRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.title {
+  margin: 0;
+  font: 600 26px / 1.15 var(--sans);
+  color: var(--ink);
+}
+
+/* The changed-scenario notice. It states a fact and stops — eight words in the
+   source, and it is styled as a quiet inline note rather than an alert, since
+   nothing has gone wrong and the learner is not being asked to undo anything.
+   `role="status"` on the element makes it a polite live region, so a screen
+   reader hears the scenario changed instead of silently re-reading it. */
+.notice {
+  margin: 0;
+  padding: 10px 14px;
+  border-radius: var(--radius-row);
+  background: var(--tint-teal);
+  color: var(--accent-text-on-tint);
+  font: 500 14px / 1.4 var(--sans);
+}
+
+.scenario {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.body {
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.footer {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* DecisionRow — the two-line stack inside a ChoiceRow                        */
+/* -------------------------------------------------------------------------- */
+
+/* BOTH HALVES SHIP. The extraction guide's one CRITICAL RENDER RULE is "Do not
+   shorten the actual scenario/options to the terse paraphrases in layer-01
+   CASES.md", so the authored label and its sub-description are two stacked
+   lines, not a label with the detail hidden behind a marker. `min-width: 0`
+   plus `overflow-wrap` is what lets a long label wrap at 320px instead of
+   pushing the row wider than the viewport. */
+.option {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+
+.optionLabel {
+  display: block;
+  font-weight: 600;
+  line-height: 1.35;
+  color: var(--ink);
+}
+
+/* Secondary, never hidden. `--body` rather than `--muted`: this is the sentence
+   that makes the option mean something, so it is readable text and not meta. */
+.optionDetail {
+  display: block;
+  font-size: 15px;
+  font-weight: 400;
+  line-height: 1.45;
+  color: var(--body);
+}
+
+/* -------------------------------------------------------------------------- */
+/* InfoMarker — the one disclosure pattern (UX_COPY.md "## Global rule")      */
+/* -------------------------------------------------------------------------- */
+
+/* A `<details>`, so opening works with no client JavaScript at all, has no
+   focus trap, and is already keyboard operable — the same pattern the mobile
+   site header uses. The client effect in the component only ever CLOSES it
+   (Escape, outside pointer), so the guaranteed behaviour survives a failed
+   hydration and the enhancement is genuinely additive. */
+.marker {
+  display: block;
+}
+
+.markerSummary {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  min-height: 44px;
+  padding: 10px 14px;
+  border: 1.5px solid var(--border-pill-strong);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  color: var(--ink);
+  font: 500 14px / 1.3 var(--sans);
+  text-align: left;
+  cursor: pointer;
+  list-style: none;
+}
+
+/* Safari draws its own triangle through a pseudo-element that `list-style`
+   does not reach. */
+.markerSummary::-webkit-details-marker {
+  display: none;
+}
+
+/* HOVER ENHANCES; IT NEVER REVEALS. The panel is opened by tap, click, Enter
+   or Space and by nothing else. Hover changes only the marker's own affordance
+   — which is what "hover only enhances desktop behavior" can mean without
+   producing content that a touch device can never reach. Guarded on
+   `hover: hover` so a touch browser's emulated hover never applies it. */
+@media (hover: hover) and (pointer: fine) {
+  .markerSummary:hover {
+    border-color: var(--ink);
+    background: var(--tint-teal);
+    color: var(--accent-text-on-tint);
+  }
+}
+
+.markerGlyph {
+  color: var(--accent-text-on-tint);
+  font-size: 12px;
+  line-height: 1;
+  transition: transform var(--reveal) ease-out;
+}
+
+.marker[open] .markerGlyph {
+  transform: rotate(180deg);
+}
+
+/* In normal flow, not absolutely positioned. A popover anchored to the marker
+   would be clipped or would overflow the document at 320px, and a learner who
+   cannot see the expansion has the same problem as a learner who cannot open
+   it. */
+.markerPanel {
+  margin-top: 10px;
+  padding: 14px 16px;
+  border-radius: var(--radius-row-lg);
+  background: var(--tint-grey);
+}
+
+.markerText {
+  margin: 0;
+  font: 400 15px / 1.5 var(--sans);
+  color: var(--body);
+}
+
+/* -------------------------------------------------------------------------- */
+/* ReflectionBox — optional writing, never scored                             */
+/* -------------------------------------------------------------------------- */
+
+/* Outlined, not filled: the encoding rule the card primitives carry is
+   "filled = system-recorded fact, outlined = learner-authored", and this is
+   the only surface in the run whose content the learner writes. */
+.reflection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  padding: 18px;
+  border: 1.5px solid var(--border-card);
+  border-radius: var(--radius-card-lg);
+  background: var(--white);
+}
+
+.reflectionHeading {
+  margin: 0;
+  font: 600 18px / 1.25 var(--sans);
+  color: var(--ink);
+}
+
+.reflectionPrompt {
+  margin: 0;
+  font: 400 16px / 1.5 var(--sans);
+  color: var(--body);
+}
+
+.reflectionField {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* Dashed, because the box is empty until the learner fills it and dashed is
+   this system's "empty / awaiting" border. 96px is about four lines at 390px —
+   enough to invite a sentence without implying an expected length, since the
+   disclosure promises "as much or as little as you want". */
+.reflectionInput {
+  display: block;
+  width: 100%;
+  min-height: 96px;
+  padding: 12px 14px;
+  border: 1.5px dashed var(--border-dashed);
+  border-radius: var(--radius-row-lg);
+  background: var(--white);
+  color: var(--ink);
+  font: 400 16px / 1.5 var(--sans);
+  resize: vertical;
+}
+
+.reflectionInput:focus-visible {
+  border-style: solid;
+  border-color: var(--ink);
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* The disclosure is INLINE, not behind a marker. See the component header:
+   every clause in it is a commitment the rest of the build keeps, and a
+   promise parked behind a collapsed control is a promise most learners never
+   open — the same argument `copy.ts` makes about the result disclaimer. */
+.reflectionDisclosure {
+  margin: 0;
+  font: 400 13px / 1.5 var(--sans);
+  color: var(--muted);
+}
+
+/* Wraps rather than scrolls. Three actions at 320px do not fit one row, and
+   "Always skip" is a real preference the learner may want — hiding it behind
+   an overflow would make the suppression path reachable only by accident. */
+.reflectionActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+/* The suppressed state. "Always skip" is a preference, never a deletion: the
+   ledger records the change and drafts already written survive it, so the way
+   back is always on screen. */
+.reflectionSuppressed {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* TeaserCard — the four gated Full-product cards                             */
+/* -------------------------------------------------------------------------- */
+
+/* "Soft, visually secondary. No lengthy AI explanation yet." — the source's own
+   direction for card 1, and the reason this card is the quietest thing on the
+   screen: grey fill, no shadow, no ink slab, a 15px title against the case
+   title's 26px, and an outlined CTA rather than the ink primary. The learner is
+   mid-run; the offer must not compete with the decision in front of them. */
+.teaser {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px;
+  border-radius: var(--radius-card-lg);
+  background: var(--tint-grey);
+}
+
+.teaserTitle {
+  margin: 0;
+  font: 600 15px / 1.3 var(--sans);
+  color: var(--ink);
+}
+
+.teaserBody {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin: 0;
+}
+
+.teaserLine {
+  margin: 0;
+  font: 400 14px / 1.5 var(--sans);
+  color: var(--muted);
+}
+
+.teaserCta {
+  display: flex;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Desktop enhancement                                                        */
+/* -------------------------------------------------------------------------- */
+
+@media (min-width: 701px) {
+  .screen {
+    gap: 26px;
+  }
+
+  .title {
+    font-size: 34px;
+  }
+
+  .caseLabel {
+    font-size: 13px;
+  }
+
+  .reflection {
+    padding: 24px;
+    border-radius: var(--radius-block);
+  }
+
+  .teaser {
+    padding: 20px;
+  }
+
+  .teaserTitle {
+    font-size: 16px;
+  }
+}
+
+/* §4.6: the reveal is an enhancement and is honoured off. */
+@media (prefers-reduced-motion: reduce) {
+  .markerGlyph {
+    transition: none;
+  }
+}

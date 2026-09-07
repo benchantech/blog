@@ -340,7 +340,11 @@ test("mode 2: every styles.<key> resolves to a class in its sibling .module.css"
   // (Q3) — imports `components/wys/wys-primitives.module.css`.
   // `components/wys/landing-stops.ts` is a pure module and imports no
   // stylesheet, so it moves this figure by zero.
-  assert.equal(modulesChecked, 59, "CSS Module imports across app/ and components/ — update deliberately");
+  // 59 -> 68. Trust Forward added nine CSS Module imports: the landing, the
+  // sandbox shell and the case/reveal component sets. The number is pinned so
+  // a new stylesheet cannot arrive unnoticed — bump it in the same commit that
+  // adds one, never to make a red test green.
+  assert.equal(modulesChecked, 68, "CSS Module imports across app/ and components/ — update deliberately");
 });
 
 /* -------------------------------------------------------------------------- */

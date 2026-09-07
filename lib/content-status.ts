@@ -94,13 +94,19 @@ export function isBenOrigin(origin: LabelOrigin): boolean {
  * claim records and the ship prose all render publicly and all need a label.
  * See docs/facelift-build-notes.md.
  */
-export type SurfaceKind = "human-source" | "fictional-scenario" | "judgment" | "general";
+export type SurfaceKind =
+  | "human-source"
+  | "fictional-scenario"
+  | "judgment"
+  | "general"
+  | "constructed-case";
 
 export const SURFACE_KINDS: readonly SurfaceKind[] = [
   "human-source",
   "fictional-scenario",
   "judgment",
-  "general"
+  "general",
+  "constructed-case"
 ];
 
 declare const provenanceLabelBrand: unique symbol;
@@ -155,6 +161,32 @@ const PROVENANCE_LABELS = {
     AI_SYNTHESIS: "Coach synthesis based on Ben sources",
     INSUFFICIENT_SIGNAL: "Ben has not addressed this closely enough",
     IMPLEMENTATION_PLACEHOLDER: "Implementation placeholder — not Ben's words" // NEW
+  },
+  /**
+   * TRUST FORWARD LITE (plan §7). A separate kind rather than a reuse of
+   * `fictional-scenario`, and the reason is one word in that row's labels:
+   * every one of them says "authored for Watch Your Step", which would be a
+   * false statement about a Trust Forward case.
+   *
+   * `CASES.md` is explicit that Lite's five scenarios are constructed and
+   * "must not be presented as Ben's lived cases", so no Ben origin appears
+   * here at all — not even `BEN_AUTHORED`. What Ben approved on 2026-09-07 was
+   * that this recovered material may RENDER; approval to publish is not a
+   * claim of authorship, and collapsing the two is exactly the corruption the
+   * provenance spine exists to prevent.
+   */
+  "constructed-case": {
+    /* The 27 world-state fragments, the callbacks, closes, cross-case surfaces
+     * and the 729 terminal narratives: recovered prior authoring, approved for
+     * public render 2026-09-07. NEW label — needs Ben's stamp (SC-TF6 list). */
+    FICTIONAL_AUTHORED: "Constructed developer scenario — authored for Trust Forward Lite", // NEW
+    BEN_APPROVED: "Approved by Ben", // NEW
+    /* The 33 receipt phrases: written during implementation under Ben's
+     * approved receipt rule, and honestly labelled as such. */
+    AI_SYNTHESIS: "Drafted during implementation — not Ben's words", // NEW
+    IMPLEMENTATION_PLACEHOLDER: "Implementation placeholder — not Ben's words", // NEW
+    /* Reflections and the local handle. */
+    LEARNER_OWNED: "Yours. Stored in this browser only." // NEW
   },
   general: {
     BEN_AUTHORED: "Ben source",

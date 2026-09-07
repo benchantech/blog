@@ -190,6 +190,8 @@ function canonicalLabel(record: AnyCanonicalText): ProvenanceLabel {
       return provenanceLabelFor("judgment", record.origin);
     case "general":
       return provenanceLabelFor("general", record.origin);
+    case "constructed-case":
+      return provenanceLabelFor("constructed-case", record.origin);
   }
 }
 

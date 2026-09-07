@@ -152,6 +152,8 @@ export function policyForCanonicalText(
       return renderPolicyFor(record, surface);
     case "general":
       return renderPolicyFor(record, surface);
+    case "constructed-case":
+      return renderPolicyFor(record, surface);
   }
 }
 

@@ -55,8 +55,22 @@ export function ActionPill({
   );
 
   if (href && !disabled) {
+    /*
+     * `onClick` RIDES ALONG WITH `href`, and dropping it was a real defect.
+     *
+     * An earlier version rendered the anchor without the handler, so a caller
+     * that passed BOTH silently got navigation and no callback — no type error,
+     * no test failure, nothing on screen. Trust Forward's four gated cards hit
+     * exactly that: they are links to /tf that also need to fire
+     * `tf_full_trust_forward_clicked`, and the event simply never fired.
+     *
+     * The handler must not preventDefault or return false — navigation is the
+     * point, and the callback is measurement layered on top of it. Fire-and-go
+     * is also why the telemetry adapter buffers rather than awaiting: the page
+     * may be unloading by the time gtag would flush.
+     */
     return (
-      <a className={className} href={href}>
+      <a className={className} href={href} onClick={onClick}>
         {content}
       </a>
     );

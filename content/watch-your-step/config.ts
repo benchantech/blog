@@ -154,3 +154,30 @@ export const WYS_COURSE_STATUS: WysCourseStatus = "under_development";
 export function wysCourseIsOpen(status: WysCourseStatus = WYS_COURSE_STATUS): boolean {
   return status === "open";
 }
+
+/**
+ * Watch Your Step is retired from public discovery (Ben's ruling, 2026-09-07).
+ *
+ * ONE CONSTANT, AND IT REVERSES IN ONE CHARACTER. The ruling is: remove the
+ * course from navigation and public discovery, preserve the source as a
+ * non-public stub, do NOT delete it, and redirect its old public entry routes
+ * to the homepage with non-permanent redirects.
+ *
+ * Nothing under `app/watch-your-step/` is removed or renamed — the deletion
+ * contract forbids it, and all 34 files are still there. What this flag changes
+ * is what the CHROME advertises and what the machine surfaces publish:
+ *
+ *   - `content/nav.ts` keeps `shipNav` and `lessonZeroCta` intact (the labels
+ *     are still the course's names) and exposes filtered `publicShipNav` /
+ *     `publicLessonZeroCta` that the header and footer actually render;
+ *   - `content/canonical-surfaces.ts` moves every course URL from the canonical
+ *     roster into `RETIRED_SURFACES`, so `/sitemap.xml`, `/llms.txt` and
+ *     `/author-ship/state.json` stop advertising them;
+ *   - `next.config.ts` shadows those URLs with `permanent: false` redirects.
+ *
+ * `tests/machine-surfaces.test.ts` asserts every retired route has a matching
+ * redirect, so a route cannot be quietly retired without also being quietly
+ * redirected. Flipping this to `false` un-retires the course; the redirects are
+ * non-permanent precisely so that stays possible.
+ */
+export const WYS_NAV_RETIRED = true;

@@ -142,7 +142,20 @@ test("preserved redirects and launch redirects survive in next.config.ts", () =>
     { source: "/about", destination: "/system" },
     { source: "/posts", destination: "https://benchanviolin.substack.com" },
     { source: "/upwork", destination: "https://www.upwork.com/freelancers/~01a10f284f33009412" },
-    { source: "/watch-your-step/:path+", destination: "/watch-your-step" }
+    /*
+     * RETIRED, NOT REMOVED. Ben's 2026-09-07 ruling takes Watch Your Step out
+     * of navigation and public discovery and points its old entry routes at the
+     * homepage. The destination therefore changes from `/watch-your-step` to
+     * `/` — a deliberate edit, not a dropped redirect — and both the specific
+     * route and the wildcard are asserted so neither can quietly disappear.
+     *
+     * `permanent: false` on both is asserted separately below: it is what keeps
+     * the retirement reversible.
+     */
+    { source: "/watch-your-step", destination: "/" },
+    { source: "/watch-your-step/:path+", destination: "/" },
+    /* The Trust Forward bridge. One line to change when Studio moves. */
+    { source: "/tf", destination: "https://studio.com/benchanviolin/trust-forward" }
   ];
   for (const redirect of redirects) {
     assert.ok(
@@ -155,6 +168,9 @@ test("preserved redirects and launch redirects survive in next.config.ts", () =>
     );
   }
   assert.equal(occurrences(config, "source:"), redirects.length, "redirect count changed without test coverage");
+  // No redirect this build adds may be permanent: a 308 is cached indefinitely
+  // and would make the Watch Your Step retirement irreversible in the wild.
+  assert.equal(occurrences(config, "permanent: true"), 0, "a permanent redirect was introduced");
 });
 
 /* -------------------------------------------------------------------------- */

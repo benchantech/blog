@@ -665,10 +665,18 @@ test("both operations explain themselves and neither claims to erase hosting or 
 /* The browser-key registry (§7.5)                                            */
 /* -------------------------------------------------------------------------- */
 
-test("BROWSER_KEYS registers both keys this build writes, with their writers", () => {
-  assert.deepEqual([...BROWSER_KEY_NAMES].sort(), ["bct_analytics_consent", "wys:v1"]);
+test("BROWSER_KEYS registers every key this build writes, with their writers", () => {
+  assert.deepEqual(
+    [...BROWSER_KEY_NAMES].sort(),
+    ["bct_analytics_consent", "benchantech:trust-forward-lite:state", "wys:v1"]
+  );
+  // Still exactly one WYS-owned key: adding a third registry row must not
+  // widen what a Watch Your Step clear sweeps.
   assert.deepEqual(wysOwnedKeys(), [WYS_STORAGE_KEY]);
-  assert.deepEqual(keysSurvivingWysClear(), [CONSENT_STORAGE_KEY]);
+  assert.deepEqual(keysSurvivingWysClear(), [
+    "benchantech:trust-forward-lite:state",
+    CONSENT_STORAGE_KEY
+  ]);
   for (const record of BROWSER_KEYS) {
     assert.ok(record.writtenBy.endsWith(".ts") || record.writtenBy.endsWith(".tsx"));
     assert.ok(record.holds.length > 0);

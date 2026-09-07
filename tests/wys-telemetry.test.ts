@@ -718,11 +718,47 @@ const EMISSION_EXEMPT = [
 const GTAG_CODE_REFERENCE = /\bwindow\s*\.\s*gtag\b|\bgtag\s*(\?\.)?\s*\(/;
 const DATALAYER_CODE_REFERENCE = /\bwindow\s*\.\s*dataLayer\b|\bdataLayer\s*(\?\.)?\s*[.[=]/;
 
-test("lib/wys/telemetry.ts is the only dataLayer emission site in the shipped tree", () => {
+/**
+ * TWO ADAPTERS NOW, AND THE RULE IS THE SAME ONE.
+ *
+ * The rule has never been "one file may touch dataLayer"; it is "nothing may
+ * reach dataLayer except through an adapter that enforces a closed event
+ * allowlist, closed property VALUE domains, the consent gate and the ga4-init
+ * flush rule". Trust Forward is a second product with its own closed
+ * allowlist — 17 `tf_`-prefixed events and four properties — and folding its
+ * events into the Watch Your Step adapter would mean one allowlist policing two
+ * vocabularies, which is how an allowlist stops being closed.
+ *
+ * So the exemption is a SET of adapters, and the test below earns each entry by
+ * asserting the properties that make it an adapter rather than a bypass.
+ */
+const DATALAYER_ADAPTERS = ["lib/wys/telemetry.ts", "lib/trust-forward/telemetry.ts"];
+
+test("every dataLayer adapter enforces a closed allowlist and the ga4-init flush rule", () => {
+  for (const relative of DATALAYER_ADAPTERS) {
+    const source = readFileSync(path.join(repoRoot, relative), "utf8");
+    // A closed event vocabulary, not an open string.
+    assert.match(source, /EVENT_NAMES\b/, `${relative} declares no event allowlist`);
+    // Key allowlists alone let a learner's sentence ride under a permitted key.
+    assert.match(source, /PROPERTY_DOMAINS|propertyDomains/i, `${relative} validates no property VALUES`);
+    // Nothing may be pushed before ga4-init's own config command lands, or the
+    // first event of a session is processed with no configured destination.
+    assert.match(source, /config/i, `${relative} does not wait for the ga4-init marker`);
+    // Props must be rebuilt from the allowlist, never spread from the caller.
+    assert.equal(
+      /\.\.\.(props|incoming)\b/.test(source),
+      false,
+      `${relative} spreads caller-supplied props instead of rebuilding them`
+    );
+  }
+});
+
+test("nothing outside the declared adapters emits to dataLayer", () => {
   const offenders: string[] = [];
   for (const file of sourceFiles(["app", "components", "lib", "content"])) {
     const relative = path.relative(repoRoot, file).split(path.sep).join("/");
     if (EMISSION_EXEMPT.includes(relative)) continue;
+    if (DATALAYER_ADAPTERS.includes(relative)) continue;
     if (DATALAYER_CODE_REFERENCE.test(codeOnly(readFileSync(file, "utf8")))) offenders.push(relative);
   }
   assert.deepEqual(

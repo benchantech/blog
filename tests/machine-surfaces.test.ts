@@ -8,6 +8,7 @@ import {
   MACHINE_SURFACE_PATHS,
   SITE_ORIGIN,
   absoluteUrl,
+  RETIRED_SURFACES,
   canonicalSurfacePaths,
   canonicalSurfaces,
   humanCanonicalSurfaces
@@ -66,9 +67,47 @@ test("the roster and the app/ route tree describe the same site", () => {
 
   // The dynamic template is not a surface; its nine concrete URLs are.
   assert.ok(disk.delete("/watch-your-step/stop/[stopId]"), "the per-stop route still exists");
+
+  /*
+   * RETIRED ROUTES: on disk, shadowed by a redirect, not canonical.
+   *
+   * Watch Your Step is retired from public discovery but NOT deleted — the
+   * deletion contract forbids removing any of its files, so its nine page.tsx
+   * routes are still here. They are therefore removed from BOTH sides of the
+   * parity check rather than from neither, and the assertion below is what
+   * stops that being a loophole: a route may only leave the roster this way if
+   * a redirect actually shadows it.
+   */
+  const config = readFileSync(path.join(repoRoot, "next.config.ts"), "utf8");
+  for (const retired of RETIRED_SURFACES) {
+    // The nine per-stop URLs are served by the `[stopId]` template, which is
+    // deleted from `disk` above, so they legitimately have no page file of
+    // their own. Every other retired route must actually exist — you may only
+    // retire something that is there.
+    const servedByTemplate = retired.startsWith("/watch-your-step/stop/");
+    if (!servedByTemplate) {
+      assert.ok(
+        disk.has(retired),
+        `${retired} is registered as retired but has no page file — retire only what exists`
+      );
+    }
+    assert.ok(
+      !roster.has(retired),
+      `${retired} is both retired and canonical; it cannot be both`
+    );
+    // The wildcard `/watch-your-step/:path+` covers every course URL below the
+    // landing, so a route is shadowed by its own rule or by that one.
+    const shadowed =
+      config.includes(`source: "${retired}"`) ||
+      config.includes('source: "/watch-your-step/:path+"');
+    assert.ok(shadowed, `${retired} was dropped from discovery with no redirect behind it`);
+    disk.delete(retired);
+  }
   for (const id of WYS_STOP_IDS) {
-    assert.ok(roster.has(`/watch-your-step/stop/${id}`), `roster is missing stop ${id}`);
-    roster.delete(`/watch-your-step/stop/${id}`);
+    const stop = `/watch-your-step/stop/${id}`;
+    if (RETIRED_SURFACES.includes(stop)) continue;
+    assert.ok(roster.has(stop), `roster is missing stop ${id}`);
+    roster.delete(stop);
   }
 
   // Machine mirrors are surfaces without a page.tsx.
@@ -102,7 +141,9 @@ test("every roster label is a name the site already uses", () => {
     assert.ok(surface.label.trim().length > 0, `${surface.path} has no label`);
     assert.ok(!surface.label.includes("undefined"));
   }
-  assert.equal(Object.keys(CANONICAL_SURFACE_GROUP_LABELS).length, 6);
+  // Seven groups: Trust Forward joined the roster as the site's primary
+  // product entry. Pinned so a group cannot be added without a decision.
+  assert.equal(Object.keys(CANONICAL_SURFACE_GROUP_LABELS).length, 7);
 });
 
 test("the origin is stated once — the roster and the preserved metadataBase agree", () => {

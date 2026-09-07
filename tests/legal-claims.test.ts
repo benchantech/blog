@@ -465,8 +465,15 @@ test("the aggregate endpoint the pages call not built is, in fact, not built", (
   assert.ok(text.text.includes("is not built"));
 });
 
-test("both browser keys are named on /privacy and /cookies, generated from the registry", () => {
-  assert.deepEqual([...BROWSER_KEY_NAMES], [WYS_STORAGE_KEY, "bct_analytics_consent"]);
+test("every browser key is named on /privacy and /cookies, generated from the registry", () => {
+  // THREE keys now. Trust Forward Lite added the third, and the point of this
+  // assertion is that neither legal page needed editing for it to appear:
+  // both render `BrowserKeyList`, which reads the registry. The count is
+  // pinned so a fourth key cannot arrive silently.
+  assert.deepEqual(
+    [...BROWSER_KEY_NAMES],
+    [WYS_STORAGE_KEY, "benchantech:trust-forward-lite:state", "bct_analytics_consent"]
+  );
   const list = read("components/BrowserKeyList.tsx");
   assert.ok(list.includes("BROWSER_KEYS"), "the key list is hand-maintained again");
   for (const record of BROWSER_KEYS) {

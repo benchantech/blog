@@ -27,7 +27,14 @@
  * code, and a claim sourced to "the serializer" with no way to say which file
  * is a claim with no checkable source at all.
  */
-export type ExternalSourceRefKind = "spec" | "artboard" | "packet" | "repo-page" | "repo-doc" | "repo-code";
+export type ExternalSourceRefKind =
+  | "spec"
+  | "artboard"
+  | "packet"
+  | "repo-page"
+  | "repo-doc"
+  | "repo-code"
+  | "tf-package";
 
 export interface ExternalSourceRef {
   id: string;
@@ -157,6 +164,76 @@ export const externalSourceRefs = [
     kind: "repo-code",
     locator:
       "lib/wys/local-state.ts WYS_DECLARED_KEYS — the declared schema has no score, streak, percentage or grade field, so the serializer cannot persist one"
+  },
+  /* ---------------------------------------------------------------------- */
+  /* Trust Forward Lite — the 2026-09-07 handoff (plan §7).                   */
+  /*                                                                          */
+  /* `tf-package` is added in the Trust Forward phase. Every locator carries  */
+  /* the artifact's SHA-256 from the handoff's own manifest, because these    */
+  /* are the first sources this repo cites that live in a versioned bundle    */
+  /* outside it: a filename alone cannot distinguish the layer-07 ruling from */
+  /* the edited-in-place copy that shipped with layer 08, and one of those    */
+  /* two really did change between handoffs.                                  */
+  /* ---------------------------------------------------------------------- */
+  {
+    id: "tf-cases-verbatim",
+    kind: "tf-package",
+    locator:
+      "06_full-five-case-authoring-extraction/FULL_FIVE_CASES_ALL_TEXT_OPTIONS_VERBATIM.md — the complete five-case prior authoring (digest declared in content/trust-forward/digests.ts)"
+  },
+  {
+    id: "tf-signal-map",
+    kind: "tf-package",
+    locator:
+      "03_codex-completion-handoff/recovered/fixed-answer-signal-map.recovered.json — 138 recovered posture tags (digest declared in content/trust-forward/digests.ts)"
+  },
+  {
+    id: "tf-variant-composition",
+    kind: "tf-package",
+    locator:
+      "03_codex-completion-handoff/recovered/55-variant-composition-spec.recovered.json — the 27 world-state fragments (digest declared in content/trust-forward/digests.ts)"
+  },
+  {
+    id: "tf-receipt-drafts",
+    kind: "tf-package",
+    locator:
+      "03_codex-completion-handoff/drafts/33-receipt-phrases.MARKED_DRAFT.json — 33 implementation-authored receipts (digest declared in content/trust-forward/digests.ts)"
+  },
+  {
+    id: "tf-729-narratives",
+    kind: "tf-package",
+    locator:
+      "04_reviewed-implementation-plan/recovered/trust_forward_lite_729_profiles_SHIP_recalculated.csv — the recovered terminal narratives (digest declared in content/trust-forward/digests.ts)"
+  },
+  {
+    id: "tf-aggregation-policy",
+    kind: "tf-package",
+    locator:
+      "05_ship16-reachability-resolution/SHIP16_AGGREGATION_POLICY.v1.json — TF-LITE-AGGREGATION-DOMINANT-POSTURE-LATER-TIEBREAK-v1, proven 16/16 SHIP reachable over all 177147 sequences"
+  },
+  {
+    id: "tf-sc-tf1-approval",
+    kind: "tf-package",
+    locator:
+      "06_full-five-case-authoring-extraction/SC_TF1_APPROVAL_RECORD_2026-09-07.md — Ben approves the 27 fragments, the callback/close/cross-case surfaces and the 729 narratives for public render; the 33 receipts are excluded"
+  },
+  {
+    id: "tf-layer07-rulings",
+    kind: "tf-package",
+    locator:
+      "07_transition-copy-import-telemetry-resolution/BEN_APPROVED_RULINGS_2026-09-07.md — transitions, Case 5 callbacks, five reflections, receipt invariant, public copy, routes, WYS, telemetry, Lite-to-Full import, v1.1.0"
+  },
+  {
+    id: "tf-layer08-rulings",
+    kind: "tf-package",
+    locator:
+      "08_final-lite-gates-resolution/LAYER08_RULINGS.md — Q-D Case 3 VERIFY_TRUST neutral, Q-E aggregate ships disabled, SC-TF6 Studio URL authority"
+  },
+  {
+    id: "tf-supersession-42",
+    kind: "tf-package",
+    locator:
+      "02_read-last-supersession/CORPUS_COUNT_42_SUPERSESSION.json — internal corpus authority 42; superseded for learner-facing copy by layer 07's \"30+ real cases\""
   }
 ] as const satisfies readonly ExternalSourceRef[];
 

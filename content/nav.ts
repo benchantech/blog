@@ -19,6 +19,7 @@
  */
 
 import { type DestinationId, destinations } from "@/content/site-config";
+import { WYS_NAV_RETIRED } from "@/content/watch-your-step/config";
 
 export interface NavItem {
   href: string;
@@ -46,6 +47,36 @@ export const lessonZeroCta: NavItem = {
   href: "/watch-your-step/start",
   label: "Start Lesson Zero"
 };
+
+/**
+ * Trust Forward — the site's primary product entry (layer-01
+ * CURRENT_SITE_INTEGRATION_NOTES, "replace primary Watch Your Step product
+ * entry with Trust Forward"). `/trust-forward` is the canonical public route
+ * under Ben's 2026-09-07 routes ruling; `/trust-forward-lite` is the sandbox
+ * and is reached from it rather than from the chrome.
+ */
+export const trustForwardNav: NavItem = {
+  href: "/trust-forward",
+  label: "Trust Forward"
+};
+
+/**
+ * WHAT THE CHROME ACTUALLY RENDERS.
+ *
+ * `shipNav` and `lessonZeroCta` above are the INVENTORY — the course's names,
+ * kept in this file because a label is a name for a node and deleting it would
+ * lose that name. These two exports are the PUBLIC VIEW, and while
+ * `WYS_NAV_RETIRED` is true they drop the Watch Your Step entry and its CTA.
+ *
+ * The split matters: the retirement is a discovery decision, not a deletion,
+ * and keeping the inventory intact is what makes it one constant to reverse.
+ */
+export const publicShipNav: readonly NavItem[] = WYS_NAV_RETIRED
+  ? [trustForwardNav, ...shipNav.filter((item) => item.href !== "/watch-your-step")]
+  : [trustForwardNav, ...shipNav];
+
+/** Null while the course is retired, so no chrome can render a dead CTA. */
+export const publicLessonZeroCta: NavItem | null = WYS_NAV_RETIRED ? null : lessonZeroCta;
 
 /**
  * Tier 2 — the inventory the live header carries today, preserved verbatim

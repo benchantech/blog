@@ -39,13 +39,15 @@
  * (plan Phase 0, Q15).
  */
 
-import { ecosystemNav, lessonZeroCta, shipNav } from "@/content/nav";
+import { ecosystemNav, lessonZeroCta, publicShipNav, shipNav, trustForwardNav } from "@/content/nav";
+import { WYS_NAV_RETIRED } from "@/content/watch-your-step/config";
 import { courseTabs, stopDisplayName } from "@/content/watch-your-step/tabs";
 import { WYS_STOP_IDS, wysWeekById } from "@/content/watch-your-step/weeks";
 
 export type CanonicalSurfaceGroup =
   | "home"
   | "ship"
+  | "trust-forward"
   | "course"
   | "legal"
   | "preserved"
@@ -125,6 +127,43 @@ const COURSE_SURFACES: readonly CanonicalSurface[] = [
 ];
 
 /**
+ * TRUST FORWARD (plan §9). Two human pages.
+ *
+ * `/tf` is deliberately ABSENT. It is a redirect, and this roster's own rule is
+ * that redirects are not surfaces — listing one is how a crawler ends up with
+ * two nodes for one concept.
+ */
+const TRUST_FORWARD_SURFACES: readonly CanonicalSurface[] = [
+  { path: trustForwardNav.href, label: trustForwardNav.label, group: "trust-forward", human: true },
+  { path: "/trust-forward-lite", label: "Trust Forward Lite", group: "trust-forward", human: true }
+];
+
+/**
+ * RETIRED SURFACES — routes with a `page.tsx` on disk that a redirect shadows.
+ *
+ * This register exists because two true things would otherwise contradict each
+ * other. `tests/machine-surfaces.test.ts` asserts the roster and the `app/`
+ * tree describe the same site; the deletion contract forbids removing any of
+ * the 34 files under `app/watch-your-step/`. So a retired course would leave
+ * nine `page.tsx` files with no roster entry and fail parity.
+ *
+ * Naming them here resolves it honestly: they exist, they are not canonical
+ * URLs, and the same test asserts every entry has a matching `permanent: false`
+ * redirect in `next.config.ts` — so a route cannot be quietly dropped from
+ * discovery without also being quietly redirected, which is the failure this
+ * register is really guarding against.
+ */
+export const RETIRED_SURFACES: readonly string[] = WYS_NAV_RETIRED
+  ? [
+      "/watch-your-step",
+      lessonZeroCta.href,
+      ...courseTabs.map((tab) => tab.href),
+      ...WYS_STOP_IDS.map((id) => `/watch-your-step/stop/${id}`),
+      "/watch-your-step/end"
+    ]
+  : [];
+
+/**
  * Every current canonical surface, human pages first.
  *
  * The Watch Your Step landing is a ship-nav item AND the course's front door;
@@ -132,13 +171,16 @@ const COURSE_SURFACES: readonly CanonicalSurface[] = [
  */
 export const canonicalSurfaces: readonly CanonicalSurface[] = [
   { path: "/", label: "BenChanTech", group: "home", human: true },
-  ...shipNav.map((item) => ({
-    path: item.href,
-    label: item.label,
-    group: "ship" as const,
-    human: true
-  })),
-  ...COURSE_SURFACES,
+  ...TRUST_FORWARD_SURFACES,
+  ...publicShipNav
+    .filter((item) => item.href !== trustForwardNav.href)
+    .map((item) => ({
+      path: item.href,
+      label: item.label,
+      group: "ship" as const,
+      human: true
+    })),
+  ...(WYS_NAV_RETIRED ? [] : COURSE_SURFACES),
   ...PRESERVED_SURFACES,
   ...LEGAL_SURFACES,
   ...MACHINE_SURFACES
@@ -156,6 +198,7 @@ export const canonicalSurfaces: readonly CanonicalSurface[] = [
 export const CANONICAL_SURFACE_GROUP_LABELS = {
   home: "Home",
   ship: "The Author Ship",
+  "trust-forward": "Trust Forward",
   course: "Watch Your Step",
   preserved: "Ecosystem and infrastructure",
   legal: "Legal and disclosure",
@@ -164,6 +207,7 @@ export const CANONICAL_SURFACE_GROUP_LABELS = {
 
 export const CANONICAL_SURFACE_GROUP_ORDER: readonly CanonicalSurfaceGroup[] = [
   "home",
+  "trust-forward",
   "ship",
   "course",
   "preserved",

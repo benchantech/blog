@@ -388,7 +388,13 @@ test("the footnote's approved half is unchanged and its addition is separate", (
 });
 
 test("what survives a clear is what the registry says survives", () => {
-  assert.deepEqual(keysSurvivingWysClear(), [CONSENT_STORAGE_KEY]);
+  // Trust Forward's dataset survives a Watch Your Step clear, and vice versa:
+  // `wysOwnedKeys()` filters on the `wys:` prefix and the Trust Forward key
+  // does not carry it. Two products, two datasets, neither sweeping the other.
+  assert.deepEqual(keysSurvivingWysClear(), [
+    "benchantech:trust-forward-lite:state",
+    CONSENT_STORAGE_KEY
+  ]);
   const survives = resolveVariant(clearingSurvivesText, "short");
   assert.equal(survives.kind, "text");
   if (survives.kind !== "text") return;

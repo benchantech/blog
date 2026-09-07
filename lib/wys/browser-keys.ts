@@ -27,7 +27,7 @@ export const CONSENT_STORAGE_KEY = "bct_analytics_consent";
 export interface BrowserKeyRecord {
   key: string;
   /** Which surface owns it. */
-  owner: "watch-your-step" | "site";
+  owner: "watch-your-step" | "site" | "trust-forward";
   /** The module that writes it — the thing that makes this registry checkable. */
   writtenBy: string;
   /** What it holds, in plain terms, for the Data page. */
@@ -36,6 +36,17 @@ export interface BrowserKeyRecord {
   clearedByWysClear: boolean;
 }
 
+/**
+ * The Trust Forward Lite dataset key, from the stamped `storage.key`.
+ *
+ * `clearedByWysClear: false` is the whole point of the field here. Two products
+ * now write local data on this origin and NEITHER may sweep the other's:
+ * `wysOwnedKeys()` filters on `WYS_KEY_PREFIX` (`wys:`), and this key does not
+ * carry that prefix, so a Watch Your Step clear cannot touch a learner's Trust
+ * Forward ledger and Trust Forward's own reset cannot touch Watch Your Step.
+ */
+export const TRUST_FORWARD_STORAGE_KEY = "benchantech:trust-forward-lite:state";
+
 export const BROWSER_KEYS: readonly BrowserKeyRecord[] = [
   {
     key: WYS_STORAGE_KEY,
@@ -43,6 +54,14 @@ export const BROWSER_KEYS: readonly BrowserKeyRecord[] = [
     writtenBy: "lib/wys/local-state.ts",
     holds: "onboarding choices, curriculum progress, kept judgments, the rulebook, deeper-practice interest and the last course route",
     clearedByWysClear: true
+  },
+  {
+    key: TRUST_FORWARD_STORAGE_KEY,
+    owner: "trust-forward",
+    writtenBy: "lib/trust-forward/storage.ts",
+    holds:
+      "your five-case answers, the immutable local ledger of what you did, any optional notes you wrote, your optional local handle, unsent drafts and the derived result",
+    clearedByWysClear: false
   },
   {
     key: CONSENT_STORAGE_KEY,

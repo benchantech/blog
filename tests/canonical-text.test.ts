@@ -22,6 +22,7 @@ import { approvalState } from "@/lib/approval-state";
 import { judgmentFrameworkRecords } from "@/content/canonical/judgment-framework";
 import { wysCanonicalRecords, wysContentObjects } from "@/content/watch-your-step";
 import { CONTENT_INTEGRITY_DIGESTS, wysSourceById } from "@/content/watch-your-step/sources";
+import { TRUST_FORWARD_DIGESTS, TRUST_FORWARD_DIGEST_VALUES } from "@/content/trust-forward/digests";
 import { shipContentObjects } from "@/content/ship";
 
 /**
@@ -431,8 +432,29 @@ test("the keel hash is null and no digest renders anywhere", () => {
   assert.equal(approvalState.keel.sha256, null);
   assert.equal(anyHashPublished(), false);
 
-  const declaredDigests = new Set<string>(CONTENT_INTEGRITY_DIGESTS.map((entry) => entry.digest));
-  const digestHome = path.join("content", "watch-your-step", "sources.ts");
+  /**
+   * TWO DECLARED HOMES NOW, AND THE RULE IS UNCHANGED.
+   *
+   * The check has never been "digests may appear in one file"; it is "a digest
+   * may appear only where it is DECLARED, with an owner and a reason". Trust
+   * Forward cites source artifacts that live in a versioned bundle outside this
+   * repo — and between the 2026-09-07 handoffs two BEN_APPROVED files were
+   * edited in place rather than superseded, so a filename stopped being enough
+   * to identify which ruling the build was written against. Those digests
+   * cannot honestly live in a Watch Your Step module, so they get their own
+   * registry carrying the same obligations.
+   *
+   * A digest in any other file, or an undeclared digest in either home, still
+   * fails exactly as before.
+   */
+  const declaredDigests = new Set<string>([
+    ...CONTENT_INTEGRITY_DIGESTS.map((entry) => entry.digest),
+    ...TRUST_FORWARD_DIGEST_VALUES
+  ]);
+  const digestHomes = new Set([
+    path.join("content", "watch-your-step", "sources.ts"),
+    path.join("content", "trust-forward", "digests.ts")
+  ]);
   const offences: string[] = [];
   const scanned = [
     ...surfaceFiles,
@@ -443,7 +465,7 @@ test("the keel hash is null and no digest renders anywhere", () => {
     const relative = path.relative(repoRoot, file);
     const source = readFileSync(file, "utf8");
     for (const match of source.matchAll(/\b[0-9a-f]{64}\b/g)) {
-      if (relative === digestHome && declaredDigests.has(match[0])) continue;
+      if (digestHomes.has(relative) && declaredDigests.has(match[0])) continue;
       offences.push(`${relative}: ${match[0].slice(0, 12)}...`);
     }
   }
@@ -453,6 +475,19 @@ test("the keel hash is null and no digest renders anywhere", () => {
     [],
     `An undeclared 64-hex digest is present while approvalState.keel.sha256 is null. packet: hashing requires freeze -> SHA-256 -> publish on yymethod.com/work -> THEN cite.\n${offences.join("\n")}`
   );
+});
+
+test("every Trust Forward digest is declared with an artifact and a reason", () => {
+  // The second home earns its exemption the same way the first one does.
+  assert.ok(TRUST_FORWARD_DIGESTS.length > 0);
+  for (const entry of TRUST_FORWARD_DIGESTS) {
+    assert.match(entry.digest, /^[0-9a-f]{64}$/, "a declared digest must be a real SHA-256");
+    assert.ok(entry.artifact.trim().length > 0, `${entry.digest} names no artifact`);
+    assert.ok(entry.reason.trim().length > 0, `${entry.digest} gives no reason`);
+    // None of these is a hash of anything this site publishes.
+    assert.equal(/yymethod|keel|standing/i.test(entry.artifact), false);
+  }
+  assert.equal(new Set(TRUST_FORWARD_DIGEST_VALUES).size, TRUST_FORWARD_DIGESTS.length);
 });
 
 test("every declared content digest belongs to a record that renders on no surface", () => {

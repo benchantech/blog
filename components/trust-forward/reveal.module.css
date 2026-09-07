@@ -1,0 +1,549 @@
+/* ==========================================================================
+   Trust Forward Lite — the final reveal (plan §10; INSTALLATION.md "Phase 10 —
+   Final result"; UX_COPY.md "## Final result").
+
+   THE STYLESHEET FOR `Reveal.tsx` AND `ShipBars.tsx`, AND NOTHING ELSE. It is
+   scoped rather than global because `.hero`, `.eyebrow`, `.section-heading`,
+   `.primary` and `.secondary` are already taken in `app/globals.css`; a reveal
+   that reached for one of those names would inherit blueprint geometry with no
+   compile error and no test failure. `tests/class-contract.test.ts` mode 2
+   checks every `styles.<key>` against a `.key` rule in this file, so a
+   misspelling here fails the suite instead of silently rendering unstyled.
+
+   ## The SHIP bar block is a governance surface, not a chart
+
+   `ROUTING_AND_SCORING.md`, "## Display": "Bars neutral/two-ended, never
+   visually ranked as higher=better." The authored posture vocabulary is a
+   progression of KIND, not of quality — `task -> relationship -> stewardship`,
+   never `bad -> okay -> good` — so a learner at 80% on Partnership is not
+   winning at anything. Four rules below carry that, and each of them is the
+   reason a more conventional bar chart is refused:
+
+     1. THERE IS NO FILL RULE. Deliberately. A bar filled from the left end
+        encodes "more of this is more of something good" in pure geometry, and
+        no caption underneath can undo it. The track is an unfilled channel and
+        the value is a MARKER sitting somewhere along it — the same way a
+        two-ended semantic differential is drawn, and the reason `barPercents`
+        is rounded to 10 in `lib/trust-forward/scoring.ts` in the first place.
+        Do not add `.barFill`.
+     2. ONE INK, BOTH DIRECTIONS. `.barMarker` is `--ink` wherever it lands.
+        No red/green, no accent teal on one half, no colour that varies with
+        the number. Teal is this repo's emphasis colour and emphasis is a
+        ranking signal here.
+     3. THE TWO ENDS ARE TYPOGRAPHICALLY IDENTICAL. `.barEnd` sets one size,
+        one weight and one colour; `.barEndHigh` changes alignment and nothing
+        else. A bolder right-hand caption is a claim about which end is the
+        destination.
+     4. THE MIDLINE IS A HAIRLINE, NOT A GOAL. `.barMidline` marks 50% because
+        that is where the `> 0.5` bit threshold sits, so a learner can see why
+        a bit read the way it did. It is `--border-row`, the same weight as the
+        track edge, so it reads as a reference and not as a target.
+
+   ## Everything else
+
+   Measured in the repo's existing registers rather than off a new artboard —
+   there is no approved artboard for this screen (see docs/facelift-unapproved.md
+   for how that is recorded). Body 16px/1.5 `--body`, section headings in the
+   44px page register reduced to 28px here because the reveal is a document and
+   not a landing, small print 13px `--muted`, cards `--tint-grey` at
+   `--radius-card`, controls at the 44px touch target §4.6 requires, iPhone
+   Safari at ~390 CSS px as the primary QA target.
+
+   `.wordsText` is the one rule in this file that is load-bearing for a
+   PROMISE rather than for a look: `white-space: pre-wrap` is how "preserved
+   exactly as you wrote them" survives contact with HTML. A learner's blank
+   lines and leading spaces are part of what they wrote, and collapsing them is
+   an edit.
+   ========================================================================== */
+
+/* -------------------------------------------------------------------------- */
+/* Shell                                                                      */
+/* -------------------------------------------------------------------------- */
+.reveal {
+  display: flex;
+  flex-direction: column;
+  gap: 40px;
+  max-width: 720px;
+  color: var(--body);
+  font: 400 16px / 1.5 var(--sans);
+}
+
+.block {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.blockHeading {
+  margin: 0;
+  font: 600 28px / 1.2 var(--sans);
+  letter-spacing: -0.02em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+.blockSubheading {
+  display: block;
+  color: var(--ink);
+}
+
+.paragraph {
+  margin: 0;
+  color: var(--body);
+}
+
+.rule {
+  height: 1px;
+  border: 0;
+  margin: 0;
+  background: var(--border-nav);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 2. The result                                                              */
+/* -------------------------------------------------------------------------- */
+.result {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  background: var(--tint-grey);
+  border-radius: var(--radius-card-lg);
+}
+
+/* The learner's own local handle, when they set one. Their word, not authored
+   copy: it is never scored, never transmitted, and stripped on import by Full,
+   so it appears here only as continuity for the person reading their own page. */
+.handle {
+  margin: 0;
+  font: 500 14px / 1.3 var(--sans);
+  color: var(--body);
+}
+
+/* "Your observed developer pattern" — a label above the code, never a verdict. */
+.patternLabel {
+  margin: 0;
+  font: 500 13px / 1.3 var(--sans);
+  letter-spacing: 0.06em;
+  color: var(--muted);
+}
+
+/* The code is a pattern label. The sanctioned second-person predicate ban is
+   enforced in `lib/trust-forward/profiles.ts`; this rule only sizes it. */
+.code {
+  margin: 0;
+  font: 500 30px / 1.1 var(--mono);
+  letter-spacing: 0.02em;
+  color: var(--ink);
+}
+
+.profileName {
+  margin: 0;
+  font: 600 20px / 1.25 var(--sans);
+  color: var(--ink);
+}
+
+.specialAbility {
+  margin: 0;
+  color: var(--body);
+}
+
+.synthesis {
+  margin: 0;
+  color: var(--ink);
+}
+
+.narrative {
+  margin: 0;
+  color: var(--body);
+}
+
+/* The source's "Critical final sentence". Never smaller than the narrative it
+   qualifies — a de-escalation set in small print is a de-escalation nobody
+   reads. */
+.closingLine {
+  margin: 0;
+  color: var(--ink);
+}
+
+.shipExplanation {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+/* UX_COPY.md's disclaimer, always open. copy.ts forbids putting it behind a
+   disclosure marker; this rule keeps it in the reading register rather than in
+   footnote grey for the same reason. */
+.disclaimer {
+  margin: 0;
+  padding: 14px 16px;
+  background: var(--white);
+  border: 1.5px solid var(--border-card);
+  border-radius: var(--radius-row-lg);
+  font-size: 14px;
+  color: var(--body);
+}
+
+/* -------------------------------------------------------------------------- */
+/* SHIP bars — see the four rules in the header                               */
+/* -------------------------------------------------------------------------- */
+.bars {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 18px;
+}
+
+.bar {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.barHead {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+}
+
+.barAxis {
+  font: 600 15px / 1.3 var(--sans);
+  color: var(--ink);
+}
+
+/* The exact lean, to 0.1%. Mono so four rows of digits align and none of them
+   looks larger than another. */
+.barReadout {
+  font: 400 14px / 1.3 var(--mono);
+  color: var(--body);
+  font-variant-numeric: tabular-nums;
+}
+
+.barTrack {
+  position: relative;
+  height: 14px;
+  border: 1.5px solid var(--border-row);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+}
+
+.barMidline {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  background: var(--border-row);
+}
+
+/* One ink, both directions. `left` is set inline from `barPercents`, rounded to
+   the nearest 10 by `lib/trust-forward/scoring.ts`. */
+.barMarker {
+  position: absolute;
+  top: -3px;
+  bottom: -3px;
+  width: 3px;
+  margin-left: -1.5px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+}
+
+.barEnds {
+  display: flex;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.barEnd {
+  flex: 1 1 0;
+  font: 400 12px / 1.35 var(--sans);
+  color: var(--muted);
+}
+
+/* Alignment only. Never weight, size or colour — see rule 3 in the header. */
+.barEndHigh {
+  text-align: right;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Why this result? — collapsed receipts                                      */
+/* -------------------------------------------------------------------------- */
+.receipts {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.receiptList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.receipt {
+  padding: 12px 14px;
+  background: var(--tint-grey);
+  border-radius: var(--radius-row);
+  font-size: 15px;
+  color: var(--ink);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 3. What you actually wrote                                                 */
+/* -------------------------------------------------------------------------- */
+.wordsNote {
+  margin: 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+
+.wordsList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.wordsItem {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  padding-left: 16px;
+  border-left: 1.5px solid var(--border-row);
+}
+
+.wordsLabel {
+  font: 600 13px / 1.3 var(--sans);
+  color: var(--muted);
+}
+
+/* THE PROMISE RULE. "preserved exactly as you wrote them" (REFLECTION.disclosure)
+   includes the learner's own line breaks and indentation. */
+.wordsText {
+  margin: 0;
+  white-space: pre-wrap;
+  overflow-wrap: anywhere;
+  font: 400 16px / 1.55 var(--sans);
+  color: var(--ink);
+}
+
+/* -------------------------------------------------------------------------- */
+/* 4. The closing upsell                                                      */
+/* -------------------------------------------------------------------------- */
+.upsell {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+  padding: 22px;
+  background: var(--tint-teal);
+  border-radius: var(--radius-card-lg);
+}
+
+.upsellLead {
+  margin: 0;
+  font: 500 16px / 1.45 var(--sans);
+  color: var(--ink);
+}
+
+.couldNotList {
+  margin: 0;
+  padding-left: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  color: var(--body);
+}
+
+.couldNotItem {
+  font-size: 15px;
+}
+
+/* The bridge's confidentiality sentence travels WITH the bridge — copy.ts:
+   a renderer that shows the claim without its limit has published the claim
+   without its limit. They are one paragraph group, never two blocks a layout
+   change can separate. */
+.bridgeGroup {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.bridge {
+  margin: 0;
+  font: 600 17px / 1.4 var(--sans);
+  color: var(--ink);
+}
+
+.confidentiality {
+  margin: 0;
+  font-size: 13px;
+  color: var(--body);
+}
+
+.evidenceLine {
+  margin: 0;
+  font: 600 16px / 1.45 var(--sans);
+  color: var(--ink);
+}
+
+.promiseHeading {
+  margin: 0;
+  font: 600 20px / 1.25 var(--sans);
+  color: var(--ink);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Controls                                                                   */
+/* -------------------------------------------------------------------------- */
+.actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+}
+
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px; /* §4.6 touch target */
+  padding: 11px 18px;
+  border: 1.5px solid var(--border-pill-strong);
+  border-radius: var(--radius-pill);
+  background: var(--white);
+  font: 500 15px / 1.2 var(--sans);
+  color: var(--ink);
+  text-decoration: none;
+  cursor: pointer;
+}
+
+.buttonPrimary {
+  background: var(--ink);
+  border-color: var(--ink);
+  color: var(--white);
+}
+
+/* A quiet control. `Start over` is destructive but it is not an alarm: it is
+   the learner's own local data and they asked for the control. Red would be
+   this build adding urgency the handoff does not. */
+.buttonQuiet {
+  border-color: transparent;
+  background: transparent;
+  color: var(--muted);
+  text-decoration: underline;
+  text-underline-offset: 0.3em;
+}
+
+.disclosureButton {
+  align-self: flex-start;
+  min-height: 44px;
+  padding: 10px 0;
+  border: 0;
+  background: transparent;
+  font: 600 16px / 1.3 var(--sans);
+  color: var(--accent-text-on-tint);
+  text-align: left;
+  cursor: pointer;
+}
+
+.confirmRow {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  background: var(--tint-grey);
+  border-radius: var(--radius-row-lg);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Clipboard summary — EXPORT_SPEC.md's checkbox field selection              */
+/* -------------------------------------------------------------------------- */
+.copyPanel {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 16px 18px;
+  background: var(--tint-grey);
+  border-radius: var(--radius-card);
+}
+
+.fieldList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.field {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  font-size: 14px;
+  color: var(--ink);
+  cursor: pointer;
+}
+
+.fieldBody {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.fieldLabel {
+  font-weight: 600;
+}
+
+/* The list is a preview, not a promise (exports.ts): the learner sees the value
+   that would be pasted, not only its name. */
+.fieldValue {
+  color: var(--muted);
+  overflow-wrap: anywhere;
+}
+
+.versionNotice {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 390px — the primary QA target                                              */
+/* -------------------------------------------------------------------------- */
+@media (max-width: 700px) {
+  .reveal {
+    gap: 32px;
+  }
+
+  .blockHeading {
+    font-size: 24px;
+  }
+
+  .result,
+  .upsell {
+    padding: 18px;
+  }
+
+  .code {
+    font-size: 26px;
+  }
+
+  .barEnds {
+    gap: 10px;
+  }
+
+  .button {
+    flex: 1 1 auto;
+  }
+}

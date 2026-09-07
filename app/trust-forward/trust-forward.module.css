@@ -1,0 +1,262 @@
+/*
+ * `/trust-forward` — the canonical public node (layer 07 routes ruling).
+ *
+ * SCOPED, per the §4.1 CSS Modules boundary. `.hero`, `.title`, `.lede`,
+ * `.body` and `.block` are all names the legacy global layer already owns or
+ * could plausibly own, and `body` in particular is an ELEMENT selector in
+ * `app/globals.css` — a global rule by any of these names here would restyle
+ * the eleven preserved routes with no compile error and no test failure. Every
+ * class below is reached only through `styles.<key>`, which
+ * `tests/class-contract.test.ts` mode 2 checks against this file.
+ *
+ * WHAT IS NOT RESTATED HERE. `Pill` carries the time and status badges,
+ * `CardShell fill="teal"` the completion promise, `CardShell fill="grey"` the
+ * offer, `ActionPill variant="ink" full` the dominant CTA and `LinkRow` the
+ * reopen row. Their geometry — radius, padding, 44px touch target, the pill
+ * radius — belongs to `components/ui/primitives.module.css` and duplicating any
+ * of it here would create a second place the same measurement can drift. What
+ * this file owns is the reading column, the heading stack, the block rhythm,
+ * and the four kinds of paragraph this page has that no primitive covers.
+ *
+ * MOBILE-FIRST, AND THE BASE RULES ARE THE PHONE. Built against 320, 375, 390
+ * and 430. The measure is `min(calc(100% - 2 * var(--gutter)), 640px)`, and
+ * `--gutter` is already 22px at <=700px in `app/globals.css`, so the narrowest
+ * target lands at 276px of content rather than at an overflow. There is one
+ * `min-width` block and it only widens the column and lifts the type ramp: no
+ * second column, no reordered blocks, no new IA. Nothing here uses a fixed
+ * width, so the layout cannot overflow a 320px viewport.
+ *
+ * THERE IS NO ARTBOARD FOR THIS PAGE. `/trust-forward` is not one of the
+ * sixteen approved screens; the type ramp is taken from the two nearest
+ * approved surfaces rather than invented — the 38px/1.05 centred hero headline
+ * from the Watch Your Step landing (`4a`) and the 15px/1.5 body register from
+ * the ship pages (`5d`). Recorded as an extrapolation in the same register the
+ * other unapproved desktop renderings are.
+ *
+ * LIGHT-ONLY, deliberately, like the rest of this stylesheet's world (§4.2).
+ * No `prefers-color-scheme` block and no inverted palette: the ink slabs are a
+ * compositional device on white, not a theme.
+ */
+
+/* -------------------------------------------------------------------------- */
+/* The reading column                                                         */
+/* -------------------------------------------------------------------------- */
+.landing {
+  width: min(calc(100% - 2 * var(--gutter)), 640px);
+  margin-inline: auto;
+  padding-block: 40px 32px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The heading stack                                                          */
+/* -------------------------------------------------------------------------- */
+.hero {
+  margin-bottom: 24px;
+}
+
+.title {
+  margin: 0 0 14px;
+  font: 600 38px / 1.05 var(--sans);
+  letter-spacing: -0.03em;
+  color: var(--ink);
+  text-wrap: balance;
+}
+
+/* The one sentence that has to land: the em-dash clause is set as one phrase,
+   so `text-wrap: pretty` rather than a hard max-width. */
+.lede {
+  margin: 0 0 16px;
+  color: var(--body);
+  font: 400 18px / 1.45 var(--sans);
+  text-wrap: pretty;
+}
+
+.body {
+  margin: 0 0 14px;
+  color: var(--body);
+  font: 400 15px / 1.55 var(--sans);
+}
+
+/* The approved Lite descriptor. Three clipped sentences; set in --muted so it
+   reads as specification under the lede rather than as a second lede. */
+.descriptor {
+  margin: 0 0 18px;
+  color: var(--muted);
+  font: 500 14px / 1.5 var(--sans);
+}
+
+.timeRow,
+.statusRow {
+  margin: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Block rhythm                                                               */
+/* -------------------------------------------------------------------------- */
+.block {
+  margin-bottom: 20px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The completion promise (inside CardShell fill="teal")                      */
+/* -------------------------------------------------------------------------- */
+.revealLead {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font: 500 15px / 1.4 var(--sans);
+}
+
+/* A real list, marked as one. The items are sentence fragments in the source
+   ("your local export", "and a completion offer…"), so the marker is what makes
+   them parse as three promises instead of one broken sentence. */
+.revealList {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--body);
+  font: 400 15px / 1.6 var(--sans);
+}
+
+.revealList li {
+  margin-bottom: 4px;
+}
+
+.revealList li:last-child {
+  margin-bottom: 0;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The dominant CTA                                                           */
+/* -------------------------------------------------------------------------- */
+/* Full-width at every phone width: the primary action must never be a target a
+   thumb has to aim for. `ActionPill full` supplies the 100% and the 17px
+   padding; this rule only reserves the space around it. */
+.cta {
+  margin: 4px 0 20px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The evidence line                                                          */
+/* -------------------------------------------------------------------------- */
+/* The doctrine boundary in one line — "evidence, never doctrine" said to the
+   learner. It is a rule about the whole product, so it sits alone between the
+   CTA and the offer rather than inside either, and takes the accent-on-tint
+   colour that this repo reserves for text that is not body copy. Q23: the
+   plain --accent misses AA on a tint; this value is the ratified replacement. */
+.evidence {
+  margin: 0 0 22px;
+  padding-left: 14px;
+  border-left: 2px solid var(--accent);
+  color: var(--accent-text-on-tint);
+  font: 500 15px / 1.5 var(--sans);
+}
+
+/* -------------------------------------------------------------------------- */
+/* The full Trust Forward offer (inside CardShell fill="grey")                */
+/* -------------------------------------------------------------------------- */
+/* Two paragraphs, one unit. The claim is set at body weight and the limit that
+   makes it publishable directly under it in --muted — smaller, never hidden,
+   never collapsed behind a disclosure. See the page's file header. */
+.offerBridge {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font: 500 16px / 1.45 var(--sans);
+  text-wrap: pretty;
+}
+
+.offerLimit {
+  margin: 0;
+  color: var(--muted);
+  font: 400 13px / 1.55 var(--sans);
+}
+
+/* -------------------------------------------------------------------------- */
+/* The answer-first wedge and the intent index                                */
+/* -------------------------------------------------------------------------- */
+/* Layer 07's SEO material, and the reason this route is prerendered. It sits
+   last because it is written for a reader arriving from a search rather than
+   for the visitor already reading down the page. */
+.wedge {
+  margin-top: 28px;
+  padding-top: 20px;
+  border-top: 1px solid var(--line);
+}
+
+.wedgeLead {
+  margin: 0 0 14px;
+  color: var(--body);
+  font: 400 15px / 1.55 var(--sans);
+  text-wrap: pretty;
+}
+
+/* QUESTIONS ONLY — an index, not an FAQ. No approved answer exists for any of
+   the six, so there is no answer slot to leave empty and no chevron implying
+   one. Unmarked rows rather than list markers: a bullet would read as an
+   assertion list, and these are the reader's questions, not the page's claims. */
+.questionList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.questionList li {
+  padding: 10px 14px;
+  border-radius: var(--radius-row);
+  background: var(--tint-grey);
+  color: var(--body);
+  font: 400 14px / 1.4 var(--sans);
+}
+
+/* -------------------------------------------------------------------------- */
+/* The completed state                                                        */
+/* -------------------------------------------------------------------------- */
+/* The sentence that earns the onward CTA, immediately above it. It concedes
+   that the pattern may not hold, so it is set as body copy and not as a boast. */
+.completeBridge {
+  margin: 0 0 18px;
+  color: var(--body);
+  font: 400 16px / 1.5 var(--sans);
+  text-wrap: pretty;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Desktop: the same composition, a wider measure                             */
+/* -------------------------------------------------------------------------- */
+/* 701px is the breakpoint `app/globals.css` already steps --gutter at, and
+   `app/watch-your-step/(shell)/landing.module.css` already uses. A third
+   breakpoint would be a third place the site's rhythm can drift. */
+@media (min-width: 701px) {
+  .landing {
+    padding-block: 56px 44px;
+  }
+
+  .title {
+    font-size: 52px;
+  }
+
+  .lede {
+    max-width: 34em;
+    font-size: 20px;
+  }
+
+  .body,
+  .wedgeLead {
+    max-width: 40em;
+    font-size: 16px;
+  }
+
+  .cta {
+    max-width: 360px;
+  }
+
+  .offerBridge {
+    font-size: 17px;
+  }
+
+  .questionList {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
