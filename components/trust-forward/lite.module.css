@@ -570,51 +570,25 @@
   line-height: 1.5;
 }
 
-/* --- Case 5's AI report -------------------------------------------------- */
+/* --- Case 5's AI report: the explanation body ---------------------------- */
 
-/* An ink slab: it is the agent's output, visually quoted rather than narrated,
-   so the learner reads it as a claim being made TO them. */
-.report {
-  margin: 0 0 20px;
-  padding: 18px 20px;
-  background: var(--ink);
-  border-radius: 18px;
-  color: var(--body-on-dark);
-}
-
-.reportHeadline {
-  margin: 0 0 10px;
-  color: var(--white);
-  font-family: var(--font-plex-mono), ui-monospace, monospace;
-  font-size: 0.8125rem;
-  font-weight: 600;
-  letter-spacing: 0.06em;
-}
-
-.reportClaims {
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  font-family: var(--font-plex-mono), ui-monospace, monospace;
-  font-size: 0.8125rem;
-  line-height: 1.8;
-}
-
-/* The report's explanation body, beneath the five claim lines and INSIDE the
-   same slab. It is one paragraph of the agent's own prose, so it keeps the
-   slab's register exactly — same mono face, same size, same on-ink colour as
-   the claims above it. No rule, no tint, no second surface: a divider or a
-   panel of its own would frame it as commentary ABOUT the report, and it is
-   part of the report. The only difference from `.reportClaims` is the top
-   margin that separates a list from a paragraph, and a slightly looser line
-   height, which is what running prose needs and a list of five short lines
-   does not. */
+/* The report itself is styled ABOVE, as a light card, and deliberately so —
+   see that block's note: it "is meant to LOOK COMPETENT ... styling it as
+   suspect would answer the question the case is asking."
+   
+   An earlier version of this file redefined `.report`, `.reportHeadline` and
+   `.reportClaims` down here as a dark ink slab. Same class names, one module:
+   the later `background: var(--ink)` won while the earlier
+   `color: var(--body)` also won, because each rule only overrides the
+   properties it declares. The result was #3A4856 on #16202B — a contrast ratio
+   of 1.76:1, against the 4.5:1 AA needs. Unreadable, and invisible to every
+   test in the suite, since nothing here checks contrast.
+   
+   Only the explanation body's own rule survives, restyled for the light card. */
 .reportBody {
   margin: 14px 0 0;
-  color: var(--body-on-dark);
-  font-family: var(--font-plex-mono), ui-monospace, monospace;
-  font-size: 0.8125rem;
-  line-height: 1.7;
+  color: var(--body);
+  line-height: 1.6;
 }
 
 /* --- Decisions ----------------------------------------------------------- */
@@ -694,4 +668,24 @@
   color: var(--muted);
   font-size: 0.9375rem;
   line-height: 1.55;
+}
+
+/* The way back to the result from an already-answered case. Full-width and
+   below the decisions, so it reads as "onward" rather than as a fifth option. */
+.resumeResult {
+  margin-top: 28px;
+}
+
+/* Reopen this case's note. A quiet text control, not a call to action: the
+   note is optional and offering it loudly a second time reads as a nudge to
+   write something, which is the opposite of what an optional surface means. */
+.notesReopen {
+  background: none;
+  border: 0;
+  color: var(--accent-text-on-tint);
+  cursor: pointer;
+  font: inherit;
+  padding: 8px 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }

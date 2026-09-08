@@ -11,7 +11,8 @@ import {
   LITE_INTRO,
   PROGRESS,
   REFLECTION,
-  RESULT
+  RESULT,
+  RESUME_RESULT_CTA
 } from "@/content/trust-forward/copy";
 import {
   caseCloseForCase,
@@ -720,6 +721,35 @@ export function LiteSandbox({ children }: { children: ReactNode }) {
   );
 
   /** The reversal. Reachable from inside the run, not from a settings screen. */
+  /**
+   * Reopen a case's note after its reflection surface has already passed.
+   *
+   * The run shows each of the five reflection surfaces EXACTLY ONCE, right
+   * after that case's last decision. Continue or Skip and it is gone: the only
+   * route back was `renderSuppressedFooter`, which renders only while
+   * `reflectionsSuppressed` is true. So a learner who simply clicked Skip —
+   * never "Always skip" — had no way to add a note afterwards, and a learner
+   * who wrote one had no way to edit it.
+   *
+   * Reopening is safe because the ledger is append-only and the reader takes
+   * the highest-sequence commit per decision: a later note supersedes an
+   * earlier one, and the earlier one stays in the export as history. Nothing is
+   * overwritten and nothing is lost.
+   */
+  const onReopenNote = useCallback(
+    (caseNumber: CaseNumber) => {
+      const placement = REFLECTION.placements.find(
+        (entry) => caseOfDecision(entry.afterDecisionId) === caseNumber
+      );
+      if (!placement) return;
+      if (!activeDecisionFor(path, placement.afterDecisionId)?.selectedOptionId) return;
+      setCursor(caseNumber);
+      setPhase({ kind: "reflection", decisionId: placement.afterDecisionId });
+      track("tf_reflection_shown", { case_number: caseNumber });
+    },
+    [path, track]
+  );
+
   const onShowReflections = useCallback(() => {
     const current = datasetRef.current;
     apply({ ...current, reflectionsSuppressed: false });
@@ -1137,6 +1167,33 @@ export function LiteSandbox({ children }: { children: ReactNode }) {
           </div>
         ))}
       </div>
+      {/*
+        THE WAY BACK TO THE RESULT.
+
+        Forward motion through the run is a side effect of ANSWERING: the last
+        decision of a case triggers its reflection, and the reflection's
+        continue leaves the case. That works exactly once. A learner who
+        finishes the run and then navigates back to a case — two clicks, and
+        "Reopen your decisions" on the reveal invites it — has every decision
+        answered, so nothing fires, and the screen offers no way onward. The
+        case navigator only moves sideways.
+
+        So the control appears whenever the active path is complete, on every
+        case, not only Case 5. Its absence was a dead end reachable from the
+        product's own affordances.
+
+        It is NOT rendered when the path is incomplete, and that is the same
+        rule the reveal follows: with an unanswered active decision there is no
+        result to go back to, and a button promising one would be a claim that
+        something exists.
+      */}
+      {resultAndExportsPresent(path) ? (
+        <div className={styles.resumeResult}>
+          <ActionPill variant="ink" full onClick={() => setPhase({ kind: "result" })}>
+            {RESUME_RESULT_CTA}
+          </ActionPill>
+        </div>
+      ) : null}
     </CaseScreen>
   );
 
@@ -1286,6 +1343,34 @@ export function LiteSandbox({ children }: { children: ReactNode }) {
     );
   };
 
+  /**
+   * The way back to this case's note when reflections are NOT suppressed.
+   *
+   * Its suppressed sibling above re-enables the surface; this one reopens a
+   * surface the learner has already been shown and moved past. Both exist for
+   * the same reason: the reflection is offered once, and "once" is not a
+   * design, it is what falls out of the surface being a step in the flow.
+   *
+   * It renders only when this case's reflection decision is answered — before
+   * that, the surface has not been reached and offering it would jump the run.
+   */
+  const renderNotesFooter = () => {
+    const decisionId = placementOf(activeCase);
+    if (!decisionId) return null;
+    if (!activeDecisionFor(path, decisionId)?.selectedOptionId) return null;
+    return (
+      <div className={styles.footer}>
+        <button
+          type="button"
+          className={styles.notesReopen}
+          onClick={() => onReopenNote(activeCase)}
+        >
+          {REFLECTION.heading}
+        </button>
+      </div>
+    );
+  };
+
   const renderPhase = () => {
     if (!hydrated || phase.kind === "intro") return renderIntro();
     if (phase.kind === "reflection") return renderReflectionScreen(phase.decisionId);
@@ -1310,7 +1395,12 @@ export function LiteSandbox({ children }: { children: ReactNode }) {
     <div className={styles.sandbox}>
       <div className={styles.screen}>{renderPhase()}</div>
       {inRun ? renderCaseNav() : null}
-      {inRun && dataset.reflectionsSuppressed ? renderSuppressedFooter() : null}
+      {inRun && phase.kind === "decisions" && dataset.reflectionsSuppressed
+        ? renderSuppressedFooter()
+        : null}
+      {inRun && phase.kind === "decisions" && !dataset.reflectionsSuppressed
+        ? renderNotesFooter()
+        : null}
     </div>
   );
 }

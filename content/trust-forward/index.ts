@@ -132,3 +132,16 @@ export const TRUST_FORWARD_ABSENT_BY_DESIGN: readonly string[] = [
  * be reinvented.
  */
 export const TRUST_FORWARD_UNSOURCED_SURFACES: readonly string[] = [];
+
+/**
+ * Control labels this build authored because no approved artifact supplies one.
+ *
+ * Distinct from the five `TODO_` surfaces: those are absent and render nothing,
+ * while these SHIP. Listing them is what keeps "every learner-facing string is
+ * approved" from quietly becoming false — each one is a real string on a real
+ * screen that Ben has not seen.
+ */
+export const TRUST_FORWARD_IMPLEMENTATION_AUTHORED_LABELS: readonly string[] = [
+  "copy.ts: RESUME_RESULT_CTA",
+  "components/trust-forward/LiteSandbox.tsx: REVEAL_ACTION_LABELS"
+];

@@ -722,3 +722,23 @@ export const EXPORT_FIRST = {
   primaryAction: "Download full backup (JSON)",
   explanation: "Saves your complete Lite record before this browser copy is reset."
 } as const;
+
+/**
+ * The forward control on an already-answered case.
+ *
+ * IMPLEMENTATION-AUTHORED, AND UNSOURCED. No approved artifact supplies a
+ * "back to your result" label — `RESULT.secondaryCta` is the reverse direction
+ * ("Reopen your decisions") and the run's normal forward motion happens as a
+ * side effect of answering, never as a named control.
+ *
+ * It exists because the product is otherwise unfinishable from one real state:
+ * a learner who completes the run and then navigates back to a case has every
+ * decision answered, so nothing triggers the advance, and the screen offers no
+ * way to the result. The case navigator only moves between cases. That is a
+ * dead end reachable in two clicks.
+ *
+ * Registered in `TRUST_FORWARD_IMPLEMENTATION_AUTHORED_LABELS` so it is visible
+ * as unsourced rather than passing for approved copy, and it is on the list of
+ * questions back to the handoff author.
+ */
+export const RESUME_RESULT_CTA = "See your result";
