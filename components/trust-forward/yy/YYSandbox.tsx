@@ -518,6 +518,80 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
   }, [positionKey]);
 
   /**
+   * The screen the learner is looking at, as one string — and it is NOT
+   * `positionKey`.
+   *
+   * The two keys answer different questions and the difference matters twice.
+   * `positionKey` carries `activeRunId` because a REPLAY has to reseed the
+   * drafts even though the case and checkpoint indices did not move; it also
+   * collapses every case ending to the bare string `"ending"`, because seeding
+   * drafts on an ending screen is meaningless. This key does the opposite on
+   * both counts: it ignores the run id, so the id resolving from `null` to a
+   * real value on the first render after `openCase` is not mistaken for a
+   * change of screen and cannot scroll twice; and it separates
+   * `ending|0` from `ending|1`, so a transition between two endings would be
+   * seen. Nothing today produces that transition — an ending always leaves
+   * through `openCase` or to the summary — but a key that is only correct
+   * because of a route nobody takes is a key that breaks when somebody takes
+   * it.
+   */
+  const screenKey =
+    phase.kind === "run"
+      ? `run|${phase.at.caseIndex}|${phase.at.checkpointIndex}`
+      : phase.kind === "ending"
+        ? `ending|${phase.caseIndex}`
+        : phase.kind;
+
+  const scrolledFromRef = useRef<string | null>(null);
+
+  /**
+   * Every new step starts at the top of the page.
+   *
+   * WHY THIS IS A CORRECTNESS FIX AND NOT A NICETY. A checkpoint is tall: the
+   * situation, four options, a free-text box, the closest-alternative step with
+   * the four options again, another box, the commit bar, then a two-part reveal
+   * and a reflection. By the time a learner presses Continue they are a long way
+   * down. Without this, the next checkpoint mounts with the viewport still at
+   * that depth — so the first thing a learner sees of the new situation is its
+   * middle, and the CAPTURE paragraph that the whole exercise depends on their
+   * reading has already scrolled past. `capture`'s own contract is that it is
+   * the situation AS IT EXISTED at the decision point; a learner who starts
+   * halfway down it is answering a different question than the one asked.
+   *
+   * KEYED ON THE SCREEN, GUARDED ON THE FIRST RUN. The ref holds the last
+   * screen actually scrolled from, so the effect fires once per real change and
+   * never on a re-render caused by typing, a ledger write or a commit. The
+   * `previous === null` branch is the one that matters: on hydration
+   * `resumePhase` can drop a returning learner straight into checkpoint 3 of
+   * case 2, and yanking their viewport on arrival — when the browser has
+   * already restored their scroll position — would be this effect fighting the
+   * browser over a screen the learner did not navigate to.
+   *
+   * NO `behavior`, DELIBERATELY. Omitting it means "auto", which defers to the
+   * `scroll-behavior` of the document element — and `app/globals.css` sets
+   * `html { scroll-behavior: smooth }` PAIRED with a `prefers-reduced-motion`
+   * block that returns it to `auto`. So this inherits the site's published
+   * motion contract instead of declaring a second one here, and a learner who
+   * asked their OS for less motion gets an instant jump without this file
+   * needing to know they exist. Passing "smooth" would have quietly overridden
+   * that accessibility claim from inside a component.
+   *
+   * SCROLL ONLY, AND FOCUS IS A KNOWN GAP. This moves the viewport; it does not
+   * move focus. A keyboard or screen-reader user therefore lands at the top
+   * visually while their focus falls back to the document body. The correct
+   * complement is a `tabIndex={-1}` heading on the new screen that receives
+   * focus here, which is a change to `CheckpointScreen`'s markup contract and
+   * is not made under a request about scrolling.
+   */
+  useEffect(() => {
+    if (!hydrated) return;
+    const previous = scrolledFromRef.current;
+    scrolledFromRef.current = screenKey;
+    if (previous === null || previous === screenKey) return;
+    window.scrollTo({ top: 0, left: 0 });
+  }, [hydrated, screenKey]);
+
+  /**
    * CAPTURE: the learner reached the situation as it existed at the decision
    * point. Recorded once per (run, checkpoint), guarded by a ref because React
    * invokes an effect twice in development and an append is not idempotent.

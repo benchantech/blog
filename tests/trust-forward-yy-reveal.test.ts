@@ -153,3 +153,69 @@ test("the reveal is mounted conditionally, never hidden with CSS", () => {
     assert.equal(panel.includes(hide), false, `RevealPanel uses ${hide} — hiding is not gating`);
   }
 });
+
+/**
+ * The step transition starts at the top of the page, and does so ONCE.
+ *
+ * This is asserted by reading the source because the runner cannot load a
+ * component — `node --import tsx --test` has no CSS loader, so no test in this
+ * repo may import anything under `components/`. What is checkable from text is
+ * the shape of the guard, and the shape is the whole risk: an unguarded
+ * `window.scrollTo` inside a component that re-renders on every keystroke would
+ * pin the viewport to the top while a learner types their WHY, and it would do
+ * it silently — the page would simply refuse to stay where they put it.
+ *
+ * THREE PROPERTIES, EACH A SEPARATE WAY TO GET THIS WRONG:
+ *
+ *  1. The call is inside an effect keyed on the screen, not on every render.
+ *  2. A ref holds the previous screen, so a re-render at the same screen is not
+ *     a transition. Without it, any state change would scroll.
+ *  3. The first observed screen does not scroll. `resumePhase` can hydrate a
+ *     returning learner into the middle of case 2, and scrolling on arrival
+ *     fights the browser's own restored scroll position.
+ *
+ * The `behavior` check is the fourth: `app/globals.css` sets
+ * `html { scroll-behavior: smooth }` paired with a `prefers-reduced-motion`
+ * override, and passing an explicit `behavior: "smooth"` here would override
+ * that pairing from inside a component — turning a published accessibility
+ * claim into a lie for the one surface where the scrolling actually happens.
+ */
+test("a new step scrolls to the top once, never on re-render and never on resume", () => {
+  const raw = readFileSync(path.join(yyDir, "YYSandbox.tsx"), "utf8");
+  const code = raw.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+
+  const calls = [...code.matchAll(/window\.scrollTo\(([^)]*)\)/g)];
+  assert.equal(calls.length, 1, "the sandbox should scroll from exactly one place");
+
+  assert.equal(
+    /behavior/.test(calls[0][1]),
+    false,
+    "scrollTo must not name a behavior — it inherits html { scroll-behavior } and its reduced-motion pair"
+  );
+
+  // The effect that owns the call, from `useEffect(` to its dependency array.
+  const effect = code.slice(0, code.indexOf("window.scrollTo")).lastIndexOf("useEffect(");
+  assert.ok(effect !== -1, "the scroll must happen inside an effect, not during render");
+  const tail = code.slice(effect);
+  const body = tail.slice(0, tail.indexOf("}, ["));
+  const deps = tail.slice(tail.indexOf("}, ["), tail.indexOf("]", tail.indexOf("}, [")) + 1);
+
+  assert.ok(deps.includes("screenKey"), `the scroll effect must be keyed on the screen; deps were ${deps}`);
+  assert.ok(
+    /scrolledFromRef\.current/.test(body),
+    "the effect must compare against the previous screen held in a ref, or it fires on every render"
+  );
+  assert.ok(
+    /previous === null/.test(body),
+    "the first observed screen must not scroll — a resumed learner arrives mid-run"
+  );
+
+  // `screenKey` must not carry the run id: it resolves from null to a real
+  // value on the first render after `openCase`, which would scroll twice.
+  const key = code.slice(code.indexOf("const screenKey"), code.indexOf("const scrolledFromRef"));
+  assert.equal(
+    /activeRunId/.test(key),
+    false,
+    "screenKey must not depend on activeRunId — it resolves late and would fire a second scroll"
+  );
+});
