@@ -85,9 +85,31 @@ export const trustForwardRegistry: readonly TrustForwardRegistryGroup[] = [
 ];
 
 /** Modules with no governed records of their own. Declared, never assumed. */
+/**
+ * The YY Method rewrite (2026-09-08). Registered so the governance checks reach
+ * it — an unregistered content module escapes every one of them silently, which
+ * is the whole reason this registry exists.
+ *
+ * These carry their own provenance vocabulary (`YYProvenance`, five values,
+ * finer than `ContentOrigin`) and their own guard,
+ * `tests/trust-forward-yy-content.test.ts`. They are listed here rather than in
+ * `trustForwardRegistry` because that array's shape is the SHIP-era one; the
+ * two architectures coexist until SHIP is retired.
+ */
+export const TRUST_FORWARD_YY_MODULES: readonly string[] = [
+  "content/trust-forward/yy/case-1.ts",
+  "content/trust-forward/yy/case-2.ts",
+  "content/trust-forward/yy/case-3.ts",
+  "content/trust-forward/yy/case-4.ts",
+  "content/trust-forward/yy/case-5.ts",
+  "content/trust-forward/yy/evidence-tags.ts",
+  "content/trust-forward/yy/approved-blurs.ts"
+];
+
 export const TRUST_FORWARD_RECORD_FREE_MODULES: readonly string[] = [
   "content/trust-forward/index.ts",
-  "content/trust-forward/stamp/v1-1-0.ts"
+  "content/trust-forward/stamp/v1-1-0.ts",
+  ...TRUST_FORWARD_YY_MODULES
 ];
 
 /**

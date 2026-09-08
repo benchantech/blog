@@ -346,6 +346,12 @@ test("the same prose is never defined in two different records (>= 6 words)", ()
  */
 const DUPLICATE_LITERAL_EXEMPTIONS: readonly { prose: string; reason: string }[] = [
   {
+    prose:
+      "so it would run off a very small server",
+    reason:
+      "content/trust-forward/yy/approved-blurs.ts records the exact substitutions Ben approved for the case narratives, so its `to` strings are BY CONSTRUCTION identical to the shipped text in case-5.ts. That is not drift — it is the mechanism: tests/trust-forward-yy-content.test.ts asserts source + these substitutions equals what ships, and it can only do that if the registry holds the literal. One definition would defeat the check that guards the other."
+  },
+  {
     prose: "Minimum Necessary Is Not Minimum Possible",
     reason:
       "a (WYS §11) principle name, carried by the principle and by the stop named after it — not a claim written twice"

@@ -201,7 +201,19 @@ test("llms.txt carries the instruction about superseded material", () => {
   const text = llmsTxt();
   assert.ok(text.includes(agentBootstrapText()));
   assert.ok(text.includes(historicalSnapshotInstruction()));
-  assert.equal(historicalSnapshotInstruction(), agentBootstrap.lines[3]);
+  // Indexed from the END, not from position 3. The ADR sentence was inserted
+  // before it on 2026-09-08 and a front-indexed reference silently pointed at
+  // the wrong sentence — the drift Standing Order 07 exists to prevent, caught
+  // here rather than shipped.
+  assert.equal(
+    historicalSnapshotInstruction(),
+    agentBootstrap.lines[agentBootstrap.lines.length - 1]
+  );
+  // The ADR instruction is part of the boot path, not an optional extra.
+  assert.ok(
+    agentBootstrapText().includes("docs/adr/README.md"),
+    "the boot instruction no longer points agents at the ADRs"
+  );
 });
 
 test("llms.txt is a map — it copies no curriculum prose into itself", () => {

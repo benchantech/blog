@@ -8,6 +8,7 @@ import { fileURLToPath } from "node:url";
 import {
   TRUST_FORWARD_AUTHORITIES,
   TRUST_FORWARD_RECORD_FREE_MODULES,
+  TRUST_FORWARD_YY_MODULES,
   trustForwardRegistry
 } from "@/content/trust-forward/index";
 import { approvalState } from "@/lib/approval-state";
@@ -232,8 +233,34 @@ test("every content/trust-forward module is registered or declared record-free",
   // most likely to be missed, being a subdirectory.
   assert.ok(onDiskSet.has("content/trust-forward/stamp/v1-1-0.ts"));
 
-  // Every registered file must also be one this test file actually opened.
+  /*
+   * The YY subtree is governed by its OWN test file, not by this one.
+   *
+   * `MODULE_NAMESPACES` exists so every module gets a value-level guard here.
+   * The YY rewrite carries a different provenance vocabulary (`YYProvenance`,
+   * five values) and a different content shape, so this file's guards cannot
+   * meaningfully read it — forcing them to would mean weakening them until they
+   * accepted both shapes, which is how a guard stops guarding.
+   *
+   * So the coverage claim is DELEGATED, not dropped, and the delegation is
+   * checked: the file it delegates to must exist and must actually import each
+   * module. That check is the whole point — a comment saying "covered
+   * elsewhere" is exactly the kind of claim this session found to be false
+   * three times over.
+   */
+  const yyGuard = "tests/trust-forward-yy-content.test.ts";
+  const yyGuardSource = readFileSync(path.join(repoRoot, yyGuard), "utf8");
+  for (const file of TRUST_FORWARD_YY_MODULES) {
+    const specifier = file.replace(/^content\//, "@/content/").replace(/\.ts$/, "");
+    assert.ok(
+      yyGuardSource.includes(specifier) || yyGuardSource.includes(path.basename(file, ".ts")),
+      `${file} claims to be governed by ${yyGuard}, which does not reference it`
+    );
+  }
+
+  // Every other registered file must be one this test file actually opened.
   for (const file of onDisk) {
+    if (TRUST_FORWARD_YY_MODULES.includes(file)) continue;
     assert.ok(
       Object.hasOwn(MODULE_NAMESPACES, file),
       `${file} is not in MODULE_NAMESPACES, so no value-level guard in this file can see it`

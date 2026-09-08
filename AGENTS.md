@@ -30,7 +30,7 @@ test -n "${CLOUDFLARE_API_TOKEN:-}" && printf 'CLOUDFLARE_API_TOKEN is set\n'
 
 Before acting on anything in this repository:
 
-> Read the current Author Ship state. Read the Standing Orders. Read the most recent Ship's Log entries relevant to this task. Do not reconstruct superseded decisions from older material when a newer captain-approved state exists.
+> Read the current Author Ship state. Read the Standing Orders. Read the most recent Ship's Log entries relevant to this task. Read docs/adr/README.md and every ADR whose Status is ACCEPTED; check each one's Stale-when condition before relying on it. Do not reconstruct superseded decisions from older material when a newer captain-approved state exists.
 
 Where those live:
 
@@ -38,5 +38,6 @@ Where those live:
 - Standing Orders — `/standing-orders`, defined in `content/ship/standing-orders.ts`.
 - Ship's Log — `/ships-log`, defined in `content/ship/ships-log.ts`.
 - The surface map an agent reads first — `/llms.txt`, built from `lib/llms-txt.ts`.
+- Architecture Decision Records — `docs/adr/`, indexed by `docs/adr/README.md`. Read **Status** and **Stale when** before trusting any ADR; a stale one is history, not guidance.
 
 The quoted paragraph is stored once, in `content/ship/agent-bootstrap.ts`, and rendered by this file, by `/llms.txt` and by `/author-ship/state.json`. `tests/machine-surfaces.test.ts` fails if this file and that module disagree, so edit the module, never this paragraph.
