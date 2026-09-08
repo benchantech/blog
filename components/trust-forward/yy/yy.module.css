@@ -205,15 +205,28 @@
 
 /* A replay opens a NEW run and never touches the old one. The rail is a list
    of cases, not a list of results: nothing here reports how a case went. */
+/* 44px, LIKE EVERY OTHER CONTROL ON THIS SITE, and it was not.
+   `padding: 6px 14px` on a 14px/1.5 line box measured about 35px tall, which is
+   under the §4.6 touch target and under the sentence /accessibility publishes:
+   "Buttons, links in navigation and course controls are at least forty-four
+   pixels tall." Five of these sit on the evidence summary, one per case, and
+   they are the last controls a learner touches — the claim was false for the
+   surface at the end of the run. `inline-flex` rather than more padding,
+   because `min-height` on a button leaves the label at the top of the box
+   without it. `tests/legal-claims.test.ts` now asserts this rule by name. */
 .replayAction {
+  align-items: center;
   background: none;
   border: 1px solid var(--border-nav);
   border-radius: var(--radius-pill);
   color: var(--ink);
   cursor: pointer;
+  display: inline-flex;
   font: inherit;
   font-size: 0.875rem;
-  padding: 6px 14px;
+  justify-content: center;
+  min-height: 44px;
+  padding: 6px 18px;
 }
 
 .replayAction:hover,

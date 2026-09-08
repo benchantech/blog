@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useRef, useState } from "react";
 import styles from "./reveal.module.css";
 
 /**
@@ -110,6 +110,16 @@ export function ReflectBox({
   const [status, setStatus] = useState<SaveStatus>("idle");
 
   /*
+   * The note is what tells a learner where their words go, and until
+   * 2026-09-08 nothing tied it to the box they go in. A screen reader moving
+   * field to field in forms mode reads the label and skips the sibling
+   * paragraph, so the disclosure was reaching everyone except the learner least
+   * able to find it by scanning. `useId` because two ReflectBoxes can exist
+   * across a replay and an id has to survive hydration.
+   */
+  const noteId = useId();
+
+  /*
    * Refs rather than state for everything the flush needs. The unmount flush
    * runs from a cleanup that must not re-subscribe on every keystroke, so what
    * it reads has to be a box it can look inside at cleanup time rather than a
@@ -183,10 +193,13 @@ export function ReflectBox({
           rows={4}
           autoComplete="off"
           spellCheck={true}
+          aria-describedby={noteId}
         />
       </label>
 
-      <p className={styles.reflectNote}>{labels.note}</p>
+      <p className={styles.reflectNote} id={noteId}>
+        {labels.note}
+      </p>
 
       {/*
         `aria-live="polite"` and never `assertive`: a save notice is an

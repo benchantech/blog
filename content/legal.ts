@@ -355,6 +355,17 @@ export const accessibilityContrastText = {
  * `content/watch-your-step/types.ts`, the bank in `artifacts.ts` is `[]`, and
  * `MediaSlot` renders a labelled stripe with an `aria-label` rather than an
  * image. Claiming shipped transcripts would exceed implemented fact.
+ *
+ * REWRITTEN 2026-09-08 BECAUSE IT HAD BECOME FALSE, AND ITS TEST DID NOT NOTICE.
+ * The sentence said *"No photograph, recording or screenshot has shipped on
+ * this site yet"*. Three images had shipped by then — an Upwork profile
+ * SCREENSHOT containing a PHOTOGRAPH of Ben, a graduation badge, and the header
+ * brand mark. `tests/legal-claims.test.ts` was asserting
+ * `media.text.includes("has shipped on this site yet")`, which checks that the
+ * page still says the words, not that the words are true, so it stayed green
+ * through the commit that made them false. Both are fixed together: the claim
+ * now describes what actually ships, and the test now scans `app/` and
+ * `components/` for image and media elements instead of matching a phrase.
  */
 export const accessibilityMediaText = {
   id: "legal-accessibility-media",
@@ -367,7 +378,7 @@ export const accessibilityMediaText = {
   },
   variants: {
     full:
-      "No photograph, recording or screenshot has shipped on this site yet, so there is no transcript to publish. The place a recording will sit is drawn as a labelled outline that a screen reader announces, and the type behind an invented document cannot be filled in at all without a written alternative that preserves the decision the exercise is asking for without giving away the answer."
+      "Photographs and screenshots ship with text alternatives. The Upwork profile screenshot on the home page carries its headline, its rating and review count, its location and its two totals in alternative text, so what the picture is evidence of can be read rather than only seen; the brand mark in the header is marked decorative, so a screen reader passes over it instead of announcing a filename. No recording has shipped, so there is no transcript to publish. The place a recording will sit is drawn as a labelled outline that a screen reader announces, and the type behind an invented document cannot be filled in at all without a written alternative that preserves the decision the exercise is asking for without giving away the answer."
   }
 } as const satisfies AnyCanonicalText;
 

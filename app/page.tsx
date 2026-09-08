@@ -8,25 +8,18 @@ import {
   TRUST_STRIP
 } from "@/content/trust-forward/copy";
 import { ROUTES } from "@/content/trust-forward/stamp/v1-1-0";
-import { wysLabels } from "@/content/watch-your-step/copy";
 import {
   landingAntiFeatures,
   landingDataHref,
   landingDataLinkLabel,
   landingHowRunBodyText,
-  landingInstructorBodyText,
-  landingInstructorEyebrowText,
-  landingInstructorHeadlineText,
   landingLabels,
   landingShipChips
 } from "@/content/watch-your-step/landing";
-import { wysBenSlotById } from "@/content/watch-your-step/sources";
 import { ActionPill } from "@/components/ui/ActionPill";
 import { Pill } from "@/components/ui/Pill";
 import { StruckPill } from "@/components/ui/StruckPill";
-import { MediaSlot } from "@/components/provenance/MediaSlot";
 import { cx } from "@/components/provenance/cx";
-import { AudioSlotPill } from "@/components/wys/AudioSlotPill";
 import styles from "./home.module.css";
 
 /**
@@ -100,12 +93,7 @@ import styles from "./home.module.css";
  * `<main>`. Adding a second one on this page would be two nodes for one claim.
  */
 
-const portrait = wysBenSlotById("slot-portrait-desktop");
-
 export default function Home() {
-  const instructorEyebrow = gatedCanonicalText(landingInstructorEyebrowText, "full");
-  const instructorHeadline = gatedCanonicalText(landingInstructorHeadlineText, "full");
-  const instructorBody = gatedCanonicalText(landingInstructorBodyText, "full");
   const howRunHeadline = gatedCanonicalText(claimById("ai-role-boundaries"), "short");
   const howRunBody = gatedCanonicalText(landingHowRunBodyText, "full");
 
@@ -147,9 +135,20 @@ export default function Home() {
           <div className={styles.screenshotSlot}>
             <picture className={styles.screenshotMedia}>
               <source media="(max-width: 700px)" srcSet="/upwork-cto-mobile.webp" />
+              {/*
+                THE ALT CARRIES THE EVIDENCE, because the image IS the evidence.
+                It said "Upwork profile screenshot for the From Upwork to CTO
+                feature" — which describes the file, not the claim. Everything
+                that makes this section worth putting on a home page is inside
+                the picture: the headline, the rating, the review count and the
+                two totals. A visitor who cannot see it was being handed the
+                caption of a proof rather than the proof. Read from the image
+                itself; if the screenshot is ever replaced, this text is part of
+                the replacement.
+              */}
               <img
                 src="/upwork-cto-desktop.webp"
-                alt="Upwork profile screenshot for the From Upwork to CTO feature"
+                alt="Upwork profile for Ben C., verified: Freelance Developer to CTO, 800K+ Earned, 10+ Years on Upwork. Rated 5.0 from 26 reviews. Schenectady, NY, USA. 58 total jobs, 9K total hours."
                 width={1448}
                 height={1086}
               />
@@ -179,51 +178,40 @@ export default function Home() {
         </section>
       </section>
 
+      {/*
+        THE INSTRUCTOR SLAB WAS REMOVED 2026-09-08, on Ben's instruction, and
+        what it carried moved rather than vanished. The ink treatment — the one
+        dark block on an otherwise white page — is now on the anti-features
+        section below, which is the section that earns it: "What you won't find
+        here" is the page's sharpest claim and it was set on white like
+        everything around it. `/who-is-ben` still exists and is still reachable
+        from the footer, so removing the block removed a homepage panel, not a
+        route. `.instructor*` stays in `home.module.css` unreferenced rather
+        than deleted, so restoring the panel is an edit here and not a
+        reconstruction; `MediaSlot` and `AudioSlotPill` are still rendered by
+        the Watch Your Step landing, so the /accessibility sentence about where
+        a recording will sit is still true.
+      */}
       <div className={styles.section}>
-        <section className={styles.instructor} aria-labelledby="instructor-heading">
-          {/*
-            A Ben slot, and it cannot be filled (§6.4): `MediaSlot` takes a label
-            and an awaited-asset descriptor and declares no children, so nothing
-            generated can occupy the portrait Ben has not supplied.
-          */}
-          <MediaSlot
-            label={portrait.label}
-            awaitedAsset={portrait.awaitedAsset}
-            medium={portrait.medium ?? "image"}
-            height={portrait.height}
-          />
-          <div>
-            {instructorEyebrow ? <p className={styles.instructorEyebrow}>{instructorEyebrow.text}</p> : null}
-            {instructorHeadline ? (
-              <h2 className={styles.instructorHeadline} id="instructor-heading">
-                {instructorHeadline.text}
-              </h2>
-            ) : null}
-            {instructorBody ? <p className={styles.instructorBody}>{instructorBody.text}</p> : null}
-            <div className={styles.instructorActions}>
-              <AudioSlotPill title={wysLabels.hearBenLabel} sub={wysLabels.hearBenSubLabel} />
-              <Link className={styles.instructorLink} href={landingLabels.whoIsBenHref}>
-                {landingLabels.whoIsBen}
-              </Link>
-            </div>
+        <section className={styles.antiFeatures} aria-labelledby="anti-features-heading">
+          <h2 className={styles.antiFeaturesHeadline} id="anti-features-heading">
+            {landingLabels.antiFeaturesHeadline}
+          </h2>
+          <div className={styles.antiFeaturesList}>
+            {/*
+              `tone="onInk"` is required here, not decorative: the default pill
+              colour measures 3.01:1 against this slab. See StruckPill.
+            */}
+            <StruckPill labels={landingAntiFeatures} tone="onInk" />
           </div>
+          <p className={styles.willFind}>
+            {landingLabels.whatYouWillFind}{" "}
+            <Link className={styles.willFindLink} href={landingDataHref}>
+              {landingDataLinkLabel} →
+            </Link>
+          </p>
         </section>
       </div>
-
-      <section className={cx(styles.section, styles.antiFeatures)} aria-labelledby="anti-features-heading">
-        <h2 className={styles.antiFeaturesHeadline} id="anti-features-heading">
-          {landingLabels.antiFeaturesHeadline}
-        </h2>
-        <div className={styles.antiFeaturesList}>
-          <StruckPill labels={landingAntiFeatures} />
-        </div>
-        <p className={styles.willFind}>
-          {landingLabels.whatYouWillFind}{" "}
-          <Link className={styles.willFindLink} href={landingDataHref}>
-            {landingDataLinkLabel} →
-          </Link>
-        </p>
-      </section>
 
       <div className={styles.section}>
         <section className={styles.howRun} aria-labelledby="how-run-heading">

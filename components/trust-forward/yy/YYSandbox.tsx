@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
 import { case1 } from "@/content/trust-forward/yy/case-1";
@@ -542,7 +542,18 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
         ? `ending|${phase.caseIndex}`
         : phase.kind;
 
+  /*
+   * The WHY hint's id. `WhyNotStep` and `ReflectBox` generate their own for the
+   * same reason: the sentence that says what happens to a learner's words has
+   * to be reachable from the box they type them into, not only from reading
+   * order. See either component for the full note.
+   */
+  const whyHintId = useId();
+
   const scrolledFromRef = useRef<string | null>(null);
+  const screenRef = useRef<HTMLDivElement | null>(null);
+  const revealRef = useRef<HTMLDivElement | null>(null);
+  const revealedRef = useRef<string | null>(null);
 
   /**
    * Every new step starts at the top of the page.
@@ -576,20 +587,74 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
    * needing to know they exist. Passing "smooth" would have quietly overridden
    * that accessibility claim from inside a component.
    *
-   * SCROLL ONLY, AND FOCUS IS A KNOWN GAP. This moves the viewport; it does not
-   * move focus. A keyboard or screen-reader user therefore lands at the top
-   * visually while their focus falls back to the document body. The correct
-   * complement is a `tabIndex={-1}` heading on the new screen that receives
-   * focus here, which is a change to `CheckpointScreen`'s markup contract and
-   * is not made under a request about scrolling.
+   * FOCUS MOVES WITH THE VIEWPORT, AND THAT HALF IS THE ACCESSIBILITY HALF.
+   * The control the learner just pressed — Continue, Next case, See your
+   * evidence — unmounts with the screen it belonged to, and a focused element
+   * that is removed from the document drops focus to `<body>`. A keyboard user
+   * would then have to tab from the top of the page, past the skip link and the
+   * whole header, to reach the new checkpoint; a screen-reader user would be
+   * told nothing happened at all. So `screenRef` is the phase container, it
+   * carries `tabIndex={-1}` so it can hold focus without entering the tab
+   * order, and it takes focus on the same transition that scrolls (WCAG 2.4.3).
+   *
+   * `preventScroll: true`, and the order matters: focusing an element scrolls
+   * it into view by default, which would race the `scrollTo` on the next line
+   * and land the page wherever the container's top happened to be. Focus first
+   * without moving anything, then put the viewport at the top deliberately.
+   *
+   * NO FOCUS RULE IS ADDED FOR IT, AND THAT IS THE CORRECT OUTCOME RATHER THAN
+   * AN OMISSION. `app/globals.css` styles `:focus-visible` and never bare
+   * `:focus`, so a programmatic focus on this container draws a ring only when
+   * the browser's own heuristic says the learner is on the keyboard — a ring
+   * around the whole screen after a mouse click would read as a rendering bug,
+   * and no ring after pressing Enter on Continue would be a 2.4.7 failure. The
+   * platform already distinguishes the two; overriding it here would break one
+   * of them.
    */
   useEffect(() => {
     if (!hydrated) return;
     const previous = scrolledFromRef.current;
     scrolledFromRef.current = screenKey;
     if (previous === null || previous === screenKey) return;
+    screenRef.current?.focus({ preventScroll: true });
     window.scrollTo({ top: 0, left: 0 });
   }, [hydrated, screenKey]);
+
+  /**
+   * When the reveal appears, focus goes to it.
+   *
+   * WCAG 4.1.3 (Status Messages) IS THE CRITERION, AND A LIVE REGION IS THE
+   * WRONG INSTRUMENT HERE. Pressing Commit mounts a panel carrying the
+   * learner's frozen judgment, Ben THEN, Ben NOW, the relation between them and
+   * every condition under which another option was reasonable. A sighted
+   * learner sees it arrive; without this, a screen-reader user is told nothing
+   * at all, because nothing they were focused on changed — the button they
+   * pressed simply stopped being there. `role="status"` on the panel would
+   * announce the entire thing as one uninterruptible utterance, which is worse
+   * than silence for a block this long. Moving focus to it is the pattern that
+   * fits: it is the result of an explicit activation, it is announced from its
+   * own heading, and it is navigable from there.
+   *
+   * NO `preventScroll`, UNLIKE THE TRANSITION ABOVE, and the asymmetry is the
+   * point. There the viewport is being sent somewhere deliberately, so the
+   * browser must not also move it; here the panel has just appeared below the
+   * commit bar and bringing it into view is the correct behaviour for everyone
+   * — and a keyboard learner who pressed Enter on Commit gets a focus ring on
+   * something they can actually see, rather than one somewhere off screen.
+   *
+   * ONCE PER (RUN, CHECKPOINT). `revealedRef` holds the last key focused, so a
+   * re-render while committed — a reflection autosave, a ledger write — does
+   * not drag focus back out of the note the learner is typing. Re-entering a
+   * committed checkpoint through a replay is a NEW run id and therefore a new
+   * key, which is correct: that reveal is being shown again.
+   */
+  useEffect(() => {
+    if (!hydrated || !committedHere) return;
+    const key = `${committedHere.runId}|${committedHere.checkpointId}`;
+    if (revealedRef.current === key) return;
+    revealedRef.current = key;
+    revealRef.current?.focus();
+  }, [hydrated, committedHere]);
 
   /**
    * CAPTURE: the learner reached the situation as it existed at the decision
@@ -928,9 +993,12 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
               readOnly={committed}
               autoComplete="off"
               spellCheck={true}
+              aria-describedby={whyHintId}
             />
           </label>
-          <p className={styles.hint}>{STEP_COPY.whyProseHint}</p>
+          <p className={styles.hint} id={whyHintId}>
+            {STEP_COPY.whyProseHint}
+          </p>
 
           {chosen ? (
             <WhyNotStep
@@ -965,7 +1033,7 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
           frozen, which is the whole reason the record is worth anything.
         */}
         {committed ? (
-          <div className={styles.step}>
+          <div className={styles.step} ref={revealRef} tabIndex={-1}>
             <RevealPanel checkpoint={checkpoint} record={committedHere} ledger={ledger} runId={activeRunId} />
           </div>
         ) : null}
@@ -1088,7 +1156,14 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
   return (
     <div className={styles.sandbox}>
       {renderNotice()}
-      <div className={styles.screen}>{renderPhase()}</div>
+      {/*
+        `tabIndex={-1}` so the transition effect can put focus here without
+        adding a stop to the tab order. See the effect for why this is the
+        element that takes it and why no focus rule accompanies it.
+      */}
+      <div className={styles.screen} ref={screenRef} tabIndex={-1}>
+        {renderPhase()}
+      </div>
     </div>
   );
 }

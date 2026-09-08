@@ -222,13 +222,33 @@
 /* -------------------------------------------------------------------------- */
 /* Anti-features (dc.html:407-415)                                            */
 /* -------------------------------------------------------------------------- */
+/* THE INK SLAB MOVED HERE 2026-09-08 (Ben), from `.instructor`. It is the only
+   dark block on the page and it now sits on the page's sharpest claim: a list
+   of what the product refuses to be. The geometry is `.instructor`'s, not a new
+   one — same `--radius-block-lg`, same `--ink`, same white ground for text — so
+   the page still has one dark treatment rather than two that drift apart.
+
+   EVERY COLOUR IN THIS BLOCK CHANGED, AND NOT FOR TASTE. A slab flips the
+   ground from white to `--ink`, and each of the four inks below fails or
+   disappears against it at its old value: `--body` measures 1.7:1, the struck
+   pills' `--muted` 3.01:1 and `--border-pill` is the ink itself at 15% alpha.
+   The `-on-dark` tokens exist for exactly this and are measured against `--ink`
+   in `app/globals.css`: `--body-on-dark` 9.72:1, `--muted-on-dark` 5.87:1. The
+   pill colours live with the pill (`components/ui/primitives.module.css`,
+   `.struckOnInk`) because a caller cannot reach into another module's classes,
+   which is why `StruckPill` grew a `tone` prop rather than an override here. */
 .antiFeatures {
-  padding-block: 88px 40px;
+  margin-top: 64px;
+  padding: 72px 48px 64px;
+  border-radius: var(--radius-block-lg);
+  background: var(--ink);
+  color: var(--white);
   text-align: center;
 }
 
 .antiFeaturesHeadline {
   margin: 0 0 28px;
+  color: var(--white);
   font: 600 clamp(1.875rem, 3.2vw, 2.5rem) / 1.1 var(--sans);
   letter-spacing: -0.025em;
 }
@@ -240,12 +260,15 @@
 
 .willFind {
   margin: 28px 0 0;
-  color: var(--body);
+  color: var(--body-on-dark);
   font: 400 17px / 1.5 var(--sans);
 }
 
+/* `--accent-on-dark`, which globals.css restricts to "ONLY inside ink slabs" —
+   this is now one. `--accent-text-on-tint` is a deepened teal built to clear
+   4.5:1 on a LIGHT tint and would be close to unreadable here. */
 .willFindLink {
-  color: var(--accent-text-on-tint);
+  color: var(--accent-on-dark);
   font-weight: 500;
   text-decoration: none;
 }
@@ -342,7 +365,8 @@
   }
 
   .antiFeatures {
-    padding-block: 56px 24px;
+    margin-top: 40px;
+    padding: 44px 24px 40px;
   }
 }
 

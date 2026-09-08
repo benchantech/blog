@@ -575,18 +575,87 @@ test("every navigation rule the /accessibility sentence names declares its own 4
 
   // The one course control that is a <summary> rather than a button.
   assert.match(ruleBody(data, ".summary"), /min-height: 44px/);
+
+  /*
+   * TRUST FORWARD LITE'S OWN CONTROLS, ADDED 2026-09-08. The sentence says
+   * "course controls", and the YY run is a course: every control a learner
+   * touches across seventeen checkpoints and the evidence summary is covered by
+   * one of the three shared primitives — except `.replayAction`, which is
+   * declared in the sandbox's own stylesheet and shipped at roughly 35px. Five
+   * of them sit on the last screen of the run. It is asserted here, by name,
+   * because a per-rule claim needs a per-rule check: the previous version of
+   * this test passed on 44px found SOMEWHERE in the file, and that is exactly
+   * how the navigation links measured 41px while it stayed green.
+   */
+  const primitives = read("components/ui/primitives.module.css");
+  assert.match(ruleBody(primitives, ".action"), /min-height: 44px/);
+  assert.match(ruleBody(primitives, ".choice"), /min-height: 44px/);
+  assert.match(ruleBody(primitives, ".linkRow"), /min-height: 44px/);
+  assert.match(
+    ruleBody(read("components/trust-forward/yy/yy.module.css"), ".replayAction"),
+    /min-height: 44px/
+  );
 });
 
-test("/accessibility claims no transcript and no artifact alternative that has not shipped", () => {
+/*
+ * THIS TEST USED TO MATCH A PHRASE, AND THAT IS WHY IT MISSED (2026-09-08).
+ *
+ * It asserted `media.text.includes("has shipped on this site yet")` — that the
+ * accessibility statement still SAID no photograph, recording or screenshot had
+ * shipped. By the time it was rewritten, three images were live: an Upwork
+ * profile screenshot containing a photograph of Ben, a graduation badge, and
+ * the header brand mark. The sentence was false and the check was green,
+ * because a phrase match cannot tell the difference between a claim that is
+ * true and a claim that is merely unchanged.
+ *
+ * So it now checks the WORLD the sentence describes: every `<img>` that ships
+ * carries an `alt` attribute, no `<video>` or `<audio>` element ships at all
+ * (which is what makes "no transcript to publish" true), and the fictional
+ * artifact bank is still empty. If a recording is ever added, this fails and
+ * the statement has to be rewritten before the build goes green — which is the
+ * behaviour the old check was supposed to have.
+ */
+test("/accessibility's media claim matches the images and recordings that actually ship", () => {
   const media = resolveVariant(
     legalCopyRecords.find((record) => record.id === "legal-accessibility-media") as AnyCanonicalText,
     "full"
   );
   assert.equal(media.kind, "text");
   if (media.kind !== "text") return;
+
   // The bank is empty, so the page states the rule rather than a shipped fact.
   assert.ok(read("content/watch-your-step/artifacts.ts").includes("wysFictionalArtifacts = [] as const"));
-  assert.ok(media.text.includes("has shipped on this site yet"));
+
+  const surfaces: string[] = [];
+  const walk = (dir: string) => {
+    for (const entry of readdirSync(path.join(repoRoot, dir), { withFileTypes: true })) {
+      const next = `${dir}/${entry.name}`;
+      if (entry.isDirectory()) walk(next);
+      else if (entry.name.endsWith(".tsx")) surfaces.push(next);
+    }
+  };
+  walk("app");
+  walk("components");
+
+  const unlabelled: string[] = [];
+  let images = 0;
+  const recordings: string[] = [];
+  for (const file of surfaces) {
+    const source = read(file).replace(/\/\*[\s\S]*?\*\//g, " ");
+    for (const tag of source.matchAll(/<img\b[\s\S]*?\/?>/g)) {
+      images += 1;
+      if (!/\balt=/.test(tag[0])) unlabelled.push(`${file}: ${tag[0].slice(0, 60)}`);
+    }
+    if (/<(video|audio)\b/.test(source)) recordings.push(file);
+  }
+
+  assert.deepEqual(unlabelled, [], "an <img> ships with no alt attribute; /accessibility claims text alternatives");
+  assert.ok(images > 0, "no image ships any more — the media claim describes images and needs rewriting");
+  assert.deepEqual(
+    recordings,
+    [],
+    "a recording ships; /accessibility says there is no transcript to publish, so the claim is now false"
+  );
 });
 
 /* -------------------------------------------------------------------------- */

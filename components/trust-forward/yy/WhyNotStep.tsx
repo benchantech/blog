@@ -1,3 +1,4 @@
+import { useId } from "react";
 import { ChoiceList, type YYChoiceOption } from "./ChoiceList";
 import styles from "./checkpoint.module.css";
 
@@ -49,10 +50,18 @@ export interface WhyNotStepCopy {
  * cannot enable its action without a closest alternative.
  *
  * THE PROMPT LABELS THE TEXTAREA, by wrapping both in one `<label>`. Implicit
- * association needs no generated id, so this file needs no `useId`, no `"use
- * client"` directive of its own and no id threaded down from the caller — and
- * there is no code path that draws an unlabelled writing box.
+ * association needs no generated id for the NAME, and there is no code path
+ * that draws an unlabelled writing box.
  * `components/trust-forward/ReflectionBox.tsx` uses the same pattern.
+ *
+ * THE HINT IS A DIFFERENT PROBLEM AND IT DOES NEED AN ID (2026-09-08). "Kept in
+ * this browser, never interpreted" is the sentence that tells a learner what
+ * happens to what they are about to write, and it sat as a sibling paragraph
+ * with nothing tying it to the field. Read linearly that is fine; a screen
+ * reader moving field to field in forms mode never reaches it, so the one
+ * learner who most needs to know where their words go is the one who is not
+ * told. `useId` is the cost — this component now generates one id — and the
+ * earlier note claiming none was needed was true only about the label.
  *
  * NO BEN, AGAIN BY ABSENCE. This surface sits BEFORE commit, so §29's
  * commit-before-reveal rule is in force here exactly as it is on the checkpoint
@@ -104,6 +113,10 @@ export function WhyNotStep({
      disabled — see the header. */
   const alternatives = options.filter((option) => option.id !== chosenId);
 
+  /* Stable across server and client render, and unique per instance — two
+     checkpoints' WHY-NOT boxes must not describe each other. */
+  const hintId = useId();
+
   return (
     <section className={styles.step}>
       <div className={styles.stepHead}>
@@ -130,10 +143,15 @@ export function WhyNotStep({
           readOnly={locked}
           autoComplete="off"
           spellCheck={true}
+          aria-describedby={copy.proseHint ? hintId : undefined}
         />
       </label>
 
-      {copy.proseHint ? <p className={styles.hint}>{copy.proseHint}</p> : null}
+      {copy.proseHint ? (
+        <p className={styles.hint} id={hintId}>
+          {copy.proseHint}
+        </p>
+      ) : null}
     </section>
   );
 }

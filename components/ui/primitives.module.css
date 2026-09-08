@@ -196,6 +196,18 @@
   font-size: 14px;
 }
 
+/* The same pill on an ink slab. MEASURED, not eyeballed: `--muted` on `--ink`
+   is 3.01:1 and fails the 4.5:1 the /accessibility statement publishes for text
+   at ordinary size, while `--muted-on-dark` measures 5.87:1 against the same
+   ground. The border moves to a white alpha for the reason the colour does —
+   `--border-pill` is `rgba(22, 32, 43, .15)`, which is the ink itself at 15%
+   and therefore invisible on ink. The line-through inherits `color`, so it
+   moves with the text and cannot be left behind at the old value. */
+.struckOnInk {
+  border-color: rgba(255, 255, 255, 0.3);
+  color: var(--muted-on-dark);
+}
+
 /* -------------------------------------------------------------------------- */
 /* ChoiceRow — normalised so selection cannot reflow (§4.7.1, Q18)            */
 /* -------------------------------------------------------------------------- */
