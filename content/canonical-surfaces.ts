@@ -39,7 +39,7 @@
  * (plan Phase 0, Q15).
  */
 
-import { ecosystemNav, lessonZeroCta, publicShipNav, shipNav, trustForwardNav } from "@/content/nav";
+import { ecosystemNav, lessonZeroCta, shipNav, trustForwardNav } from "@/content/nav";
 import { WYS_NAV_RETIRED } from "@/content/watch-your-step/config";
 import { courseTabs, stopDisplayName } from "@/content/watch-your-step/tabs";
 import { WYS_STOP_IDS, wysWeekById } from "@/content/watch-your-step/weeks";
@@ -172,8 +172,31 @@ export const RETIRED_SURFACES: readonly string[] = WYS_NAV_RETIRED
 export const canonicalSurfaces: readonly CanonicalSurface[] = [
   { path: "/", label: "BenChanTech", group: "home", human: true },
   ...TRUST_FORWARD_SURFACES,
-  ...publicShipNav
+  /*
+   * THE INVENTORY, NOT THE MENU (changed 2026-09-08 with
+   * `SHIP_NAV_CONSOLIDATED`).
+   *
+   * This mapped `publicShipNav` — the filtered view the chrome renders — which
+   * was right while the two lists agreed. They stopped agreeing when Ben pulled
+   * Bridge, Standing Orders, Ship's Log, Crew and Ben out of the top menu:
+   * `publicShipNav` went down to Trust Forward alone, and mapping it here would
+   * have dropped five LIVE, UNREDIRECTED pages out of the sitemap and
+   * /llms.txt in the same edit. Not retired, not canonical, still served —
+   * the one state a URL must never be in, and the state
+   * `tests/machine-surfaces.test.ts` exists to make impossible.
+   *
+   * A menu is a discovery decision for humans. This roster is the site's URL
+   * inventory, and the two are allowed to differ: `RETIRED_SURFACES` is how a
+   * URL leaves the inventory, and it requires a redirect to actually shadow the
+   * page. Nothing redirects these five, so they stay.
+   *
+   * Watch Your Step is the exception, filtered for the opposite reason: it IS
+   * retired and IS shadowed, and the same test fails if a route is both retired
+   * and canonical.
+   */
+  ...shipNav
     .filter((item) => item.href !== trustForwardNav.href)
+    .filter((item) => !(WYS_NAV_RETIRED && item.href === "/watch-your-step"))
     .map((item) => ({
       path: item.href,
       label: item.label,

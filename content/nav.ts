@@ -61,19 +61,41 @@ export const trustForwardNav: NavItem = {
 };
 
 /**
+/**
+ * CONSOLIDATION, 2026-09-08 (Ben): *"remove Bridge, Standing Orders, Ship's
+ * Log, Crew, Ben from the top menu … we're consolidating until i can build it
+ * out more."*
+ *
+ * The five ship routes still EXIST and are still served — `/bridge`,
+ * `/standing-orders`, `/ships-log`, `/crew` and `/ben` all have page files and
+ * `tests/preserved-surfaces.test.ts` still asserts every one of them. What
+ * changed is discovery, not existence, which is the same distinction
+ * `WYS_NAV_RETIRED` already draws for the course. A separate flag rather than
+ * an edit to `shipNav`, for the reason that inventory exists at all: a label is
+ * the name of a node, and the way to stop advertising a room is to stop
+ * pointing at it, not to forget what it is called.
+ *
+ * One flag, one line to reverse. The five come back by setting this to `false`.
+ */
+export const SHIP_NAV_CONSOLIDATED = true;
+
+/**
  * WHAT THE CHROME ACTUALLY RENDERS.
  *
  * `shipNav` and `lessonZeroCta` above are the INVENTORY — the course's names,
  * kept in this file because a label is a name for a node and deleting it would
- * lose that name. These two exports are the PUBLIC VIEW, and while
- * `WYS_NAV_RETIRED` is true they drop the Watch Your Step entry and its CTA.
+ * lose that name. These two exports are the PUBLIC VIEW, and they drop the
+ * Watch Your Step entry and its CTA while `WYS_NAV_RETIRED` is true and the
+ * five remaining ship links while `SHIP_NAV_CONSOLIDATED` is true.
  *
- * The split matters: the retirement is a discovery decision, not a deletion,
- * and keeping the inventory intact is what makes it one constant to reverse.
+ * The split matters: neither retirement is a deletion, and keeping the
+ * inventory intact is what makes each one a constant to reverse.
  */
-export const publicShipNav: readonly NavItem[] = WYS_NAV_RETIRED
-  ? [trustForwardNav, ...shipNav.filter((item) => item.href !== "/watch-your-step")]
-  : [trustForwardNav, ...shipNav];
+export const publicShipNav: readonly NavItem[] = SHIP_NAV_CONSOLIDATED
+  ? [trustForwardNav]
+  : WYS_NAV_RETIRED
+    ? [trustForwardNav, ...shipNav.filter((item) => item.href !== "/watch-your-step")]
+    : [trustForwardNav, ...shipNav];
 
 /** Null while the course is retired, so no chrome can render a dead CTA. */
 export const publicLessonZeroCta: NavItem | null = WYS_NAV_RETIRED ? null : lessonZeroCta;

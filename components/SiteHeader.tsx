@@ -29,12 +29,26 @@ import styles from "./SiteHeader.module.css";
  * `<img aria-hidden>` + adjacent-text pairing (the accessible name comes from
  * the text node, not from alt text), the wordmark "BenChanTech" (Q8 — the
  * artboard reads "Ben Chan Tech"; changing it would touch metadata and OG copy),
- * and the three-link ecosystem row EXACTLY AS IT SHIPS TODAY: the same
+ * and the ecosystem row's element EXACTLY AS IT SHIPS TODAY: the same
  * `.desktop-nav` class and the same `aria-label="Primary navigation"` on the
- * same element. Two nav landmarks in one header need two names, and the
- * additive reading (R7, R9) is that the PRESERVED landmark keeps its accessible
- * name and the NEW one gets a new name — not that the new tier takes the old
- * name over. So the ship tier is "Ship navigation".
+ * same element.
+ *
+ * ONE MENU, FROM 2026-09-08 (Ben): *"move Violin for Parents, Neon, and YY
+ * Method up into it so there's only one menu now."* Until then the header
+ * carried two tiers — a "Ship navigation" row of six and the preserved
+ * three-link "Primary navigation" row — under R7's additive reading, and the
+ * ship row is what `SHIP_NAV_CONSOLIDATED` has now emptied down to Trust
+ * Forward. Two landmarks for four links is chrome describing itself; the tiers
+ * are merged into the single preserved element.
+ *
+ * WHICH ELEMENT SURVIVED IS NOT ARBITRARY. The merge renders into the
+ * `.desktop-nav` node carrying `aria-label="Primary navigation"` — the element
+ * that shipped before any of this work — because a landmark's accessible name
+ * is a shipped surface: moving the four links into the NEW node and deleting
+ * the old one would read identically on screen while renaming a landmark a
+ * screen-reader user navigates by. The "Ship navigation" name goes, since the
+ * tier it named is gone; `styles.shipNav` stays in the stylesheet against the
+ * flag being reversed.
  *
  * MOBILE (NEW/unapproved, Q9 ratified at its default): today `.desktop-nav`
  * is `display:none` below 700px with no replacement, so /studio, /neon and
@@ -77,20 +91,20 @@ export function SiteHeader() {
       </Link>
 
       <div className={styles.tiers}>
-        <nav className={styles.shipNav} aria-label="Ship navigation">
-          {publicShipNav.map((item) => (
+        <nav className={cx("desktop-nav", styles.ecosystemNav)} aria-label="Primary navigation">
+          {[...publicShipNav, ...ecosystemNav].map((item) => (
             <NavLink item={item} key={item.href} />
           ))}
+          {/*
+            Still rendered from `publicLessonZeroCta` rather than dropped: it is
+            `null` while the course is retired, so this is a no-op today and the
+            teal CTA returns with the course rather than having to be rebuilt.
+          */}
           {publicLessonZeroCta ? (
             <Link className={styles.cta} href={publicLessonZeroCta.href}>
               {publicLessonZeroCta.label}
             </Link>
           ) : null}
-        </nav>
-        <nav className={cx("desktop-nav", styles.ecosystemNav)} aria-label="Primary navigation">
-          {ecosystemNav.map((item) => (
-            <NavLink item={item} key={item.href} />
-          ))}
         </nav>
       </div>
 

@@ -227,7 +227,23 @@ test("the /studio CTA keeps its target and rel attributes", () => {
  * An anchor that stops resolving breaks a live control just as surely as a
  * dropped href, and nothing else in the suite would notice (plan Phase 0).
  */
-const anchorIds = ["main", "router", "router-heading", "destinations-heading", "stakeholder-heading"];
+const anchorIds = ["main", "stakeholder-heading"];
+
+/**
+ * Anchors whose MARKUP left `/` on 2026-09-08 (Ben: *"from routing foyer down
+ * to just above review routes remove all of these sections"*).
+ *
+ * `router` and `router-heading` still exist as ids, because
+ * `components/IntentRouter.tsx` was not touched — the page simply stopped
+ * mounting it. `destinations-heading` went with the floor plan. None of the
+ * three has a referrer any more, which is the state this register records: an
+ * id that is still written but no longer pointed at is not a broken anchor, and
+ * calling it one would fail a page that is behaving correctly.
+ *
+ * The pair below is what keeps that honest — an anchor may be here OR in
+ * `anchorIds`, never both, so a live anchor cannot be parked here to silence it.
+ */
+const WITHDRAWN_ANCHOR_IDS = ["router", "router-heading", "destinations-heading"];
 
 test("every in-page anchor target id still exists", () => {
   for (const id of anchorIds) {
@@ -235,22 +251,27 @@ test("every in-page anchor target id still exists", () => {
   }
 });
 
-test("every in-page anchor reference still points at a live target", () => {
-  assert.ok(corpus.includes('href="#main"'), "the skip link lost its #main target");
-  assert.ok(
-    occurrences(corpus, 'href="#router"') >= 2,
-    'both audience buttons ("I’m human" / "I’m AI") keep their live href="#router"'
-  );
-  for (const id of ["router-heading", "destinations-heading", "stakeholder-heading"]) {
-    assert.ok(
-      corpus.includes(`aria-labelledby="${id}"`),
-      `the section labelled by ${id} lost its aria-labelledby reference`
+test("a withdrawn anchor is withdrawn from the markup, not just from the register", () => {
+  for (const id of WITHDRAWN_ANCHOR_IDS) {
+    assert.equal(
+      anchorIds.includes(id),
+      false,
+      `${id} is registered as withdrawn and as live; it cannot be both`
+    );
+    assert.equal(
+      occurrences(stripComments(readRepoFile("app/page.tsx")), `href="#${id}"`),
+      0,
+      `/ still links to #${id}, which nothing on the page targets any more`
     );
   }
 });
 
-test("the sr-only destinations heading copy is preserved", () => {
-  assert.ok(readRepoFile("app/page.tsx").includes("The ecosystem has four stable doors."));
+test("every in-page anchor reference still points at a live target", () => {
+  assert.ok(corpus.includes('href="#main"'), "the skip link lost its #main target");
+  assert.ok(
+    corpus.includes('aria-labelledby="stakeholder-heading"'),
+    "the Review routes section lost its aria-labelledby reference"
+  );
 });
 
 /* -------------------------------------------------------------------------- */
@@ -383,7 +404,10 @@ test("no internal href written in the chrome is dead", () => {
 test("both nav inventories survive in the header", () => {
   // §3.3: the six approved ship links and the CTA are ADDED; the three links
   // the live header carries today are KEPT. R7 forbids trading one for the
-  // other, so both must be present.
+  // other, so both must be present AS INVENTORY — which is what this checks,
+  // and why it reads content/nav.ts rather than the rendered chrome. Ben
+  // consolidated the MENU on 2026-09-08 (see SHIP_NAV_CONSOLIDATED); the names
+  // are unchanged, and a name is what §3.3 protects.
   const nav = readRepoFile("content/nav.ts");
   for (const label of [
     "Watch Your Step",
@@ -418,8 +442,33 @@ test("both nav inventories survive in the header", () => {
     1,
     "exactly one landmark carries the preserved name"
   );
-  for (const label of ["Ship navigation", "Mobile navigation"]) {
-    assert.ok(header.includes(`aria-label="${label}"`), `the new header landmark "${label}" is unnamed`);
+  /*
+   * ONE DESKTOP LANDMARK, FROM 2026-09-08. The header carried two nav
+   * landmarks while it carried two tiers — "Ship navigation" for the six ship
+   * links and the preserved "Primary navigation" for the ecosystem three. Ben
+   * merged them ("so there's only one menu now"), and the four surviving links
+   * render into the PRESERVED element, which is why the assertion above still
+   * finds `aria-label="Primary navigation"` on `.desktop-nav` and why exactly
+   * one landmark carries it.
+   *
+   * "Ship navigation" is therefore expected to be ABSENT, and that is asserted
+   * rather than merely un-asserted: a second desktop nav quietly reappearing is
+   * the regression this file is for. The mobile disclosure keeps its own name —
+   * it is a separate landmark on a separate breakpoint, not a duplicate.
+   */
+  assert.ok(
+    header.includes('aria-label="Mobile navigation"'),
+    'the header landmark "Mobile navigation" is unnamed'
+  );
+  assert.equal(
+    stripComments(header).includes('aria-label="Ship navigation"'),
+    false,
+    "a second desktop nav landmark is back; the header is meant to carry one menu"
+  );
+  // The consolidated menu still renders both inventories' public views, so no
+  // link is lost by the merge — only the tier boundary is.
+  for (const inventory of ["publicShipNav", "ecosystemNav", "publicLessonZeroCta"]) {
+    assert.ok(header.includes(inventory), `the header no longer renders ${inventory}`);
   }
 });
 

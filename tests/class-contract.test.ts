@@ -63,7 +63,49 @@ const UNRESOLVED_CLASSNAMES: readonly string[] = [];
  * className -> selector scan never visits an orphan rule, so an orphan parked
  * in that list could never be reported and would sit there forever.
  */
-const ORPHAN_RULES: readonly string[] = [];
+/*
+ * WITHDRAWN MARKUP, 2026-09-08 — the ONE reason an entry may sit here.
+ *
+ * Ben removed the routing foyer, the four-door floor plan and the intent
+ * router from `/` ("we're consolidating until i can build it out more"). The
+ * rules that styled them are KEPT rather than deleted, because the markup is
+ * coming back and a stylesheet is cheaper to keep than to reconstruct — the
+ * same call `home.module.css` records for `.instructor*`.
+ *
+ * That leaves eighteen rules in `globals.css` with no className pointing at
+ * them, which is precisely the condition this register exists to name out loud
+ * instead of letting a scan go quiet. Every entry below is a rule whose markup
+ * was withdrawn in one commit, not a rule that never had markup — the two
+ * findings this list held at Phase 0 were the latter and were both retired by
+ * deletion.
+ *
+ * SELF-EXPIRING, and that is what keeps it honest: the `stale` assertion below
+ * fails the moment one of these is referenced again, so restoring the foyer
+ * cannot leave a lie parked here. If the markup is ever abandoned for good,
+ * these rules should be deleted and this register should return to empty.
+ */
+const ORPHAN_RULES: readonly string[] = [
+  // The foyer hero: label, headline, copy, signature, and the two buttons.
+  "hero",
+  "hero-foyer",
+  "hero-copy",
+  "hero-copy-block",
+  "welcome-label",
+  "signature-note",
+  "audience-actions",
+  "audience-button",
+  "primary",
+  "secondary",
+  // The four-door floor plan.
+  "destinations-section",
+  "floor-plan",
+  "plan-room",
+  "plan-room-1",
+  "plan-room-2",
+  "plan-room-3",
+  "plan-room-4",
+  "room-number"
+];
 
 /**
  * Class names built at runtime from data. The static prefix before `${` is the
@@ -72,8 +114,11 @@ const ORPHAN_RULES: readonly string[] = [];
  * than silently lose coverage for it.
  */
 const DYNAMIC_CLASS_EXPANSIONS: Record<string, string[]> = {
-  // app/page.tsx:44 — `plan-room-${item.number}`, values 1-4 from
-  // content/site-config.ts destinations[].number.
+  // `plan-room-${item.number}`, values 1-4 from content/site-config.ts
+  // destinations[].number. The floor plan was withdrawn from `/` on
+  // 2026-09-08, so nothing expands this today; the entry stays because the
+  // markup is coming back and because the check it belongs to fires on
+  // UNREGISTERED prefixes, which an empty register would still do.
   "plan-room-": ["plan-room-1", "plan-room-2", "plan-room-3", "plan-room-4"]
 };
 
@@ -230,12 +275,31 @@ test("mode 1: every className token resolves to a globals.css rule", () => {
 test("mode 1: the extractor actually sees the known tokens", () => {
   // Guards the scanner itself. A silently-empty scan would make every other
   // assertion in this file vacuously true.
+  /*
+   * FOUR OF THESE WERE REPLACED ON 2026-09-08, and the replacements were chosen
+   * to keep the same three extractor features under test rather than to make
+   * the list green. "hero", "audience-button", "plan-room-1" and "plan-room-4"
+   * all belonged to the foyer and floor plan Ben withdrew from `/`, so a
+   * scanner that had stopped working entirely would now pass on them.
+   *
+   *   - a MULTI-TOKEN attribute: `className="section-heading compact"` is the
+   *     shape `"hero hero-foyer"` used to cover — one attribute, two tokens.
+   *   - a CONDITIONAL: "active" / "complete" come from IntentRouter's ternary,
+   *     which the component still contains even though `/` no longer mounts it.
+   *   - a token from a `cx()` call and one from a bare string, so neither path
+   *     can go quiet on its own.
+   *
+   * The `plan-room-` entry in DYNAMIC_CLASS_EXPANSIONS is now the register's
+   * only member and its markup is withdrawn, so the dynamic-className path has
+   * no live consumer. It is kept, not deleted: the check fires on any dynamic
+   * class it does not recognise, so it is still load-bearing for the next one.
+   */
   const tokens = new Set(allClassUses.map((use) => use.token));
   for (const expected of [
-    "hero",
-    "audience-button",
-    "plan-room-1",
-    "plan-room-4",
+    "section-heading",
+    "compact",
+    "stakeholder-card",
+    "external-arrow",
     "active",
     "complete",
     "skip-link",

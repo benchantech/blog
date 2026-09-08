@@ -1,6 +1,5 @@
 import Link from "next/link";
-import { IntentRouter } from "@/components/IntentRouter";
-import { destinations, stakeholderRoutes } from "@/content/site-config";
+import { stakeholderRoutes } from "@/content/site-config";
 import { claimById } from "@/content/claims";
 import { gatedCanonicalText } from "@/lib/wys/content-gate";
 import {
@@ -244,49 +243,27 @@ export default function Home() {
           ==================================================================== */}
       <div className={styles.seam} />
 
-      <section className="hero hero-foyer">
-        <div className="hero-copy-block">
-          <p className="welcome-label">Routing foyer · Sheet A-01</p>
-          <h1>Come on in - even if you&apos;re AI.</h1>
-          <p className="hero-copy">
-            Welcome to a system overview of what I&apos;m building, piece by piece, using AI and my years of technical
-            judgment. It&apos;s not the prettiest site by far... but the foundation is solid underneath.
-          </p>
-          <p className="signature-note">
-            I built the whole thing in plain sight, so yes, you can see the framing. That&apos;s the point.
-            <span> - B.C.</span>
-          </p>
-        </div>
-        <div className="audience-actions" aria-label="Start by audience">
-          <a className="audience-button primary" href="#router">
-            <span>I&apos;m human</span>
-            <small>I think, choose, and decide.</small>
-          </a>
-          <a className="audience-button secondary" href="#router">
-            <span>I&apos;m AI</span>
-            <small>I execute, retrieve, and compose.</small>
-          </a>
-        </div>
-      </section>
+      {/* ====================================================================
+          WITHDRAWN 2026-09-08, on Ben's instruction: *"from routing foyer down
+          to just above review routes remove all of these sections … we're
+          consolidating until i can build it out more."*
 
-      <section className="destinations-section" aria-labelledby="destinations-heading">
-        <h2 className="sr-only" id="destinations-heading">
-          The ecosystem has four stable doors.
-        </h2>
-        <div className="floor-plan">
-          {destinations.map((item) => (
-            <a className={`plan-room plan-room-${item.number}`} href={item.url} rel="noreferrer" key={item.id}>
-              <span className="room-number">Door 0{item.number}</span>
-              <strong>{item.eyebrow}</strong>
-              <small>{item.description}</small>
-              <em>{item.url.replace("https://", "")} -&gt;</em>
-            </a>
-          ))}
-        </div>
-      </section>
+          THREE BLOCKS LEFT THIS PAGE: the routing foyer ("Come on in - even if
+          you're AI", the two audience buttons), the four-door floor plan, and
+          the <IntentRouter/> the audience buttons anchored to. Review routes
+          below stays; everything above the seam stays.
 
-      <IntentRouter />
+          NOTHING WAS DELETED TO ACHIEVE IT. `components/IntentRouter.tsx` is
+          untouched and still exported. `content/site-config.ts` still holds all
+          four `destinations[]`, which the footer's DOORS group still renders,
+          so the four URLs remain reachable from every page — this removed a
+          panel, not a set of doors. The globals.css rules that styled the
+          withdrawn markup are kept and registered in `ORPHAN_RULES` in
+          `tests/class-contract.test.ts`, which is self-expiring: the day this
+          markup returns, that register fails until the entries come out.
 
+          Restoring it is `git show` on this commit, not a reconstruction.
+          ==================================================================== */}
       <section className="stakeholder-section" aria-labelledby="stakeholder-heading">
         <div className="section-heading compact">
           <p className="eyebrow">Review routes</p>

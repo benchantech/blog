@@ -51,8 +51,30 @@ const heroDemo = read("components/wys/HeroDemo.tsx");
 /* The preserved half of `/`                                                  */
 /* -------------------------------------------------------------------------- */
 
-/** Every line of copy the plan §3.1 enumeration names, verbatim. */
+/**
+ * Every line of copy the plan §3.1 enumeration names, verbatim — MINUS the
+ * twelve Ben withdrew on 2026-09-08.
+ *
+ * *"from routing foyer down to just above review routes remove all of these
+ * sections … we're consolidating until i can build it out more."* The routing
+ * foyer, the four-door floor plan and the intent router left `/`; Review routes
+ * stayed, and its two lines are what remains of the preserved half here.
+ *
+ * THE WITHDRAWN LINES ARE LISTED, NOT DELETED, because this array's job is to
+ * be the record of what §3.1 enumerated. An entry silently dropped from a
+ * verbatim register is indistinguishable from an entry that was never there,
+ * and the next person to compare this file against the plan would find twelve
+ * unexplained absences. `WITHDRAWN_HOME_COPY` is asserted below in the
+ * opposite direction — it must NOT appear — so the two halves cannot drift:
+ * restoring the markup fails that assertion until the line moves back up.
+ */
 const PRESERVED_HOME_COPY: readonly string[] = [
+  "Review routes",
+  "Two rooms are built for current reviewers."
+];
+
+/** Withdrawn from `/` on 2026-09-08. Still in the markup would be the bug. */
+const WITHDRAWN_HOME_COPY: readonly string[] = [
   "Routing foyer · Sheet A-01",
   "Come on in - even if you&apos;re AI.",
   "Welcome to a system overview of what I&apos;m building, piece by piece, using AI and my years of technical",
@@ -64,9 +86,7 @@ const PRESERVED_HOME_COPY: readonly string[] = [
   "I&apos;m AI",
   "I execute, retrieve, and compose.",
   "The ecosystem has four stable doors.",
-  "Door 0",
-  "Review routes",
-  "Two rooms are built for current reviewers."
+  "Door 0"
 ];
 
 test("every preserved line of home copy survives the assimilation, verbatim", () => {
@@ -74,41 +94,51 @@ test("every preserved line of home copy survives the assimilation, verbatim", ()
   assert.deepEqual(missing, [], "copy dropped from the preserved half of /");
 });
 
-test("both audience buttons keep their live #router anchors and their classes", () => {
-  assert.equal(homePage.split('href="#router"').length - 1, 2, "an audience button lost its anchor");
-  assert.ok(homePage.includes('className="audience-button primary"'));
-  assert.ok(homePage.includes('className="audience-button secondary"'));
+/*
+ * The withdrawal, asserted from the other side. Without this the register above
+ * would be a comment: twelve lines could sit in `WITHDRAWN_HOME_COPY` while the
+ * markup that carries them was never actually removed, and every test in this
+ * file would still pass. `homeMarkup` rather than `homePage`, so the commit's
+ * own explanation of what it withdrew does not count as the markup returning.
+ */
+test("the withdrawn home sections are gone from the markup, not just from the register", () => {
+  const present = WITHDRAWN_HOME_COPY.filter((line) => homeMarkup.includes(line));
+  assert.deepEqual(present, [], "copy registered as withdrawn is still rendered on /");
 });
 
 test("the preserved sections keep their ids, their labels and their order", () => {
   for (const fragment of [
-    'className="hero hero-foyer"',
-    'className="destinations-section" aria-labelledby="destinations-heading"',
-    'className="sr-only" id="destinations-heading"',
-    'className="floor-plan"',
-    "plan-room plan-room-${item.number}",
-    "<IntentRouter />",
     'className="stakeholder-section" aria-labelledby="stakeholder-heading"',
     'id="stakeholder-heading"'
   ]) {
     assert.ok(homePage.includes(fragment), `the preserved half of / lost: ${fragment}`);
   }
 
-  // Order matters: Q2's ratified default APPENDS the preserved blocks below the
-  // 4a composition. Relocating one inside it would satisfy every assertion
-  // above and still be the thing the plan forbids.
-  const foyer = homePage.indexOf('className="hero hero-foyer"');
-  const doors = homePage.indexOf('className="destinations-section"');
-  const router = homePage.indexOf("<IntentRouter />");
+  // Order matters: Q2's ratified default APPENDS the preserved block below the
+  // 4a composition. Relocating it inside would satisfy the assertion above and
+  // still be the thing the plan forbids. Three of the four blocks this once
+  // ordered were withdrawn on 2026-09-08; Review routes is the one that stayed,
+  // and it is still last.
   const stakeholders = homePage.indexOf('className="stakeholder-section"');
-  assert.ok(foyer < doors && doors < router && router < stakeholders, "the preserved blocks were reordered");
-  assert.ok(homePage.indexOf("upworkFeature") < foyer, "the 4a composition is no longer above the preserved foyer");
+  assert.ok(
+    homePage.indexOf("upworkFeature") < stakeholders,
+    "the 4a composition is no longer above the preserved Review routes block"
+  );
+  assert.ok(homePage.indexOf("styles.seam") < stakeholders, "the seam no longer divides the two halves");
 });
 
 test("the two class-contract findings are resolved in the stylesheet, not in the markup", () => {
   const css = read("app/globals.css");
-  assert.ok(css.includes(".hero-foyer {"), "`hero-foyer` is applied with no rule again");
-  assert.ok(css.includes(".audience-button.secondary {"), "`secondary` is applied with no rule again");
+  /*
+   * The MARKUP for these two was withdrawn on 2026-09-08 and the RULES were
+   * deliberately kept — see ORPHAN_RULES in tests/class-contract.test.ts, which
+   * names both and fails if they are ever referenced again without being
+   * de-registered. So this still asserts exactly what it always did: the Phase
+   * 0 findings were fixed by giving each class the job it claimed, and neither
+   * was ever fixed by deleting a class from preserved markup.
+   */
+  assert.ok(css.includes(".hero-foyer {"), "the withdrawn foyer's rule was deleted rather than kept");
+  assert.ok(css.includes(".audience-button.secondary {"), "the withdrawn button pair's rule was deleted");
   assert.ok(!css.includes(".hero-principle"), "the retired orphan rule came back");
   assert.ok(!css.includes(".card-eyebrow"), "the retired orphan selector came back");
 });
@@ -265,10 +295,23 @@ test("Trust Forward is the home page's primary CTA, in the approved words", () =
   // (content/trust-forward/copy.ts). The home page shows neither.
   assert.ok(!homeMarkup.includes("fullOffer.bridge"), "/ publishes the real-cases claim without its limit");
   assert.ok(!homeMarkup.includes("confidentiality"), "/ publishes the confidentiality sentence alone");
-  // The h1 is the offer's heading, and the preserved foyer keeps the h1 it
-  // shipped with — two on this URL, as Q2's stacking already made true.
+  /*
+   * ONE h1, FROM 2026-09-08 — and this assertion moved from 2 to 1 because the
+   * page changed, not because the number was inconvenient.
+   *
+   * Q2's stacking put the Trust Forward hero above the preserved foyer, and
+   * each kept its own h1, so this URL carried two: an accepted deviation
+   * recorded as such. Ben's withdrawal of the foyer removed the second one, and
+   * a single h1 naming the offer is the correct end state rather than a
+   * tolerated one — the page now has one document title in its outline, which
+   * is what a screen-reader user navigating by heading level expects.
+   *
+   * Still an EQUALITY, not a "<= 2": the failure this guards against is a
+   * second h1 arriving unnoticed, and that is only catchable by pinning the
+   * count.
+   */
   assert.ok(homeMarkup.includes('id="trust-forward-heading"'));
-  assert.equal(homeMarkup.split("<h1").length - 1, 2, "the home page no longer carries exactly two h1s");
+  assert.equal(homeMarkup.split("<h1").length - 1, 1, "the home page no longer carries exactly one h1");
 });
 
 test("the phone peek is the first three of the same nine — not a second list", () => {
