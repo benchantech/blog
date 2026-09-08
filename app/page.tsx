@@ -4,25 +4,20 @@ import { destinations, stakeholderRoutes } from "@/content/site-config";
 import { claimById } from "@/content/claims";
 import { gatedCanonicalText } from "@/lib/wys/content-gate";
 import {
-  stopScaffoldFootnoteText,
-  stopsHeadline,
-  wysLabels
-} from "@/content/watch-your-step/copy";
+  LANDING_INCOMPLETE,
+  TRUST_STRIP
+} from "@/content/trust-forward/copy";
+import { ROUTES } from "@/content/trust-forward/stamp/v1-1-0";
+import { wysLabels } from "@/content/watch-your-step/copy";
 import {
   landingAntiFeatures,
-  landingBadgeText,
   landingDataHref,
   landingDataLinkLabel,
-  landingFourMoves,
-  landingFourMovesLeadText,
-  landingHeadlineText,
   landingHowRunBodyText,
   landingInstructorBodyText,
   landingInstructorEyebrowText,
   landingInstructorHeadlineText,
   landingLabels,
-  landingLeadText,
-  landingPathLeadText,
   landingShipChips
 } from "@/content/watch-your-step/landing";
 import { wysBenSlotById } from "@/content/watch-your-step/sources";
@@ -32,87 +27,121 @@ import { StruckPill } from "@/components/ui/StruckPill";
 import { MediaSlot } from "@/components/provenance/MediaSlot";
 import { cx } from "@/components/provenance/cx";
 import { AudioSlotPill } from "@/components/wys/AudioSlotPill";
-import { StopCard, StopStrip } from "@/components/wys/StopCard";
-import { landingStopCells } from "@/components/wys/landing-stops";
 import styles from "./home.module.css";
 
 /**
- * `/` — the `4a` composition, and the whole of the previous home page beneath it.
+ * `/` — Trust Forward at the top, and the whole of the previous home page
+ * beneath it.
  *
- * Q2 IS RATIFIED AT ITS BUILD-NOW DEFAULT: the preserved blocks are APPENDED
- * BELOW the new composition, restyled, on the same URL. Nothing is removed and
- * nothing is relocated. Everything from `.hero-foyer` down is the page as it
+ * THE PRODUCT ENTRY IS TRUST FORWARD, AND THAT IS A CONSEQUENCE OF A RULING
+ * ALREADY IN FORCE RATHER THAN A NEW ONE. `WYS_NAV_RETIRED` is `true`,
+ * `content/canonical-surfaces.ts` moves the course into `RETIRED_SURFACES`, and
+ * `next.config.ts` points the course routes at `/` with non-permanent
+ * redirects. A hero that still sold the course, a Lesson Zero start pill and a
+ * nine-cell preview of its stops were therefore advertising a redirect: every
+ * one of those controls landed the visitor back on this page. They are removed from the RENDER — not from `content/`, where
+ * the records stay published and where `/watch-your-step` still reads them, so
+ * the retirement remains reversible by flipping one flag rather than by
+ * recovering deleted copy.
+ *
+ * WHAT WENT, AND WHY EACH ONE COUNTS AS "WATCH YOUR STEP AS THE PRODUCT ENTRY":
+ *
+ *  - The hero badge, headline and lead. `landingLeadText.full` opens "Watch
+ *    Your Step teaches one skill first"; it is the course's pitch, by name.
+ *  - The start CTA — the Lesson Zero pill, whose href came from `landingLabels`
+ *    — and the "or try one question →" label that pointed at it.
+ *  - The whole path section: `stopsHeadline()`, the nine `StopCard`s from
+ *    `landingStopCells()` and the scaffold footnote that explained their
+ *    withheld titles. That is the stop preview.
+ *  - The four-moves slab, "Every visit, the same four moves · Watch. Try.
+ *    Judge. Carry." It describes the visit loop of a course with no visits
+ *    left, which is the same claim as the hero in a different tile.
+ *
+ * WHAT STAYED, deliberately, because none of it is course-entry: the instructor
+ * band (it is about Ben, and `/ben` is live), the anti-feature pills — "AI you
+ * can trust" has exactly one approved use and this struck pill is it — and "How
+ * the site is run", whose four chips point at `/standing-orders`, `/bridge`,
+ * `/ships-log` and `/crew`, all of which serve pages.
+ *
+ * ONE LIVE LINK STILL POINTS INTO THE RETIRED TREE and this file cannot fix it:
+ * `landingDataHref` is the course's Data page, which the wildcard redirect
+ * sends to `/`. The label is the site's one route to "what this site knows about
+ * you", so dropping the link would cost more than it saves; the href is defined
+ * in `content/watch-your-step/landing.ts` and belongs to whoever owns the Data
+ * page's new home.
+ *
+ * EVERY SENTENCE IN THE NEW HERO COMES FROM `content/trust-forward/copy.ts`,
+ * through `LANDING_INCOMPLETE` — the same object `/trust-forward` renders, in
+ * the same order (heading, lede, body, descriptor, time estimate), so the two
+ * surfaces cannot make the offer with different words. `FULL_OFFER.bridge` and
+ * its confidentiality sentence are NOT rendered here: copy.ts requires them as
+ * one unit, and the home page has no room for the pair, so it shows neither.
+ * `descriptor` is the half that is safe alone — it describes Lite's fictional
+ * cases and makes no claim about real clients.
+ *
+ * THE CTA POINTS AT `ROUTES.canonical`, the door, not at `ROUTES.publicAlternate`,
+ * the run. `/trust-forward` is the crawlable node that carries the answer-first
+ * material and the completion split; sending the home page past it would skip
+ * the one surface that knows whether this browser has already finished.
+ *
+ * PRESERVED, UNCHANGED. Everything from `.hero-foyer` down is the page as it
  * shipped — the foyer copy, both audience buttons with their live `#router`
  * anchors, the sr-only destinations heading, the four-door grid, `IntentRouter`
  * and the stakeholder section — with its class names, its hrefs, its ids and
- * its words untouched.
+ * its words untouched. `tests/preserved-surfaces.test.ts` and
+ * `tests/home-landing.test.ts` execute that promise.
  *
- * (The three `aria-hidden` blueprint-scaffolding blocks — `.dimension-line`,
- * `.plan-foyer` and `.scale-line`/`.scale-bar` — were retired in Phase 4 under
- * plan §4.4's explicit resolution, markup and rules together in one commit.
- * They carried no copy a screen reader reached, no href and no metadata. That
- * decision is recorded in docs/facelift-unapproved.md and is not reopened here.)
+ * TWO `<h1>`s STILL EXIST ON THIS URL. The Trust Forward hero is the page's
+ * primary heading and the preserved foyer keeps the one it shipped with,
+ * because demoting it would be a semantic edit to preserved markup.
  *
- * Q3 IS ALSO RATIFIED: `/watch-your-step` owns the pitch, and the hero demo
- * below is `HeroDemo` — the SAME component bound to the SAME scenario record
- * that the landing mounts. There is no second copy of the text on this page,
- * and there is no way to give this page a different scenario without changing
- * the content object both surfaces read.
- *
- * TWO `<h1>`s NOW EXIST ON THIS URL. The `4a` hero is the page's primary
- * heading and the preserved foyer keeps the one it shipped with, because
- * demoting it would be a semantic edit to preserved markup. That is a visible
- * consequence of Q2's stacking default rather than a decision of its own, and
- * it is recorded for Ben.
- *
- * NO DISCLOSURE STRIP IS COMPOSED HERE. `4a` draws one between "How the site is
- * run" and the footer; `components/DisclosureStrip.tsx` already renders it on
- * every route from `app/layout.tsx` (§5.5), directly below `<main>`. Adding a
- * second one on this page would be two nodes for one claim.
+ * NO DISCLOSURE STRIP IS COMPOSED HERE. `components/DisclosureStrip.tsx`
+ * already renders it on every route from `app/layout.tsx`, directly below
+ * `<main>`. Adding a second one on this page would be two nodes for one claim.
  */
 
 const portrait = wysBenSlotById("slot-portrait-desktop");
 
-/** The one dark tile of the four (dc.html:403). Named, not compared inline. */
-const CARRY_TILE = "CARRY";
-
 export default function Home() {
-  const badge = gatedCanonicalText(landingBadgeText, "full");
-  const headline = gatedCanonicalText(landingHeadlineText, "full");
-  const lead = gatedCanonicalText(landingLeadText, "full");
   const instructorEyebrow = gatedCanonicalText(landingInstructorEyebrowText, "full");
   const instructorHeadline = gatedCanonicalText(landingInstructorHeadlineText, "full");
   const instructorBody = gatedCanonicalText(landingInstructorBodyText, "full");
-  const pathLead = gatedCanonicalText(landingPathLeadText, "full");
-  const movesLead = gatedCanonicalText(landingFourMovesLeadText, "full");
   const howRunHeadline = gatedCanonicalText(claimById("ai-role-boundaries"), "short");
   const howRunBody = gatedCanonicalText(landingHowRunBodyText, "full");
-  const footnote = gatedCanonicalText(stopScaffoldFootnoteText, "short");
-
-  const cells = landingStopCells();
-  const withheldTitles = cells.some((cell) => cell.titleWithheld);
 
   return (
     <>
-      <section className={cx(styles.section, styles.hero)} aria-labelledby="course-heading">
+      <section className={cx(styles.section, styles.hero)} aria-labelledby="trust-forward-heading">
         <div>
-          {badge ? (
-            <p className={styles.heroBadge}>
-              <Pill variant="status">{badge.text}</Pill>
-            </p>
-          ) : null}
-          {headline ? (
-            <h1 className={styles.heroHeadline} id="course-heading">
-              {headline.text}
-            </h1>
-          ) : null}
-          {lead ? <p className={styles.heroLead}>{lead.text}</p> : null}
+          <h1 className={styles.heroHeadline} id="trust-forward-heading">
+            {LANDING_INCOMPLETE.heading}
+          </h1>
+          <p className={styles.heroLead}>{LANDING_INCOMPLETE.lede}</p>
+          <p className={styles.heroBody}>{LANDING_INCOMPLETE.body}</p>
+          <p className={styles.heroDescriptor}>{LANDING_INCOMPLETE.fullOffer.descriptor}</p>
+          <p className={styles.heroBadge}>
+            <Pill variant="status">{LANDING_INCOMPLETE.timeEstimate}</Pill>
+          </p>
           <div className={styles.heroActions}>
-            <ActionPill variant="ink" href={landingLabels.startCtaHref}>
-              {landingLabels.startCta}
+            <ActionPill variant="ink" href={ROUTES.canonical}>
+              {LANDING_INCOMPLETE.primaryCta}
             </ActionPill>
-            <p className={styles.heroTryOne}>{landingLabels.tryOneDesktop}</p>
           </div>
+          {/*
+            The four things a visitor wants settled before they start, directly
+            under the CTA rather than further down the page — free, no account,
+            no AI, nothing leaves the browser. Every one was verified against
+            the code before it was written (see TRUST_STRIP's header); they read
+            as marketing because the honest version of these facts is the pitch.
+          */}
+          <ul className={styles.trustStrip} aria-label="What this costs and what it collects">
+            {TRUST_STRIP.items.map((item) => (
+              <li className={styles.trustItem} key={item}>
+                {item}
+              </li>
+            ))}
+          </ul>
+          <p className={styles.trustLine}>{TRUST_STRIP.line}</p>
         </div>
         <section className={styles.upworkFeature} aria-labelledby="upwork-feature-title">
           <div className={styles.screenshotSlot}>
@@ -178,48 +207,6 @@ export default function Home() {
               </Link>
             </div>
           </div>
-        </section>
-      </div>
-
-      <section className={cx(styles.section, styles.path)} aria-labelledby="path-heading">
-        <p className={styles.pathEyebrow}>{landingLabels.pathEyebrow}</p>
-        <h2 className={styles.pathHeadline} id="path-heading">
-          {stopsHeadline()}
-        </h2>
-        {pathLead ? <p className={styles.pathLead}>{pathLead.text}</p> : null}
-        <StopStrip>
-          {cells.map((cell) => (
-            <StopCard key={cell.id} meta={cell.meta} title={cell.title} state={cell.state} href={cell.href} />
-          ))}
-        </StopStrip>
-        {withheldTitles && footnote ? <p className={styles.pathFootnote}>{footnote.text}</p> : null}
-      </section>
-
-      <div className={styles.section}>
-        <section className={styles.moves} aria-labelledby="moves-heading">
-          <div>
-            <p className={styles.movesEyebrow}>{landingLabels.fourMovesEyebrow}</p>
-            <h2 className={styles.movesHeadline} id="moves-heading">
-              {landingLabels.fourMovesHeadline}
-            </h2>
-            {movesLead ? <p className={styles.movesLead}>{movesLead.text}</p> : null}
-          </div>
-          <ul className={styles.moveGrid}>
-            {landingFourMoves.map((move) => {
-              const body = gatedCanonicalText(move.record, "full");
-              // Composed BEFORE the JSX: `tests/class-contract.test.ts` mode 1
-              // reads every string literal inside a `className={...}` expression
-              // as a class token, so the comparison is hoisted rather than the
-              // guard loosened — the same shape every primitive uses.
-              const inkTile = move.key === CARRY_TILE;
-              return (
-                <li className={cx(styles.move, inkTile && styles.moveInk)} key={move.key}>
-                  <p className={styles.moveLabel}>{move.key}</p>
-                  {body ? <p className={styles.moveBody}>{body.text}</p> : null}
-                </li>
-              );
-            })}
-          </ul>
         </section>
       </div>
 

@@ -125,6 +125,174 @@
 }
 
 /* -------------------------------------------------------------------------- */
+/* The teaser: three sections, one argument                                   */
+/* -------------------------------------------------------------------------- */
+/* Added 2026-09-08 with the teaser rewrite. Lite, then Full, then the method
+   that governs both. The sections are separated by space alone — no rules, no
+   cards, no tint. Three boxed blocks in a 640px column would read as three
+   offers, and the page makes ONE offer; the sections are stages of a single
+   argument, so what divides them is a paragraph gap and a heading. */
+.section {
+  margin-bottom: 26px;
+}
+
+/* 22px against the 38px page title and the 15px body: a clear second rank that
+   still reads as a sentence, because every one of these headings IS a sentence
+   ("Trust Forward Lite is the deterministic introduction."). Sentence case and
+   a full stop, not a label — the headings carry the argument's three claims and
+   a reader who skims only them has read it. */
+.sectionHeading {
+  margin: 0 0 10px;
+  color: var(--ink);
+  font: 600 22px / 1.25 var(--sans);
+  letter-spacing: -0.015em;
+  text-wrap: balance;
+}
+
+.sectionBody {
+  margin: 0 0 12px;
+  color: var(--body);
+  font: 400 15px / 1.6 var(--sans);
+  text-wrap: pretty;
+}
+
+.sectionBody:last-child {
+  margin-bottom: 0;
+}
+
+/* The product's own prompt, quoted. Set at the heading's weight and larger than
+   body, with the accent rule the evidence line uses, because it is the one
+   sentence on this page that a reader will meet again inside the product —
+   seventeen times. Left rule rather than quotation marks: the marks are part of
+   the sentence's punctuation in some renderings and not others, and a border
+   cannot be copied into a paste. */
+.prompt {
+  margin: 0 0 14px;
+  padding-left: 14px;
+  border-left: 2px solid var(--accent);
+  color: var(--ink);
+  font: 500 18px / 1.4 var(--sans);
+}
+
+.boundedLead {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font: 500 15px / 1.4 var(--sans);
+}
+
+/* Marked, for the same reason `.revealList` is: the three items are sentence
+   fragments joined by commas and a final "and", so without markers they parse
+   as one broken sentence rather than three refusals. */
+.boundedList {
+  margin: 0;
+  padding-left: 20px;
+  color: var(--body);
+  font: 400 15px / 1.6 var(--sans);
+}
+
+.boundedList li {
+  margin-bottom: 4px;
+}
+
+.boundedList li:last-child {
+  margin-bottom: 0;
+}
+
+/* THE PASSES ARE NUMBERED IN THE COPY, SO THE MARKER IS SUPPRESSED. Ben's own
+   labels read "Pass 1 — Draw From the Well"; an `ol` marker beside them would
+   print the number twice. The element stays an `ol` because the ORDER is the
+   claim (see the page file) — this is a presentational suppression of a marker,
+   never a downgrade of the semantics. */
+.passList {
+  margin: 0 0 12px;
+  padding: 0;
+  list-style: none;
+}
+
+.passItem {
+  padding-left: 14px;
+  border-left: 2px solid var(--border-row);
+  margin-bottom: 14px;
+}
+
+.passItem:last-child {
+  margin-bottom: 0;
+}
+
+.passLabel {
+  margin: 0 0 4px;
+  color: var(--ink);
+  font: 600 15px / 1.35 var(--sans);
+}
+
+.passBody {
+  margin: 0;
+  color: var(--body);
+  font: 400 15px / 1.6 var(--sans);
+  text-wrap: pretty;
+}
+
+/* The four extras. Muted and smaller: they are a list of what SOME cases add,
+   and setting them at body weight would read as a promise about every case. */
+.alsoLine {
+  margin: 0;
+  color: var(--muted);
+  font: 400 14px / 1.6 var(--sans);
+  text-wrap: pretty;
+}
+
+/* CAPTURE -> WHY -> WHY-NOT -> COMMIT -> TIMESTAMP. The five stages are a
+   grammar, not prose, so they are set apart from the paragraph that explains
+   them: ink, tracked out slightly, and allowed to wrap on a phone rather than
+   scroll. `text-wrap: balance` keeps a two-line wrap from orphaning one stage. */
+.grammar {
+  margin: 0 0 12px;
+  color: var(--ink);
+  font: 600 16px / 1.5 var(--sans);
+  letter-spacing: 0.005em;
+  text-wrap: balance;
+}
+
+/* The only sentence that says what any of this is FOR, so it sits alone between
+   the three sections and the couplet, at body size on a tint rather than in a
+   card — a card would make it a fourth section and it is a conclusion. */
+.goal {
+  margin: 0 0 22px;
+  padding: 16px 18px;
+  border-radius: 12px;
+  background: var(--tint-grey);
+  color: var(--body);
+  font: 400 15px / 1.6 var(--sans);
+  text-wrap: pretty;
+}
+
+/* The couplet, and it only works as a pair: the second line is a concession
+   that the first line's signal might not survive. Both lines take the same
+   weight — ranking them typographically would answer the question the pair is
+   asking. */
+.positioning {
+  margin: 0 0 20px;
+}
+
+.positioningLine {
+  margin: 0 0 8px;
+  color: var(--ink);
+  font: 500 17px / 1.45 var(--sans);
+  text-wrap: pretty;
+}
+
+.positioningLine:last-child {
+  margin-bottom: 0;
+}
+
+/* The way back to the free doorway. Below the offer, not beside the primary
+   CTA: two controls of similar weight side by side would make the reader
+   choose between products, and the page's argument is that Lite comes first. */
+.secondary {
+  margin-bottom: 4px;
+}
+
+/* -------------------------------------------------------------------------- */
 /* The dominant CTA                                                           */
 /* -------------------------------------------------------------------------- */
 /* Full-width at every phone width: the primary action must never be a target a
@@ -282,6 +450,29 @@
   .faqAnswer {
     max-width: 40em;
     font-size: 16px;
+  }
+
+  /* The teaser's ramp, one step each, exactly as the blocks above: a wider
+     measure and one size up. No new composition at desktop. */
+  .sectionHeading {
+    font-size: 26px;
+  }
+
+  .sectionBody,
+  .passBody,
+  .boundedList,
+  .goal {
+    max-width: 40em;
+    font-size: 16px;
+  }
+
+  .prompt {
+    font-size: 20px;
+  }
+
+  .positioningLine {
+    max-width: 38em;
+    font-size: 19px;
   }
 
   .cta {

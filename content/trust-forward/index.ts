@@ -165,5 +165,28 @@ export const TRUST_FORWARD_UNSOURCED_SURFACES: readonly string[] = [];
  */
 export const TRUST_FORWARD_IMPLEMENTATION_AUTHORED_LABELS: readonly string[] = [
   "copy.ts: RESUME_RESULT_CTA",
+  /*
+   * Added 2026-09-08 when the YY rewrite made the approved descriptor false.
+   * "Five fictional cases … Six dimensions of judgment" was approved on
+   * 2026-09-07 for a product that no longer exists — the cases are real and
+   * SHIP is gone. Approval fixes a wording, not the world it described, so the
+   * replacement ships and is tracked as unapproved rather than inheriting the
+   * old string's authority.
+   */
+  "copy.ts: FULL_OFFER.descriptor (supersedes an approved string that became false)",
+  "copy.ts: LANDING_INCOMPLETE.body (same supersession)",
+  "copy.ts: LANDING_INCOMPLETE.timeEstimate (an estimate, not a measurement — time a real run)",
+  /*
+   * Added 2026-09-08 on Ben's instruction: the public Full bridge says "40+",
+   * where layer 07 approved "30+". Ben set the number himself, so the CLAIM is
+   * his; the sentence is still listed here because the string that ships is no
+   * longer the approved artifact's string, and a registry that only tracked
+   * strings nobody authorised would miss exactly this case — an approved
+   * sentence edited afterwards. Both numbers are floors under the internal
+   * count of 42 (copy.ts header, conflict 3): "40+" stops being true if that
+   * count ever drops, which is the one thing worth re-checking here.
+   */
+  "copy.ts: FULL_OFFER.bridge (Ben raised the approved \"30+\" floor to \"40+\")",
+  "copy.ts: TRUST_STRIP (every claim verified against the code; wording unapproved)",
   "components/trust-forward/LiteSandbox.tsx: REVEAL_ACTION_LABELS"
 ];

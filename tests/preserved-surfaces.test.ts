@@ -428,7 +428,20 @@ test("the footer is a complete mobile path to every header link", () => {
   // with no replacement today, so /studio, /neon and yymethod.com are
   // unreachable from mobile chrome. This assertion holds however Q9 resolves.
   const footer = readRepoFile("components/SiteFooter.tsx");
-  for (const inventory of ["shipNav", "lessonZeroCta", "footerDoors", "ecosystemNav"]) {
+  /*
+   * `publicShipNav` / `publicLessonZeroCta`, not the raw inventories.
+   *
+   * `content/nav.ts` keeps `shipNav` and `lessonZeroCta` as the full inventory
+   * — the labels are the course's names and deleting one loses that name — and
+   * exposes filtered views that drop Watch Your Step while `WYS_NAV_RETIRED` is
+   * true. The chrome must render the FILTERED views, or it advertises routes
+   * that redirect to `/`.
+   *
+   * This assertion named the raw inventories, so it passed for the whole period
+   * in which the flag existed and nothing read it. The requirement it encodes —
+   * every header link is reachable from the footer on mobile — is unchanged.
+   */
+  for (const inventory of ["publicShipNav", "publicLessonZeroCta", "footerDoors", "ecosystemNav"]) {
     assert.ok(footer.includes(inventory), `the footer does not render ${inventory}`);
   }
   assert.ok(footer.includes("stampLabel()"), "the footer stamp line is not bound to approvalState");

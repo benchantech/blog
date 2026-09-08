@@ -75,11 +75,21 @@
  *     product — the learner would be writing about the answer, not the case.
  *  3. **The size of the full corpus, in public.** Layer 02's corpus-count
  *     supersession makes every current internal reference 42. Layer 07's
- *     `public-copy-and-full-bridge.BEN_APPROVED.json` is newer and fixes the
+ *     `public-copy-and-full-bridge.BEN_APPROVED.json` is newer and fixed the
  *     PUBLIC bridge sentence at "30+ real cases", while recording 42 as
- *     `internalCanonicalFullCorpusCount`. `FULL_OFFER.bridge` is the public
- *     sentence verbatim; 42 is not a landing-page number and does not appear
- *     anywhere in this module.
+ *     `internalCanonicalFullCorpusCount`. **SUPERSEDED TWICE ON 2026-09-08, and
+ *     the second time the rule went with it.** First Ben raised the public
+ *     floor from "30+" to "40+" — the floor moved, the rule held.  Then he
+ *     wrote `TRUST_FORWARD_TEASER`, which says "42 canonical case families" in
+ *     public, in his own words. Layer 07's rule that 42 is internal-only is
+ *     therefore GONE, not narrowed, and any comment in this file claiming 42
+ *     does not appear here is out of date the moment you read it.
+ *
+ *     The two numbers are not in conflict — a floor of 40+ under a count of 42,
+ *     and a "case family" is not a "case" — but they ARE two public statements
+ *     of one corpus. If that corpus ever changes, both have to change.
+ *     `tests/trust-forward-content.test.ts` pins each of them by name so
+ *     neither can drift alone.
  *
  * TYPOGRAPHY IS PART OF THE SOURCE. The en dash in "15–30", the unspaced em
  * dashes in "carry—and what still has to remain theirs", the spaced em dash in
@@ -130,14 +140,14 @@ export const INFO_MARKERS = {
     id: "local-only",
     label: "Everything stays in your browser",
     expansion:
-      "Your answers, optional writing, local handle, drafts, SHIP result, and Lite history stay in this browser's local storage. They are not sent to the server. The site may collect coarse funnel events such as whether a case was reached or an export button was clicked, but not which answers you chose or what you wrote."
+      "Your decisions, optional writing, local handle, drafts and the whole run history stay in this browser's local storage. They are not sent to the server. The site may collect coarse funnel events such as whether a case was reached or an export button was clicked, but not which options you chose or what you wrote."
   },
   /** The determinism expansion. `[info]` on the intro's no-AI line. */
   deterministic: {
     id: "deterministic",
-    label: "Fixed scenarios. No AI reading your answers.",
+    label: "Real cases. No AI reading your answers.",
     expansion:
-      "Trust Forward Lite runs from prewritten cases, fixed transition rules, and deterministic scoring. Your optional writing is remembered locally but is not interpreted."
+      "Trust Forward Lite runs from real cases written in advance and fixed rules. Nothing you write is read by a model — your optional notes are remembered locally, exactly as you wrote them, and never interpreted."
   }
 } as const;
 
@@ -374,8 +384,12 @@ export const RESULT = {
  * Both landing states and `surfaces.ts`'s Case 5 closing upsell render these,
  * which is exactly why they are one definition and not two (see the header).
  *
- * `bridge` says "30+ real cases", not 42: see conflict (3) in the header. It
- * also supersedes the recovered source's "39 real, scar-bearing cases…".
+ * `bridge` says "40+ real cases", not 42: see conflict (3) in the header. It
+ * also supersedes the recovered source's "39 real, scar-bearing cases…", and,
+ * as of 2026-09-08, layer 07's own approved "30+" — Ben raised the public floor
+ * to 40+. Both the old and the new sentence are FLOORS chosen to sit under the
+ * internal count of 42; "40+" is a tighter floor, not a new claim about a
+ * larger corpus, and it stays true only while that count does not fall.
  * `confidentiality` travels WITH `bridge` and is not optional garnish — "real
  * cases drawn from Ben Chan's actual professional experience" is a claim about
  * real clients and colleagues, and the sentence that says how they are
@@ -391,9 +405,37 @@ export const RESULT = {
  * are fictional, Full's are not.
  *
  */
+/**
+ * SUPERSEDED 2026-09-08 — the approved descriptor became FALSE.
+ *
+ * Ruling Q-C (2026-09-07) approved "Five fictional cases. A fixed decision
+ * system. Six dimensions of judgment." for the product that existed then. The
+ * YY Method rewrite the next day made two thirds of that sentence untrue:
+ *
+ *   "fictional"            -> the five cases are Ben's REAL professional work,
+ *                             composited only where they named something
+ *                             concrete (docs/adr/0002).
+ *   "six dimensions"       -> SHIP and its six-dimension lattice were removed
+ *                             from the required path entirely (docs/adr/0001).
+ *
+ * A published page cannot go on saying either. R8 is explicit that a false
+ * public claim is fixed rather than left, and this one is worse than most
+ * because the false half — "fictional" — understates what the product actually
+ * offers. Approved copy is not exempt from being true; approval fixes the
+ * wording, not the world it described.
+ *
+ * The replacement states only what the shipped product does: five cases,
+ * seventeen checkpoints, and the ordering that makes the exercise mean
+ * anything — the learner's judgment is recorded BEFORE Ben's is revealed.
+ *
+ * NEEDS BEN'S APPROVAL. It is registered in
+ * `TRUST_FORWARD_IMPLEMENTATION_AUTHORED_LABELS` as implementation-authored,
+ * not passed off as the approved string it replaces.
+ */
 export const FULL_OFFER = {
-  descriptor: "Five fictional cases. A fixed decision system. Six dimensions of judgment.",
-  bridge: "30+ real cases drawn from Ben Chan’s actual professional experience.",
+  descriptor:
+    "Five real cases. Seventeen decision points. Your judgment is recorded before Ben's is revealed.",
+  bridge: "40+ real cases drawn from Ben Chan’s actual professional experience.",
   confidentiality:
     "Cases may be anonymized or composited where necessary to protect clients, employers, colleagues, confidential information, or identifying details while preserving the underlying decision pressure."
 } as const;
@@ -431,8 +473,32 @@ export const LANDING_INCOMPLETE = {
   heading: "Trust Forward",
   lede:
     "Hands-dirty judgment practice for developers deciding what AI can carry—and what still has to remain theirs.",
-  body: "Start with five fixed developer scenarios. You make the calls. The runtime stays deterministic.",
-  timeEstimate: "Expected time: about 15–30 minutes.",
+  /*
+   * SUPERSEDED 2026-09-08. "Five fixed developer scenarios" described the
+   * fictional instrument; it now understates the product and miscounts the
+   * work — five cases, but seventeen decision points inside them.
+   *
+   * "The runtime stays deterministic" survives unchanged: it was true then and
+   * is true now, and it is the claim the whole architecture exists to keep.
+   */
+  body:
+    "Five cases from Ben Chan's own professional work. You decide at each point and commit, before you see what he chose — and how his judgment has changed since. The runtime stays deterministic.",
+  /*
+   * SUPERSEDED 2026-09-08, and flagged rather than silently re-estimated.
+   *
+   * "About 15-30 minutes" was measured against eleven decisions with three
+   * options each. The product now has seventeen checkpoints, four options each,
+   * plus a closest-alternative selection, a commit, a two-part reveal and an
+   * optional note at every one. The old figure is not a rounding error; it is
+   * roughly half.
+   *
+   * The replacement is an ESTIMATE this build made, not a measurement and not
+   * an approved string. It is registered as implementation-authored. If it is
+   * wrong it should be replaced by timing a real run, not by adjusting it until
+   * it feels right — an under-promise on time is the kind of small dishonesty
+   * that a learner notices exactly once.
+   */
+  timeEstimate: "Expected time: about 30–45 minutes.",
   revealLead: "Complete Lite to reveal:",
   revealItems: [
     "your observed SHIP developer pattern",
@@ -551,7 +617,15 @@ export const COPY_PROVENANCE = {
   RESULT: "ben_canonical",
   FULL_OFFER: "ben_canonical",
   LANDING_INCOMPLETE: "ben_canonical",
-  LANDING_COMPLETE: "ben_canonical"
+  LANDING_COMPLETE: "ben_canonical",
+  /*
+   * Added 2026-09-08. The only `ben_canonical` group in this module that came
+   * from Ben directly rather than from a Ben-supplied file — see the ruling
+   * recorded at `TRUST_FORWARD_TEASER`'s definition, and the matching entry in
+   * `BEN_AUTHORED_GROUPS` in tests/trust-forward-content.test.ts, which is the
+   * gate that requires the ruling to exist.
+   */
+  TRUST_FORWARD_TEASER: "ben_canonical"
 } as const;
 
 export type TrustForwardCopyGroup = keyof typeof COPY_PROVENANCE;
@@ -742,3 +816,167 @@ export const EXPORT_FIRST = {
  * questions back to the handoff author.
  */
 export const RESUME_RESULT_CTA = "See your result";
+
+/* -------------------------------------------------------------------------- */
+/* Trust strip — the four things a visitor wants to know before starting      */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * Free, no account, no AI, nothing leaves the browser.
+ *
+ * EVERY CLAIM HERE WAS VERIFIED AGAINST THE CODE BEFORE IT WAS WRITTEN, which
+ * is the only reason it is allowed to be this confident:
+ *
+ *   "Free"                  no payment, pricing or checkout code exists anywhere
+ *                           in `app/`, `components/` or `lib/`.
+ *   "No account"            no auth code, no session cookie, no identity of any
+ *                           kind. The optional handle is a local string.
+ *   "No AI"                 `package.json` runtime dependencies are `next`,
+ *                           `react`, `react-dom`. There is no model in the
+ *                           bundle and none is called at runtime.
+ *   "Nothing leaves your browser"
+ *                           answers, notes and the whole ledger live in
+ *                           localStorage. Analytics carry coarse funnel events
+ *                           only — that a case was reached, not which option was
+ *                           chosen — behind a consent gate, and the aggregate
+ *                           choice counter ships disabled (`TF_AGGREGATE_ENABLED
+ *                           = false`, no endpoint exists).
+ *
+ * This is the site's existing trust posture, stated for Trust Forward. It reads
+ * as marketing because the honest version of these four facts IS the pitch —
+ * "no AI reading your answers" is a real differentiator precisely because it is
+ * true, and it would be worth nothing the moment it stopped being.
+ *
+ * IMPLEMENTATION-AUTHORED. Registered as such; not an approved artifact string.
+ */
+export const TRUST_STRIP = {
+  items: [
+    "Free",
+    "No account",
+    "No AI",
+    "Nothing leaves your browser"
+  ],
+  /** The one-line expansion under the pills. */
+  line:
+    "No signup, no email, no chatbot. Your decisions and notes stay in this browser — the site counts whether a case was reached, never what you chose.",
+  /** What the product deliberately does not have. The site's anti-feature idiom. */
+  without: ["A chatbot", "An account", "Your email", "A score", "A certificate"]
+} as const;
+
+/* -------------------------------------------------------------------------- */
+/* 13. The /trust-forward teaser                                              */
+/*     (Ben's instruction, 2026-09-08 — see the provenance note below)        */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * What `/trust-forward` says now: how Lite and full Trust Forward relate.
+ *
+ * PROVENANCE, STATED PRECISELY, BECAUSE THIS GROUP IS `ben_canonical` AND THAT
+ * TAG IS GATED. Every other `ben_canonical` group in this module came from a
+ * Ben-supplied FILE — layer 01's `UX_COPY.md` or a layer-07
+ * `ben_approved_governing_rule`. This one did not. Ben wrote these sentences
+ * directly, in the session of 2026-09-08, as the brief for this page. There is
+ * no artifact under `bct-facelift/` to diff against and there never will be, so
+ * the record of what he wrote is the session transcript and this comment.
+ *
+ * `tests/trust-forward-content.test.ts` freezes the set of groups allowed to
+ * claim `ben_canonical` and fails on any addition, for a good reason: *"Never
+ * relabel implementation-authored copy as Ben-authored merely because it was
+ * generated to fill a package gap."* That rule is about copy this build wrote.
+ * These are Ben's own sentences, so labelling them anything else would be the
+ * same lie pointing the other way — and
+ * `CURRENT_IMPLEMENTATION_STATUS_2026-09-07.md` forbids the conversion in both
+ * directions. The gate is satisfied the way it asks to be: by a ruling recorded
+ * alongside the addition, not by a quiet content edit.
+ *
+ * THE ONE EDIT MADE TO HIS TEXT, AND ITS LIMIT. Ben's brief describes the
+ * product in the third person — *"It gives the learner authored professional
+ * situations"*, *"The learner encounters each case across multiple rounds"* —
+ * because he was writing a specification, not a page. His own headline copy is
+ * second person (*"helps you hear your own signal"*), and a public page that
+ * calls its reader "the learner" is talking about them rather than to them. So
+ * every "the learner" became "you" and the surrounding verbs agree. Nothing
+ * else changed: no sentence was shortened, reordered, softened or added, and
+ * the two headline lines, the pass names, the method grammar and the CTA are
+ * character-for-character his.
+ *
+ * WHAT `42` IS DOING IN PUBLIC COPY, GIVEN THAT `FULL_OFFER.bridge` SAYS "40+".
+ * Layer 07 ruled that 42 was the INTERNAL corpus authority and that no public
+ * string should say it; the plan records that as SC-TF7. Ben superseded both
+ * halves of that on 2026-09-08 — first by raising the public floor from "30+"
+ * to "40+", then by writing "42 canonical case families" into this page
+ * himself. The two numbers do not contradict each other (a floor of 40+ under a
+ * count of 42, and a "case family" is not a "case"), but they are two different
+ * public statements of the same corpus, and that is a thing to notice rather
+ * than to smooth over: if the corpus count ever moves, BOTH have to move, and
+ * only one of them is guarded by a test that names the number.
+ *
+ * THE ORDER OF THE PAGE IS THE ARGUMENT. Lite first, bounded, and honest about
+ * what it refuses to do; then Full, which is where the AI Coach appears; then
+ * the method that governs both; then the goal, which is the only sentence that
+ * says what any of it is FOR. The positioning couplet is last before the CTA
+ * because it is the sentence a reader should be holding when they click.
+ */
+export const TRUST_FORWARD_TEASER = {
+  heading: "Trust Forward",
+
+  lite: {
+    heading: "Trust Forward Lite is the deterministic introduction.",
+    body:
+      "It gives you authored professional situations, asks what you would do in Ben's shoes, and requires you to commit your judgment before you see what Ben actually did. It preserves an auditable record of your decisions.",
+    /** The prompt itself, quoted, because it is the product's actual words. */
+    prompt: "What would you do in my shoes?",
+    boundedLead: "It is deliberately bounded:",
+    boundedItems: [
+      "no AI interprets your free text,",
+      "no personality score is produced,",
+      "and no AI gets to decide what you believe."
+    ]
+  },
+
+  full: {
+    heading: "Trust Forward is the 90-day curriculum.",
+    body:
+      "It is the deeper 90-day AI-assisted judgment curriculum, built from 42 canonical case families grounded in Ben Chan's lived professional experience. You encounter each case across multiple rounds.",
+    passes: [
+      {
+        label: "Pass 1 — Draw From the Well",
+        body: "Make an independent call before seeing Ben's historical decision and outcome."
+      },
+      {
+        label: "Pass 2 — Study the Map",
+        body:
+          "Revisit the same underlying problem after a meaningful condition, incentive, perspective, or role changes."
+      },
+      {
+        label: "Pass 3 — Build Your Compass",
+        body:
+          "Transfer the pattern into a sufficiently different situation where simply copying Ben — or your own earlier answer — can fail."
+      }
+    ],
+    alsoLine:
+      "Selected cases also include STORM recovery exercises, source inspection, perspective inversions, and spaced retrieval of your own earlier judgments."
+  },
+
+  method: {
+    heading: "Every consequential decision follows the YY Method™.",
+    /** The case grammar, as five stages. Rendered as one line, arrows included. */
+    grammar: "Capture → Why → Why-Not → Commit → Timestamp",
+    body:
+      "You commit first. Ben's historical judgment comes afterward. Ben's current judgment may disagree with his past judgment. The AI Coach can retrieve, compare, challenge, and pressure-test, but it does not make your decision for you."
+  },
+
+  goal:
+    "The goal is not to teach you to copy Ben. It is to help you accumulate enough real judgment evidence, corrections, disagreements, verification rules, delegation boundaries, and recovery principles that you build a Developer Judgment Playbook of your own.",
+
+  /** Both lines render. The second only lands because the first came first. */
+  positioning: [
+    "Trust Forward Lite helps you hear your own signal.",
+    "Trust Forward helps you test whether it survives another perspective, another condition, and eventually your own real work."
+  ],
+
+  /** The arrow is Ben's, typed in his brief. */
+  primaryCta: "Continue to Trust Forward →",
+  /** The way back to the free doorway, secondary by construction. */
+  liteCta: "Start Trust Forward Lite"
+} as const;

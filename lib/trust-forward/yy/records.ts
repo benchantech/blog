@@ -471,7 +471,7 @@ export interface AppendYYEventOptions {
 
 /** The freeze key. A run and a checkpoint together identify one frozen judgment. */
 function pairKey(runId: string, checkpointId: string): string {
-  return `${runId} ${checkpointId}`;
+  return `${runId}\u0000${checkpointId}`;
 }
 
 /** True when this (run, checkpoint) pair already carries a COMMIT. */

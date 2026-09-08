@@ -96,6 +96,7 @@ import {
   type YYReceipt,
   type YYResonance
 } from "@/lib/trust-forward/yy/types";
+import { isRevealUnlocked } from "@/lib/trust-forward/yy/records";
 
 /* -------------------------------------------------------------------------- */
 /* 1. The language guard (§12)                                                */
@@ -222,7 +223,22 @@ function resolveCommitments(
     const checkpoint = checkpointById.get(record.checkpointId);
     if (!checkpoint) continue;
     if (record.caseId !== checkpoint.caseId) continue;
-    if (!record.commit || record.commit.committedAtLocal.trim().length === 0) continue;
+    /*
+     * ONE DEFINITION OF "COMMITTED", NOT TWO.
+     *
+     * This loop used to accept any record with a non-empty commit timestamp,
+     * while `buildReceipts` gated on `isRevealUnlocked` — which additionally
+     * rejects a record whose WHY and WHY-NOT are the same choice. The two
+     * disagreed, and a review found the consequence: a ledger read back from
+     * `localStorage` (untrusted by design — that is what the sanitizer is for)
+     * could produce a record this function counted as an independent tuning
+     * fork but that yielded NO receipt. The resonance then rendered with fewer
+     * supporting receipts than checkpoints, or with none at all.
+     *
+     * A resonance whose evidence cannot be shown is exactly the claim this
+     * product refuses to make. So both paths now ask the same question.
+     */
+    if (!isRevealUnlocked(record)) continue;
 
     const choice = checkpoint.choices.find((candidate) => candidate.id === record.why.choiceId);
     if (!choice) continue;

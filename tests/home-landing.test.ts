@@ -9,6 +9,7 @@ import { stopCount } from "@/content/watch-your-step/weeks";
 import { wysLabels } from "@/content/watch-your-step/copy";
 import { lessonZeroCta } from "@/content/nav";
 import { policyForCanonicalText } from "@/lib/canonical-text";
+import { ROUTES } from "@/content/trust-forward/stamp/v1-1-0";
 
 /**
  * Phase 10 — `/` and `/watch-your-step` (plan Phase 10; mockup `4a`).
@@ -32,6 +33,17 @@ const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), ".."
 const read = (relative: string): string => readFileSync(path.join(repoRoot, relative), "utf8");
 
 const homePage = read("app/page.tsx");
+
+/**
+ * Markup, with the doc comments removed.
+ *
+ * The negative assertions below say a name is no longer RENDERED. A header
+ * comment that records which names were removed, and why, is documentation —
+ * counting it as markup would make the file unable to explain its own change,
+ * which is the same distinction `tests/preserved-surfaces.test.ts` draws when
+ * it strips comments before counting landmarks.
+ */
+const homeMarkup = homePage.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
 const landingPage = read("app/watch-your-step/(shell)/page.tsx");
 const heroDemo = read("components/wys/HeroDemo.tsx");
 
@@ -209,8 +221,54 @@ test("a withheld stop title falls back to the derived stop name, never to draft 
   const cells = landingStopCells();
   assert.ok(cells.every((cell) => cell.titleWithheld), "a stop title became renderable — re-check this fallback");
   assert.deepEqual(cells.slice(0, 3).map((cell) => cell.title), ["Lesson 0", "Stop A", "Stop B"]);
-  assert.ok(homePage.includes("stopScaffoldFootnoteText"), "/ drops the scaffold footnote");
+  // `/` NO LONGER RENDERS THE STOP PREVIEW, so it no longer needs the footnote
+  // that explained the withheld titles. Updated deliberately with the change
+  // that removed the path section: Watch Your Step is retired from navigation
+  // (`WYS_NAV_RETIRED`) and its routes redirect to `/`, so a nine-cell preview
+  // of its stops on the home page was advertising a redirect. The footnote is
+  // still asserted on `/watch-your-step`, which still renders the cells, and
+  // the negative below is what stops the preview drifting back.
   assert.ok(landingPage.includes("stopScaffoldFootnoteText"), "/watch-your-step drops the scaffold footnote");
+});
+
+test("/ no longer advertises the retired course: no hero, no CTA, no stop preview", () => {
+  // Every one of these controls landed the visitor back on `/` through
+  // next.config.ts's non-permanent redirects. They are gone from the RENDER
+  // and not from content/, so flipping `WYS_NAV_RETIRED` back restores the
+  // course's own landing without recovering deleted copy.
+  for (const gone of [
+    "landingBadgeText",
+    "landingHeadlineText",
+    "landingLeadText",
+    "landingPathLeadText",
+    "stopsHeadline",
+    "landingStopCells",
+    "StopCard",
+    "landingFourMoves",
+    "startCtaHref",
+    "tryOneDesktop"
+  ]) {
+    assert.ok(!homeMarkup.includes(gone), `/ still renders the retired course's ${gone}`);
+  }
+  assert.equal(/href="\/watch-your-step/.test(homeMarkup), false, "/ links straight into the retired tree");
+});
+
+test("Trust Forward is the home page's primary CTA, in the approved words", () => {
+  // The hero reads `LANDING_INCOMPLETE` — the same object `/trust-forward`
+  // renders — so the two surfaces cannot make the offer with different words,
+  // and `tests/canonical-text.test.ts`'s one-definition rule keeps it that way.
+  assert.ok(homePage.includes('from "@/content/trust-forward/copy"'), "/ types its own Trust Forward copy");
+  assert.ok(homePage.includes("LANDING_INCOMPLETE.primaryCta"), "/ has no Trust Forward CTA label");
+  assert.ok(homePage.includes("ROUTES.canonical"), "/ does not send the CTA to the canonical node");
+  assert.equal(ROUTES.canonical, "/trust-forward");
+  // The bridge sentence and its confidentiality limit are one unit or neither
+  // (content/trust-forward/copy.ts). The home page shows neither.
+  assert.ok(!homeMarkup.includes("fullOffer.bridge"), "/ publishes the real-cases claim without its limit");
+  assert.ok(!homeMarkup.includes("confidentiality"), "/ publishes the confidentiality sentence alone");
+  // The h1 is the offer's heading, and the preserved foyer keeps the h1 it
+  // shipped with — two on this URL, as Q2's stacking already made true.
+  assert.ok(homeMarkup.includes('id="trust-forward-heading"'));
+  assert.equal(homeMarkup.split("<h1").length - 1, 2, "the home page no longer carries exactly two h1s");
 });
 
 test("the phone peek is the first three of the same nine — not a second list", () => {

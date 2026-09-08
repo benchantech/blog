@@ -341,6 +341,18 @@ test("every provenance value is one of the six declared authority levels", () =>
  * it was generated to fill a package gap."* A group that acquires
  * `ben_canonical` without a ruling is the exact failure named, and it fails
  * here whether it was relabelled or newly written.
+ *
+ * ONE ENTRY WAS ADDED ON 2026-09-08 AND IT IS THE FIRST WITHOUT A FILE BEHIND
+ * IT. `TRUST_FORWARD_TEASER` carries sentences Ben wrote directly in the
+ * session of 2026-09-08 as the brief for `/trust-forward`, not sentences
+ * extracted from a document under `bct-facelift/`. The gate did what it exists
+ * to do: the group was written first, this test went red, and the entry was
+ * added together with the ruling recorded at the constant's definition site —
+ * including the one edit made to his words (third person to second) and why
+ * labelling it anything but `ben_canonical` would have been the same
+ * mislabelling pointing the other way. Frozen still means frozen: the next
+ * addition needs its own recorded ruling, and "there was one last time" is not
+ * one.
  */
 const BEN_AUTHORED_GROUPS: readonly string[] = [
   "content/trust-forward/copy.ts::INFO_MARKERS",
@@ -352,6 +364,7 @@ const BEN_AUTHORED_GROUPS: readonly string[] = [
   "content/trust-forward/copy.ts::FULL_OFFER",
   "content/trust-forward/copy.ts::LANDING_INCOMPLETE",
   "content/trust-forward/copy.ts::LANDING_COMPLETE",
+  "content/trust-forward/copy.ts::TRUST_FORWARD_TEASER",
   "content/trust-forward/variants.ts::caseAxes",
   "content/trust-forward/variants.ts::missingEvidenceFallbacks"
 ];
@@ -625,15 +638,26 @@ test("no struck or superseded public claim is reachable from content/trust-forwa
     },
     {
       text: "39 real",
-      why: "superseded by the approved Full bridge, which says '30+ real cases'"
+      why: "superseded by the Full bridge, which says '40+ real cases'"
     },
+    /*
+     * THESE TWO BANS SURVIVED A SUPERSESSION THAT KILLED THEIR ORIGINAL REASON,
+     * and they are kept on a narrower one. Layer 07 ruled 42 internal-only;
+     * Ben overturned that on 2026-09-08 by writing "42 canonical case families"
+     * into `TRUST_FORWARD_TEASER` himself, and that string is asserted below.
+     * So the number is now sayable — in the ONE form he wrote. What stays
+     * banned is 42 attached to the word `bridge` uses: "42 cases" / "42 real"
+     * would make the public floor "40+ real cases" read as a coy understatement
+     * of a number the same page states outright, which is the only way these
+     * two sentences can embarrass each other.
+     */
     {
       text: "42 cases",
-      why: "42 is the INTERNAL corpus authority; the public bridge is '30+ real cases'"
+      why: "the public count is '42 canonical case families'; the bridge's unit stays '40+ real cases'"
     },
     {
       text: "42 real",
-      why: "42 is the internal corpus authority and is not a learner-facing number"
+      why: "same — 42 may not borrow the bridge's wording"
     },
     {
       text: "New Game Plus",
@@ -663,10 +687,22 @@ test("no struck or superseded public claim is reachable from content/trust-forwa
   }
   assert.equal(copyModule.RESULT.label, "Your observed developer pattern");
 
-  // The approved bridge itself, so the guards above cannot pass by deletion.
+  // The bridge itself, so the guards above cannot pass by deletion. The number
+  // is asserted exactly: "40+" (Ben, 2026-09-08) replaced layer 07's approved
+  // "30+", and a bans-only test would have gone on passing if the sentence had
+  // silently drifted back — every forbidden string above is a number that is
+  // NOT there, so nothing else in this test looks at the number that is.
   assert.ok(
-    copyModule.FULL_OFFER.bridge.includes("30+ real cases"),
-    "the approved Full bridge sentence is gone; the guards above would then pass vacuously"
+    copyModule.FULL_OFFER.bridge.includes("40+ real cases"),
+    "the Full bridge sentence is gone or no longer says 40+; the guards above would then pass vacuously"
+  );
+
+  // The other public statement of the same corpus (Ben, 2026-09-08). Pinned by
+  // name for the reason copy.ts's header gives: 40+ and 42 describe one corpus
+  // from two sides, so a change to it has to break BOTH assertions, not one.
+  assert.ok(
+    copyModule.TRUST_FORWARD_TEASER.full.body.includes("42 canonical case families"),
+    "the teaser no longer states the corpus count; it and FULL_OFFER.bridge must move together"
   );
 
   // "729" survives ONLY as the artifact filename and reason in the digest

@@ -1,96 +1,98 @@
 import type { Metadata } from "next";
-import { LANDING_COMPLETE, LANDING_FAQ, LANDING_INCOMPLETE } from "@/content/trust-forward/copy";
+import { FULL_OFFER, LANDING_FAQ, LANDING_INCOMPLETE, TRUST_FORWARD_TEASER } from "@/content/trust-forward/copy";
 import { ROUTES } from "@/content/trust-forward/stamp/v1-1-0";
 import { ActionPill } from "@/components/ui/ActionPill";
 import { CardShell } from "@/components/ui/CardShell";
 import { LinkRow } from "@/components/ui/LinkRow";
-import { Pill } from "@/components/ui/Pill";
-import { LandingCompletion } from "@/components/trust-forward/LandingCompletion";
 import styles from "./trust-forward.module.css";
 
 /**
  * `/trust-forward` — the canonical public node for Trust Forward (layer 07's
  * routes ruling; `ROUTES.canonical`).
  *
+ * WHAT THIS PAGE IS NOW, AND WHAT IT STOPPED BEING. Ben's instruction of
+ * 2026-09-08: *"Create a simple `/trust-forward` teaser page explaining the
+ * relationship between Trust Forward Lite and the full Trust Forward
+ * experience… Keep this page compact. It should feel like a teaser, not a
+ * duplicate landing page."* It used to be the landing page that SOLD Lite —
+ * lede, body, descriptor, time estimate, a reveal list and a full-width Start
+ * button. The homepage now carries that pitch, so this page carrying it too was
+ * the duplication the instruction names. Every sentence of the teaser comes
+ * from `TRUST_FORWARD_TEASER`, which records the ruling and the one edit made
+ * to Ben's words.
+ *
+ * THE ONE-STATE DECISION, WHICH WAS FORCED RATHER THAN CHOSEN. This page used
+ * to render two trees through `LandingCompletion`, an island that swaps in a
+ * "Lite complete" state when the browser holds a finished run. That island
+ * reads `TRUST_FORWARD_LITE_STORAGE_KEY` and gates on `result_viewed`,
+ * `export_markdown` and three other SHIP-era ledger events. The YY runtime
+ * writes `TRUST_FORWARD_YY_STORAGE_KEY` and emits none of them, so since the
+ * YY rewrite the complete tree has been unreachable for every learner: a person
+ * who finished all five cases still saw "Complete Lite to reveal:". Shipping a
+ * teaser through a state machine with one live state would have been shipping
+ * the appearance of a second door. So there is one page for everybody, and the
+ * dead branch is reported rather than re-plumbed — `LandingCompletion` and
+ * `LANDING_COMPLETE` are both still exported and neither is deleted, so the fix
+ * is a rewire when someone rules on what "complete" means under YY.
+ *
+ * TWO SENTENCES STOPPED RENDERING HERE AND THAT IS A REPAIR, NOT A LOSS.
+ * `LANDING_INCOMPLETE.revealItems` promised "your observed SHIP developer
+ * pattern" and `LANDING_COMPLETE.bridge` opened "SHIP gives you a place to
+ * start looking at how you decide." SHIP was removed from the required path by
+ * the YY rewrite (docs/adr/0001), so both were approved copy that had become
+ * false — the same defect as the homepage's "five fictional cases", which was
+ * fixed on 2026-09-08 in a pass that did not reach this route. They remain
+ * exported and unrendered rather than edited, because rewriting an approved
+ * sentence to describe a product it was not written about is how a false claim
+ * survives a review: it looks like maintenance.
+ *
  * A SERVER COMPONENT, PRERENDERED, AND THAT IS A PRODUCT REQUIREMENT RATHER
  * THAN A PERFORMANCE ONE. Layer 07's SEO ruling puts the answer-first material
  * — the semantic wedge and the six intent questions — on this page precisely
- * because "personalized local summaries are not the crawlable SEO surface". A
- * page that read `localStorage` during render would be dynamic for everybody,
- * including the crawler that the wedge exists for. So nothing outside
- * `LandingCompletion` touches the browser, and the HTML that ships is the
- * incomplete state.
+ * because "personalized local summaries are not the crawlable SEO surface". The
+ * teaser is compact; the FAQ below it is not a second landing page but the
+ * crawlable surface that ruling requires, and it is the only place on the site
+ * those six answers exist. Dropping it to satisfy "compact" would have been
+ * this build overruling a ruling. With the completion island gone, the whole
+ * page is now static HTML with nothing to hide behind an effect, which is a
+ * stronger version of what the ruling asked for.
  *
- * TWO STATES, BOTH DECIDED LOCALLY, AND THE SERVER PICKS NEITHER. Both trees
- * are built here and handed to the island, which swaps them in an effect. The
- * server cannot know which one is right — completion lives in one browser's
- * `localStorage` and, per PRIVACY_ANALYTICS.md, must never be transmitted, so
- * there is no request-time signal that could tell it. See
- * `components/trust-forward/LandingCompletion.tsx` for why the island carries
- * neither the copy nor the stylesheet nor the case bank.
+ * COMPLETION NO LONGER CHANGES THIS PAGE AT ALL, so the privacy note that used
+ * to sit here is narrower than it was: this file reads no browser state, fires
+ * no telemetry, and takes no query, hash or segment.
+ * `tf_full_trust_forward_clicked` is still owned by Lite's four gated cards and
+ * is NOT fired by the primary CTA below — this page has no client boundary to
+ * fire it from, and adding one to measure a click would undo the paragraph
+ * above. That is a real gap in the funnel and it is named here rather than
+ * silently accepted. `components/GoogleAnalytics.tsx` is byte-frozen with
+ * `send_page_view: true`, so a URL is telemetry whether or not the adapter
+ * knows about it.
  *
- * COMPLETION CHANGES THIS PAGE'S UI AND NOTHING ELSE. PRIVACY_ANALYTICS.md's
- * last line is the whole permission: inspect it to change the UI, never emit it
- * as a learner identity attribute. This file therefore fires no telemetry at
- * all. `tf_lite_started` belongs to the Lite route (it answers "does the
- * landing convert into an actual start?", and only the start can answer it) and
- * `tf_full_trust_forward_clicked` to whichever surface owns the onward CTA's
- * click; adding either here would put a landing-side event next to the one fact
- * that is not allowed to travel, which is exactly the adjacency the rule bans.
+ * THE CTA POINTS AT `ROUTES.fullTarget`, NOT AT `/tf`. Ben's instruction gives
+ * the destination as a literal URL, and `ROUTES.fullTarget` already holds
+ * exactly that string — so this links to the one definition rather than to the
+ * redirect that resolves to it, and `TRUST_FORWARD_PROVENANCE.md`'s requirement
+ * that the Full target keep a single definition under `content/trust-forward/`
+ * is met either way. `/tf` stays live and stays the short link.
  *
- * NO LEARNER STATE IN THE URL. There is one URL for the whole five-case run and
- * this is not it — `/trust-forward` is a door and takes no query, no hash and
- * no segment. `components/GoogleAnalytics.tsx` is byte-frozen with
- * `send_page_view: true`, so `page_location` and `page_title` reach GA4 outside
- * `trackTrustForward` and outside its four-key allowlist. A URL is telemetry
- * whether or not the adapter knows about it.
- *
- * EVERY SENTENCE COMES FROM `content/trust-forward/copy.ts`, and both states
- * read it through one door apiece — `LANDING_INCOMPLETE` and `LANDING_COMPLETE`
- * — including their `fullOffer`, which is the same `FULL_OFFER` object in both.
+ * EVERY SENTENCE COMES FROM `content/trust-forward/copy.ts`.
  * `tests/canonical-text.test.ts` fails on any prose literal or JSX text node of
  * twelve words or more under `app/`, and that mechanism is what makes "all
  * learner-facing prose is governed content" true rather than aspirational.
  *
- * THE BRIDGE AND ITS CONFIDENTIALITY SENTENCE ARE RENDERED AS ONE UNIT, in both
- * states, and `renderFullOffer` is a single function for exactly that reason.
- * "30+ real cases drawn from Ben Chan's actual professional experience" is a
+ * THE BRIDGE AND ITS CONFIDENTIALITY SENTENCE ARE RENDERED AS ONE UNIT.
+ * "40+ real cases drawn from Ben Chan's actual professional experience" is a
  * claim about real clients, employers and colleagues; the sentence that says
  * how they are protected is what makes the first sentence publishable. copy.ts
  * states it plainly — a renderer that shows `bridge` without `confidentiality`
  * has published the claim without its limit — so there is no code path here
  * that can show one without the other.
  *
- * THE SIX INTENT QUESTIONS NOW RENDER AS AN ANSWERED FAQ. They rendered as a
- * bare index for as long as there were no approved answers to put under them;
- * layer 09's `landing-faq-answers.BEN_APPROVED.json` supplied all six, and they
- * reach this file as `LANDING_FAQ`. `TODO_LANDING_FAQ_ANSWERS` is now a
- * tombstone, still `null` and still exported, and
- * `TRUST_FORWARD_RESOLVED_SURFACES` records where the copy went. The index is
- * gone rather than kept alongside: the same six questions printed twice on one
- * page is a duplicate, not a summary.
- *
- * ANSWER-FIRST MEANS THE ANSWER IS IN THE SERVED HTML, and that is a stronger
- * requirement than it sounds. `LandingCompletion` mounts the incomplete tree on
- * the server and on the first client render, so this block is what a crawler
- * receives — but only while nothing hides it. So: no `<details>`, no accordion,
- * no `hidden` attribute, no client-side reveal. Layer 07's rule is that
- * "personalized local summaries are not the crawlable SEO surface; use
- * answer-first public Trust Forward landing/FAQ content", and the whole point
- * of that rule is content a machine can read without executing anything.
- *
- * A HEADING AND A PARAGRAPH, INSIDE A LIST. The question is an `h2` because it
- * is what a screen-reader user jumps between and what a crawler indexes, and a
- * bolded paragraph is neither. The six sit in a `ul` so assistive technology
+ * A HEADING AND A PARAGRAPH, INSIDE A LIST. The FAQ question is an `h2` because
+ * it is what a screen-reader user jumps between and what a crawler indexes, and
+ * a bolded paragraph is neither. The six sit in a `ul` so assistive technology
  * announces how many there are before the reader commits to the first; the
- * marker is removed in the stylesheet, not the semantics. `dl` was the other
- * candidate and was not taken — a `dt` is not a heading, so it would cost the
- * heading-navigation the FAQ exists to be reachable by.
- *
- * NO SECTION EYEBROWS. `SectionEyebrow` is a fine primitive and every label it
- * would carry here would have to be typed in this file — caps are typed in the
- * copy, by rule — and no eyebrow label for this surface exists in the handoff.
- * The page uses the approved sentences as its own structure instead.
+ * marker is removed in the stylesheet, not the semantics.
  *
  * MOBILE-FIRST. The base rules in the stylesheet are the phone; 320, 375, 390
  * and 430 are the widths this was built against, and the desktop block only
@@ -103,63 +105,98 @@ export const metadata: Metadata = {
 };
 
 /**
- * The offer's three approved public sentences, as one block.
- *
- * `descriptor` describes LITE (fictional cases, a fixed system) and is the
- * honest counterweight to `bridge`, which describes FULL (real cases). They are
- * rendered apart for that reason: the descriptor belongs beside the thing it
- * describes, at the top of the incomplete state. `bridge` and `confidentiality`
- * are never rendered apart — see the file header.
+ * The offer's two public sentences, as one block. Never rendered apart — see
+ * the file header.
  */
-function FullOffer({ offer }: { offer: typeof LANDING_INCOMPLETE.fullOffer }) {
+function FullOffer() {
   return (
     <CardShell fill="grey">
-      <p className={styles.offerBridge}>{offer.bridge}</p>
-      <p className={styles.offerLimit}>{offer.confidentiality}</p>
+      <p className={styles.offerBridge}>{FULL_OFFER.bridge}</p>
+      <p className={styles.offerLimit}>{FULL_OFFER.confidentiality}</p>
     </CardShell>
   );
 }
 
-/** The visitor with no local completion: the page sells Lite. */
-function IncompleteLanding() {
-  const copy = LANDING_INCOMPLETE;
+export default function TrustForwardPage() {
+  const teaser = TRUST_FORWARD_TEASER;
   return (
     <article className={styles.landing}>
       <header className={styles.hero}>
-        <h1 className={styles.title}>{copy.heading}</h1>
-        <p className={styles.lede}>{copy.lede}</p>
-        <p className={styles.body}>{copy.body}</p>
-        <p className={styles.descriptor}>{copy.fullOffer.descriptor}</p>
-        <p className={styles.timeRow}>
-          <Pill variant="status">{copy.timeEstimate}</Pill>
-        </p>
+        <h1 className={styles.title}>{teaser.heading}</h1>
       </header>
 
-      <div className={styles.block}>
-        <CardShell fill="teal">
-          <p className={styles.revealLead}>{copy.revealLead}</p>
-          <ul className={styles.revealList}>
-            {copy.revealItems.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
-        </CardShell>
+      <section className={styles.section}>
+        <h2 className={styles.sectionHeading}>{teaser.lite.heading}</h2>
+        <p className={styles.sectionBody}>{teaser.lite.body}</p>
+        {/*
+          The product's own words, in the product's own punctuation. It is a
+          `blockquote` and not a styled paragraph because it is a quotation of a
+          surface the reader has not seen yet, and the seventeen checkpoints ask
+          it verbatim.
+        */}
+        <blockquote className={styles.prompt}>{teaser.lite.prompt}</blockquote>
+        <p className={styles.boundedLead}>{teaser.lite.boundedLead}</p>
+        <ul className={styles.boundedList}>
+          {teaser.lite.boundedItems.map((item) => (
+            <li key={item}>{item}</li>
+          ))}
+        </ul>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionHeading}>{teaser.full.heading}</h2>
+        <p className={styles.sectionBody}>{teaser.full.body}</p>
+        {/*
+          An ordered list, because the three passes ARE an order: Pass 3 asks
+          the learner to transfer a pattern they can only have formed in passes
+          1 and 2. A `ul` would say these are three things you can do; `ol` says
+          what the curriculum actually claims.
+        */}
+        <ol className={styles.passList}>
+          {teaser.full.passes.map((pass) => (
+            <li className={styles.passItem} key={pass.label}>
+              <p className={styles.passLabel}>{pass.label}</p>
+              <p className={styles.passBody}>{pass.body}</p>
+            </li>
+          ))}
+        </ol>
+        <p className={styles.alsoLine}>{teaser.full.alsoLine}</p>
+      </section>
+
+      <section className={styles.section}>
+        <h2 className={styles.sectionHeading}>{teaser.method.heading}</h2>
+        <p className={styles.grammar}>{teaser.method.grammar}</p>
+        <p className={styles.sectionBody}>{teaser.method.body}</p>
+      </section>
+
+      <p className={styles.goal}>{teaser.goal}</p>
+
+      <div className={styles.positioning}>
+        {teaser.positioning.map((line) => (
+          <p className={styles.positioningLine} key={line}>
+            {line}
+          </p>
+        ))}
       </div>
 
       <div className={styles.cta}>
-        <ActionPill href={ROUTES.publicAlternate} variant="ink" full>
-          {copy.primaryCta}
+        <ActionPill href={ROUTES.fullTarget} variant="ink" full>
+          {teaser.primaryCta}
         </ActionPill>
       </div>
 
-      <p className={styles.evidence}>{copy.evidenceLine}</p>
-
       <div className={styles.block}>
-        <FullOffer offer={copy.fullOffer} />
+        <FullOffer />
+      </div>
+
+      <div className={styles.secondary}>
+        <LinkRow href={ROUTES.publicAlternate} size="lg">
+          {teaser.liteCta}
+        </LinkRow>
       </div>
 
       <section className={styles.wedge}>
-        <p className={styles.wedgeLead}>{copy.semanticWedge}</p>
+        <p className={styles.wedgeLead}>{LANDING_INCOMPLETE.semanticWedge}</p>
         <ul className={styles.faqList}>
           {LANDING_FAQ.map((entry) => (
             <li key={entry.question} className={styles.faqItem}>
@@ -171,50 +208,4 @@ function IncompleteLanding() {
       </section>
     </article>
   );
-}
-
-/**
- * The visitor whose browser holds a finished run: a different page, not the
- * same page with a badge.
- *
- * Two doors, and the copy is blunt about which is which. `LANDING_COMPLETE.bridge`
- * concedes that the pattern may not hold — that is the sentence that earns the
- * onward CTA, so it stands immediately before it. `/tf` is a redirect and never
- * a canonical node, which is why it is read from `ROUTES.redirect` rather than
- * typed.
- */
-function CompleteLanding() {
-  const copy = LANDING_COMPLETE;
-  return (
-    <article className={styles.landing}>
-      <header className={styles.hero}>
-        <h1 className={styles.title}>{copy.heading}</h1>
-        <p className={styles.statusRow}>
-          <Pill variant="status">{copy.status}</Pill>
-        </p>
-      </header>
-
-      <div className={styles.block}>
-        <LinkRow href={ROUTES.publicAlternate} size="lg">
-          {copy.reopenCta}
-        </LinkRow>
-      </div>
-
-      <p className={styles.completeBridge}>{copy.bridge}</p>
-
-      <div className={styles.cta}>
-        <ActionPill href={ROUTES.redirect} variant="ink" full>
-          {copy.continueCta}
-        </ActionPill>
-      </div>
-
-      <div className={styles.block}>
-        <FullOffer offer={copy.fullOffer} />
-      </div>
-    </article>
-  );
-}
-
-export default function TrustForwardPage() {
-  return <LandingCompletion incomplete={<IncompleteLanding />} complete={<CompleteLanding />} />;
 }

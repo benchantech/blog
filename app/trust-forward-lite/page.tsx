@@ -1,29 +1,49 @@
 import type { Metadata } from "next";
 import { INFO_MARKERS, LITE_INTRO } from "@/content/trust-forward/copy";
-import { InfoMarker } from "@/components/trust-forward/InfoMarker";
-import { LiteSandbox } from "@/components/trust-forward/LiteSandbox";
-import styles from "@/components/trust-forward/lite.module.css";
+import { YYSandbox } from "@/components/trust-forward/yy/YYSandbox";
+import styles from "@/components/trust-forward/yy/yy.module.css";
 
 /**
  * `/trust-forward-lite` — the public alternate route for the five-case run
  * (plan §5.3 and Phase 8; SC-TF8 resolved: `/trust-forward` is canonical, this
  * URL is retained as a public alternate, `/tf` is a redirect and never a node).
  *
+ * REWIRED TO THE YY ISLAND. The mount is now `YYSandbox` — the YY Method state
+ * machine for five cases, seventeen checkpoints and one URL — rather than
+ * `LiteSandbox`. `components/trust-forward/LiteSandbox.tsx` STAYS ON DISK
+ * untouched: the deletion contract forbids removing it, and it is the archived
+ * SHIP-era UI, kept the way ADR 0001 keeps the rest of the SHIP layer ("archived
+ * in place, never deleted"). It is simply no longer mounted by a route.
+ *
  * A THIN SERVER COMPONENT ON PURPOSE. Everything that reads or writes the
- * learner's dataset lives in one `"use client"` island, `LiteSandbox`. That
- * keeps this route prerendered, keeps the server render byte-identical for a
- * first visitor and for a crawler, and keeps learner state out of the RSC
- * payload — three separate properties that all collapse the moment a page-level
- * component touches `localStorage`.
+ * learner's ledger lives in one `"use client"` island. That keeps this route
+ * prerendered, keeps the server render byte-identical for a first visitor and
+ * for a crawler, and keeps learner state out of the RSC payload — three
+ * separate properties that all collapse the moment a page-level component
+ * touches `localStorage`.
  *
  * THE INTRO IS COMPOSED HERE AND PASSED IN, NOT RENDERED BESIDE THE ISLAND.
- * `UX_COPY.md` wants a very short intro that GIVES WAY to Case 1 immediately
- * after Start. If this file rendered the intro as a sibling of `<LiteSandbox/>`
- * it would still be sitting above Case 3 an hour later, because a server
- * component cannot unmount itself. So the intro is handed to the island as
- * `children` — a server-rendered slot the island shows on the intro screen and
- * drops afterwards. The words are still in the initial HTML, which is what a
- * crawler and a first paint need; they are simply not permanent.
+ * If this file rendered the intro as a sibling of `<YYSandbox/>` it would still
+ * be sitting above Case 3 an hour later, because a server component cannot
+ * unmount itself. So the intro is handed to the island as `children` — a
+ * server-rendered slot the island shows on the intro screen and drops
+ * afterwards. The words are still in the initial HTML, which is what a crawler
+ * and a first paint need; they are simply not permanent.
+ *
+ * WHAT THE INTRO NO LONGER SAYS, AND WHY THAT IS THE REWIRE AND NOT AN EDIT.
+ * `LITE_INTRO.promiseLead` and `LITE_INTRO.promiseItems` promise the learner
+ * "your SHIP profile" at the end of the run. This build does not produce one:
+ * ADR 0001 removed numeric scoring from Lite's required path, and the governing
+ * addendum forbids inventing a replacement. A promise of a score on the first
+ * screen would break the no-score invariant before the learner had answered
+ * anything, so those two fields are not rendered. Nothing in `content/` was
+ * changed to achieve that — the records stand, unrendered, and Ben-approved YY
+ * intro copy replaces this composition when it exists.
+ *
+ * Only `INFO_MARKERS.localOnly.label` is used, not its expansion: the expansion
+ * tells the learner their "SHIP result" is stored in this browser, and a
+ * storage disclosure is the one sentence that may not be wrong about storage.
+ * The label — five words about where the data lives — is true in both builds.
  *
  * NO DESCRIPTION IN THE METADATA. The route's own description would be a public
  * claim about a product whose landing copy is the crawlable surface
@@ -54,24 +74,14 @@ export const metadata: Metadata = {
 export default function TrustForwardLitePage() {
   return (
     <article className={styles.page}>
-      <LiteSandbox>
+      <YYSandbox>
         <header className={styles.intro}>
           <h1>{LITE_INTRO.heading}</h1>
           <p className={styles.lede}>{LITE_INTRO.lede}</p>
-          <p className={styles.promiseLead}>{LITE_INTRO.promiseLead}</p>
-          <ul className={styles.promiseList}>
-            {LITE_INTRO.promiseItems.map((item) => (
-              <li key={item}>{item}</li>
-            ))}
-          </ul>
           <p className={styles.time}>{LITE_INTRO.timeEstimate}</p>
-          <div className={styles.markers}>
-            {LITE_INTRO.infoMarkerKeys.map((key) => (
-              <InfoMarker key={key} marker={INFO_MARKERS[key]} />
-            ))}
-          </div>
+          <p className={styles.localOnly}>{INFO_MARKERS.localOnly.label}</p>
         </header>
-      </LiteSandbox>
+      </YYSandbox>
     </article>
   );
 }

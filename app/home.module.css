@@ -7,10 +7,17 @@
  * public API of `app/globals.css` (§4.1) and are not restated here. Two
  * stylesheets, one page, and no rule in this file can reach the preserved half.
  *
- * The demo card, the stop cells, the struck pills, the audio slot and the
- * portrait are shared primitives; their geometry is theirs. What this file
- * carries is the page's own layout: the two-column hero, the three inset
- * slabs, the nine-cell path row and the four-move grid.
+ * The struck pills, the audio slot and the portrait are shared primitives;
+ * their geometry is theirs. What this file carries is the page's own layout:
+ * the two-column hero and the two inset slabs.
+ *
+ * THE PATH ROW AND THE FOUR-MOVE GRID ARE GONE, rules and markup together in
+ * one edit. `app/page.tsx` stopped rendering the nine-cell stop preview and the
+ * "Watch. Try. Judge. Carry." slab when Watch Your Step was retired as the
+ * product entry; leaving `.path*`, `.moves*` and `.move*` here would leave
+ * eleven selectors that no className can reach, which is exactly the orphan
+ * `tests/class-contract.test.ts` mode 3 exists to catch in globals.css and
+ * cannot see inside a module.
  *
  * MOBILE IS AN EXTRAPOLATION. `4a`'s phone is the `/watch-your-step` landing,
  * not this page, so every rule below 900px here is composed from the desktop
@@ -28,21 +35,26 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Hero (dc.html:325-331) — 1fr / 520px, 64px gap                             */
+/* Hero — 1fr / 520px, 64px gap. Trust Forward's offer left, the feature right */
 /* -------------------------------------------------------------------------- */
 .hero {
   padding-block: 56px 72px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) 520px;
   gap: 64px;
-  /* Artboard 4a top-aligns the two hero columns: the badge pill and the demo
-   * card share a baseline at the top of the grid. `center` floated the card
-   * above the badge by ~112px at 1280. */
+  /* The two hero columns top-align: the headline and the feature card share a
+   * baseline at the top of the grid. `center` floated the card above the copy
+   * by ~112px at 1280. The geometry is `4a`'s (dc.html:325-331); only what the
+   * left column says has changed. */
   align-items: start;
 }
 
+/* The time estimate, and it is the only pill in the hero. It sits below the
+   copy rather than above it: the badge slot used to carry "Free · No account ·
+   No AI required" for a course, and a claim in that position reads as a banner.
+   An expected duration reads as the last thing before the button. */
 .heroBadge {
-  margin: 0 0 26px;
+  margin: 0 0 20px;
 }
 
 .heroHeadline {
@@ -54,10 +66,29 @@
 
 .heroLead {
   max-width: 540px;
-  margin: 0 0 34px;
+  margin: 0 0 18px;
   color: var(--body);
   font: 400 21px / 1.5 var(--sans);
   text-wrap: pretty;
+}
+
+/* The offer's three paragraphs step DOWN in weight — lede, body, descriptor —
+   because `/trust-forward` renders them in that order and the two surfaces are
+   showing the same block. The descriptor is the quietest of the three: it is
+   the honest counterweight ("Five fictional cases"), not the pitch. */
+.heroBody {
+  max-width: 540px;
+  margin: 0 0 14px;
+  color: var(--body);
+  font: 400 18px / 1.55 var(--sans);
+  text-wrap: pretty;
+}
+
+.heroDescriptor {
+  max-width: 540px;
+  margin: 0 0 26px;
+  color: var(--muted);
+  font: 400 15px / 1.5 var(--sans);
 }
 
 .heroActions {
@@ -65,15 +96,6 @@
   gap: 12px;
   align-items: center;
   flex-wrap: wrap;
-}
-
-/* dc.html:330 — teal text beside the pill. The artboard draws it as a label,
-   not a control, and it is rendered as one: the demo it names is on the same
-   screen, so a link to it would be a second route to a visible object. */
-.heroTryOne {
-  margin: 0;
-  color: var(--accent-text-on-tint);
-  font: 500 17px / 1.4 var(--sans);
 }
 
 .upworkFeature {
@@ -198,114 +220,6 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* The path (dc.html:375-392)                                                 */
-/* -------------------------------------------------------------------------- */
-.path {
-  padding-block: 96px 24px;
-  text-align: center;
-}
-
-.pathEyebrow {
-  margin: 0 0 14px;
-  color: var(--accent-text-on-tint);
-  font: 500 15px / 1.3 var(--sans);
-}
-
-.pathHeadline {
-  max-width: 760px;
-  margin: 0 auto 14px;
-  font: 600 clamp(2rem, 3.6vw, 2.75rem) / 1.08 var(--sans);
-  letter-spacing: -0.025em;
-  text-wrap: balance;
-}
-
-.pathLead {
-  max-width: 620px;
-  margin: 0 auto 44px;
-  color: var(--body);
-  font: 400 18px / 1.5 var(--sans);
-  text-wrap: pretty;
-}
-
-.pathFootnote {
-  margin: 24px 0 0;
-  color: var(--muted);
-  font: 400 13px / 1.45 var(--sans);
-}
-
-/* -------------------------------------------------------------------------- */
-/* Watch. Try. Judge. Carry. (dc.html:393-406) — tint-teal slab               */
-/* -------------------------------------------------------------------------- */
-.moves {
-  margin-top: 64px;
-  padding: 48px 56px;
-  border-radius: var(--radius-block-lg);
-  background: var(--tint-teal);
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 56px;
-  align-items: center;
-}
-
-.movesEyebrow {
-  margin: 0 0 14px;
-  color: var(--accent-text-on-tint);
-  font: 500 15px / 1.3 var(--sans);
-}
-
-.movesHeadline {
-  margin: 0 0 16px;
-  font: 600 clamp(1.875rem, 3.2vw, 2.5rem) / 1.1 var(--sans);
-  letter-spacing: -0.025em;
-}
-
-.movesLead {
-  margin: 0;
-  color: var(--body);
-  font: 400 18px / 1.55 var(--sans);
-}
-
-.moveGrid {
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: 12px;
-  /* This is a <ul>. Without the reset the UA's disc markers and 40px
-   * padding-inline-start render OUTSIDE the four cards (dc.html:395-403 draws
-   * no bullets). */
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.move {
-  padding: 22px;
-  border-radius: var(--radius-card);
-  background: var(--white);
-}
-
-/* CARRY is the one dark tile of the four (dc.html:403). */
-.moveInk {
-  background: var(--ink);
-  color: var(--white);
-}
-
-.moveLabel {
-  margin: 0 0 6px;
-  color: var(--accent-text-on-tint);
-  font: 600 12px / 1.3 var(--sans);
-  letter-spacing: 0.04em;
-}
-
-.moveInk .moveLabel {
-  color: var(--accent-on-dark);
-}
-
-.moveBody {
-  margin: 0;
-  font: 400 15px / 1.4 var(--sans);
-}
-
-/* -------------------------------------------------------------------------- */
 /* Anti-features (dc.html:407-415)                                            */
 /* -------------------------------------------------------------------------- */
 .antiFeatures {
@@ -413,21 +327,18 @@
   }
 
   .heroLead,
+  .heroBody,
+  .heroDescriptor,
   .heroActions {
     margin-inline: auto;
     justify-content: center;
   }
 
   .instructor,
-  .moves,
   .howRun {
     grid-template-columns: 1fr;
     gap: 28px;
     padding: 32px;
-  }
-
-  .path {
-    padding-block: 56px 16px;
   }
 
   .antiFeatures {
@@ -445,17 +356,43 @@
     font-size: 17px;
   }
 
-  .instructorBody,
-  .movesLead,
-  .pathLead {
+  .heroBody,
+  .instructorBody {
     font-size: 16px;
-  }
-
-  .moveGrid {
-    grid-template-columns: 1fr;
   }
 
   .seam {
     padding-block: 48px 0;
   }
+}
+
+/* --- Trust strip: free · no account · no AI · nothing leaves your browser ---
+   Directly under the CTA, because these are the objections a visitor raises
+   before they will start anything. Pills rather than prose: they are read at a
+   glance, and each is a single verifiable fact rather than a claim needing
+   qualification. Muted, not shouted — the content is reassuring enough. */
+.trustStrip {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  list-style: none;
+  margin: 18px 0 0;
+  padding: 0;
+}
+
+.trustItem {
+  background: var(--tint-teal);
+  border-radius: 999px;
+  color: var(--accent-text-on-tint);
+  font-size: 0.8125rem;
+  font-weight: 500;
+  padding: 6px 12px;
+}
+
+.trustLine {
+  color: var(--muted);
+  font-size: 0.875rem;
+  line-height: 1.55;
+  margin: 10px 0 0;
+  max-width: 52ch;
 }

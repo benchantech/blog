@@ -7,6 +7,7 @@ import {
   BROWSER_KEYS,
   BROWSER_KEY_NAMES,
   CONSENT_STORAGE_KEY,
+  TRUST_FORWARD_YY_STORAGE_KEY,
   keysSurvivingWysClear,
   wysOwnedKeys
 } from "@/lib/wys/browser-keys";
@@ -666,15 +667,25 @@ test("both operations explain themselves and neither claims to erase hosting or 
 /* -------------------------------------------------------------------------- */
 
 test("BROWSER_KEYS registers every key this build writes, with their writers", () => {
+  // FOUR keys. The fourth is the YY judgment ledger, which is its own key and
+  // not a field inside the v1 dataset — that dataset's serializer drops every
+  // undeclared top-level key, so a nested YY stream would be erased on the
+  // first v1 write. Updated deliberately when the row was added.
   assert.deepEqual(
     [...BROWSER_KEY_NAMES].sort(),
-    ["bct_analytics_consent", "benchantech:trust-forward-lite:state", "wys:v1"]
+    [
+      "bct_analytics_consent",
+      "benchantech:trust-forward-lite:state",
+      "benchantech:trust-forward-lite:yy",
+      "wys:v1"
+    ]
   );
-  // Still exactly one WYS-owned key: adding a third registry row must not
+  // Still exactly one WYS-owned key: adding a fourth registry row must not
   // widen what a Watch Your Step clear sweeps.
   assert.deepEqual(wysOwnedKeys(), [WYS_STORAGE_KEY]);
   assert.deepEqual(keysSurvivingWysClear(), [
     "benchantech:trust-forward-lite:state",
+    "benchantech:trust-forward-lite:yy",
     CONSENT_STORAGE_KEY
   ]);
   for (const record of BROWSER_KEYS) {
@@ -686,6 +697,23 @@ test("BROWSER_KEYS registers every key this build writes, with their writers", (
 test("the registered consent key is byte-identical to the frozen ConsentBanner literal", () => {
   const source = readFileSync(path.join(repoRoot, "components", "ConsentBanner.tsx"), "utf8");
   assert.ok(source.includes(`const storageKey = "${CONSENT_STORAGE_KEY}";`));
+});
+
+test("the registered YY key is byte-identical to the literal records.ts writes", () => {
+  // The registry restates the literal rather than importing it, because
+  // `lib/trust-forward/yy/records.ts` reaches the ledger, the session and the
+  // storage probe, and `/privacy`, `/cookies` and the Data page need the NAME
+  // and nothing else. A restated literal is only safe while something asserts
+  // the two agree — this is that something, and it is the same mechanism the
+  // frozen ConsentBanner literal is held to above.
+  const source = readFileSync(
+    path.join(repoRoot, "lib", "trust-forward", "yy", "records.ts"),
+    "utf8"
+  );
+  assert.ok(
+    source.includes(`export const TRUST_FORWARD_YY_STORAGE_KEY = "${TRUST_FORWARD_YY_STORAGE_KEY}";`),
+    "the YY ledger writes a key the registry does not name — the Data page key list is now false"
+  );
 });
 
 test("every wys: key literal in lib/ and components/ is in the registry", () => {

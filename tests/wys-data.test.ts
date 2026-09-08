@@ -194,10 +194,16 @@ test("the key list is generated from BROWSER_KEYS, not written out", () => {
   assert.equal(/"wys:v1"|'wys:v1'/.test(view), false, "the storage key is imported, never typed");
 });
 
-test("both browser keys are in the registry, so the sitewide title stays honest (Q6)", () => {
+test("every browser key is in the registry, so the sitewide title stays honest (Q6)", () => {
+  // Four now, not two: the two Trust Forward keys are registered alongside the
+  // course dataset and the consent choice, and the page title is a claim about
+  // the SITE, so every key an origin holds has to be reachable from this list.
   const keys = BROWSER_KEYS.map((record) => record.key);
   assert.ok(keys.includes(WYS_STORAGE_KEY));
   assert.ok(keys.includes(CONSENT_STORAGE_KEY));
+  assert.ok(keys.includes("benchantech:trust-forward-lite:state"));
+  assert.ok(keys.includes("benchantech:trust-forward-lite:yy"));
+  assert.equal(keys.length, 4, "a browser key arrived without updating this assertion");
   // Q6's ratified default keeps "What this site knows about you" — a claim
   // about the SITE — and makes it true by listing the consent key too.
   assert.equal(dataLabels.pageTitle, "What this site knows about you");
@@ -393,6 +399,7 @@ test("what survives a clear is what the registry says survives", () => {
   // does not carry it. Two products, two datasets, neither sweeping the other.
   assert.deepEqual(keysSurvivingWysClear(), [
     "benchantech:trust-forward-lite:state",
+    "benchantech:trust-forward-lite:yy",
     CONSENT_STORAGE_KEY
   ]);
   const survives = resolveVariant(clearingSurvivesText, "short");

@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { cx } from "@/components/provenance/cx";
-import { ecosystemNav, lessonZeroCta, shipNav, type NavItem } from "@/content/nav";
+import { ecosystemNav, publicLessonZeroCta, publicShipNav, type NavItem } from "@/content/nav";
 import styles from "./SiteHeader.module.css";
 
 /**
@@ -11,6 +11,19 @@ import styles from "./SiteHeader.module.css";
  * replacing one with the other, and nine links plus a CTA do not fit one
  * 1280px row minus 56px gutters at 15px / gap 32 — so the header is two tiers:
  * the ship row above, the ecosystem row below, right-aligned under the brand.
+ *
+ * WHAT THE CHROME RENDERS IS THE *PUBLIC* INVENTORY.
+ *
+ * `shipNav` and `lessonZeroCta` remain the full inventory in `content/nav.ts` —
+ * the course's names, kept because a label is a name for a node and deleting it
+ * loses that name. The header renders `publicShipNav` and
+ * `publicLessonZeroCta`, which drop Watch Your Step while `WYS_NAV_RETIRED` is
+ * true.
+ *
+ * Wiring these was missed when the flag was added: the constant existed, the
+ * filtered exports existed, and the header went on rendering the unfiltered
+ * inventory — so a retired course kept a nav entry and a CTA pointing at routes
+ * that now redirect to `/`. A flag nothing reads is not a flag.
  *
  * PRESERVED FROM app/layout.tsx, unchanged: the `.brand` link to `/`, the
  * `<img aria-hidden>` + adjacent-text pairing (the accessible name comes from
@@ -65,12 +78,14 @@ export function SiteHeader() {
 
       <div className={styles.tiers}>
         <nav className={styles.shipNav} aria-label="Ship navigation">
-          {shipNav.map((item) => (
+          {publicShipNav.map((item) => (
             <NavLink item={item} key={item.href} />
           ))}
-          <Link className={styles.cta} href={lessonZeroCta.href}>
-            {lessonZeroCta.label}
-          </Link>
+          {publicLessonZeroCta ? (
+            <Link className={styles.cta} href={publicLessonZeroCta.href}>
+              {publicLessonZeroCta.label}
+            </Link>
+          ) : null}
         </nav>
         <nav className={cx("desktop-nav", styles.ecosystemNav)} aria-label="Primary navigation">
           {ecosystemNav.map((item) => (
@@ -84,7 +99,7 @@ export function SiteHeader() {
           Menu
         </summary>
         <nav className={styles.menuPanel} aria-label="Mobile navigation">
-          {[...shipNav, lessonZeroCta, ...ecosystemNav].map((item) => (
+          {[...publicShipNav, ...(publicLessonZeroCta ? [publicLessonZeroCta] : []), ...ecosystemNav].map((item) => (
             <NavLink item={item} key={item.href} />
           ))}
         </nav>

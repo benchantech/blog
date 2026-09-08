@@ -53,7 +53,7 @@ R7 is the one that bites, and it is why §5.3 stays an open question rather than
 
 `READ_ORDER_AND_AUTHORITY.md` narrows the supersession scope explicitly, which resolves an ambiguity in revision 1 of this plan:
 
-1. **Corpus count.** Layer 02 set the current corpus at 42. **Layer 07 supersedes this for learner-facing copy:** the public Full bridge is *"30+ real cases drawn from Ben Chan's actual professional experience"*, with the note that cases may be anonymized or composited to protect clients, employers, colleagues and confidential details while preserving the decision pressure. **42 remains the internal canonical corpus authority; no public string says 42 or 39.** This resolves SC-TF7 in a way revision 5 did not anticipate — the answer was neither "say 42" nor "disclose coverage" but "say less, and say it accurately."
+1. **Corpus count.** Layer 02 set the current corpus at 42. **Layer 07 supersedes this for learner-facing copy:** the public Full bridge was *"30+ real cases drawn from Ben Chan's actual professional experience"* (**raised to "40+" on Ben's instruction, 2026-09-08**), with the note that cases may be anonymized or composited to protect clients, employers, colleagues and confidential details while preserving the decision pressure. ~~42 remains the internal canonical corpus authority; no public string says 42 or 39.~~ **STALE 2026-09-08:** Ben wrote "42 canonical case families" into the `/trust-forward` teaser himself, so 42 is now a public number. 39 is still struck. This resolves SC-TF7 in a way revision 5 did not anticipate — the answer was neither "say 42" nor "disclose coverage" but "say less, and say it accurately."
 2. **Lite's JSON export is a deterministically validated input to Full onboarding.** This makes `EXPORT_SPEC.md` an interface contract (§6.9).
 3. **Imported Lite material is evidence, never doctrine.**
 
@@ -583,7 +583,7 @@ Adopting `BEN_ESCALATIONS_8.md`'s numbering. **Codex may prepare code around the
 4. **SC-TF4 — RESOLVED.** Production version is **v1.1.0**; v1.0.0 stays as immutable historical provenance.
 5. **SC-TF5 — RESOLVED.** Receipts are governed by an approved *rule* rather than approved strings: the invariant is **"Situation → observable choice/action. Nothing else."** — no inferred intention, praise, judgment label, doctrine, or "because" explanation. Provenance is `implementation_authored_under_ben_approved_rule`, never Ben-verbatim and never recovered prior authoring. **Receipt strength is explicitly dropped**, which closes GAP-4's rider: highlight sort is SHIP contribution → later case → stable authored order. All **11** decision receipts are preserved in the export in case/decision order; the profile may highlight a subset but may never delete or substitute the underlying trail.
 6. **SC-TF6 — Studio canonical URL.** Confirm `https://studio.com/benchanviolin/trust-forward` before release.
-7. **SC-TF7 — RESOLVED.** Public Full bridge is **"30+ real cases drawn from Ben Chan's actual professional experience"**, with anonymization/compositing disclosed. Internal corpus authority stays 42. No public string claims 42 or 39.
+7. **SC-TF7 — RESOLVED, THEN SUPERSEDED 2026-09-08.** Public Full bridge is **"40+ real cases drawn from Ben Chan's actual professional experience"** (layer 07 approved "30+"; Ben raised it), with anonymization/compositing disclosed. The internal-only rule for 42 is **gone**: the `/trust-forward` teaser states "42 canonical case families" in Ben's own words. Two public statements of one corpus, both pinned by name in `tests/trust-forward-content.test.ts`. 39 is still struck.
 8. **SC-TF8 — RESOLVED.** `/trust-forward` is the canonical public route, `/trust-forward-lite` is retained as a public alternate, `/tf` is retained as a convenience redirect. Learner state never appears in path, query or hash. Telemetry inherits the existing BenChanTech boundary rather than changing site-wide policy — see §8.1 for the one part of this that conflicts with the repository.
 
 Two more this plan adds, neither in layer 03:
@@ -678,7 +678,7 @@ Layer 03's "definition of complete", reconciled with this repo's gates. Do not d
 - [ ] **SC-TF4** — the stamp ships as **v1.1.0**; v1.0.0 is retained as historical provenance.
 - [ ] **SC-TF5** — receipts satisfy the approved invariant, carry no strength field, and all 11 appear in the export in case/decision order.
 - [ ] **SC-TF6** — URL authority is resolved (`https://studio.com/benchanviolin/trust-forward`). The remaining Lite-export → Full-import smoke test is an **external compatibility check to run once the Full importer exists**, not a Ben ruling and not a Lite blocker.
-- [ ] **SC-TF7** — public copy says "30+ real cases…"; no public string says 42 or 39.
+- [ ] **SC-TF7** — public copy says "40+ real cases…" and "42 canonical case families"; no public string says 39.
 - [ ] **SC-TF8** answered; final route/redirect shape accepted as telemetry.
 - [ ] **Q-A** — WYS is out of navigation and discovery, its source is preserved as a non-public stub, and every old entry route redirects to `/` with `permanent: false` and a matching entry in the retired register.
 - [ ] **Q-B** checked in the GA4 console.

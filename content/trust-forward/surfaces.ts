@@ -60,7 +60,7 @@
  *      export and engineering documentation, never a public claim, and no
  *      public string in this module carries a profile count at all.
  *   2. **"39 real, scar-bearing cases" is not shipped.** The approved Full
- *      bridge is `FULL_OFFER.bridge` — "30+ real cases…" — and it travels with
+ *      bridge is `FULL_OFFER.bridge` — "40+ real cases…" — and it travels with
  *      `FULL_OFFER.confidentiality`, because cases may be anonymized or
  *      composited to protect clients, employers, colleagues and confidential
  *      details while preserving the underlying decision pressure. The internal

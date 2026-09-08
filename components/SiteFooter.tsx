@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { stampLabel } from "@/lib/approval-state";
-import { ecosystemNav, footerDoors, lessonZeroCta, shipNav, type NavItem } from "@/content/nav";
+import { ecosystemNav, footerDoors, publicLessonZeroCta, publicShipNav, type NavItem } from "@/content/nav";
 
 /**
  * Site footer (plan §3.3, §5.4, Phase 5; mockup 4a footer, dc.html:427-430).
@@ -86,7 +86,7 @@ export function SiteFooter() {
         <FooterGroup
           label="THE SHIP"
           ariaLabel="Ship links"
-          items={[...shipNav, lessonZeroCta]}
+          items={[...publicShipNav, ...(publicLessonZeroCta ? [publicLessonZeroCta] : [])]}
         />
         <FooterGroup label="DOORS" ariaLabel="The four destinations" items={footerDoors} />
         <FooterGroup label="REVIEWERS" ariaLabel="Reviewer routes" items={ecosystemNav} />

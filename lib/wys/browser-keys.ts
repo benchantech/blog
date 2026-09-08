@@ -47,6 +47,37 @@ export interface BrowserKeyRecord {
  */
 export const TRUST_FORWARD_STORAGE_KEY = "benchantech:trust-forward-lite:state";
 
+/**
+ * The Trust Forward Lite YY ledger key, from `TRUST_FORWARD_YY_STORAGE_KEY` in
+ * `lib/trust-forward/yy/records.ts`.
+ *
+ * A FOURTH KEY, AND A SECOND ONE FOR THE SAME PRODUCT. It is not nested inside
+ * the v1 dataset because that dataset's serializer drops every undeclared
+ * top-level key by design, so a nested YY stream would be deleted on the first
+ * v1 write. Two keys, two sanitizers, one origin — and therefore two registry
+ * rows, because this registry is about what is STORED, not about how many
+ * products store it.
+ *
+ * `clearedByWysClear: false`, for the same reason the v1 row carries it:
+ * `wysOwnedKeys()` filters on `WYS_KEY_PREFIX` (`wys:`) and this key carries
+ * the `benchantech:` namespace instead, so a Watch Your Step clear cannot reach
+ * a learner's YY judgment ledger. That ledger is the one dataset in the product
+ * that must not be swept by another surface's reset: it holds decisions that
+ * were committed BEFORE Ben's judgment was revealed, and the whole epistemic
+ * claim of the YY Method is that later information never overwrites them.
+ * `clearYYLedger()` removes this key and only this key, and the confirmation is
+ * the caller's.
+ *
+ * THE LITERAL IS RESTATED RATHER THAN IMPORTED, exactly as the v1 key above is.
+ * `records.ts` reaches `@/lib/trust-forward/ledger`, `/session` and `/storage`;
+ * importing it here would pull the whole YY machinery into `/privacy`,
+ * `/cookies` and the Data page, all of which need the NAME of the key and
+ * nothing else. `tests/wys-local-state.test.ts` reads `records.ts` off disk and
+ * asserts the two literals are byte-identical, which is the same mechanism that
+ * keeps `CONSENT_STORAGE_KEY` and the frozen `ConsentBanner` literal in step.
+ */
+export const TRUST_FORWARD_YY_STORAGE_KEY = "benchantech:trust-forward-lite:yy";
+
 export const BROWSER_KEYS: readonly BrowserKeyRecord[] = [
   {
     key: WYS_STORAGE_KEY,
@@ -61,6 +92,14 @@ export const BROWSER_KEYS: readonly BrowserKeyRecord[] = [
     writtenBy: "lib/trust-forward/storage.ts",
     holds:
       "your five-case answers, the immutable local ledger of what you did, any optional notes you wrote, your optional local handle, unsent drafts and the derived result",
+    clearedByWysClear: false
+  },
+  {
+    key: TRUST_FORWARD_YY_STORAGE_KEY,
+    owner: "trust-forward",
+    writtenBy: "lib/trust-forward/yy/records.ts",
+    holds:
+      "the judgment you committed at each case checkpoint, the option you named as your closest alternative, any optional notes you wrote before or after committing, and the time and run each one belongs to",
     clearedByWysClear: false
   },
   {

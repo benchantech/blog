@@ -466,13 +466,20 @@ test("the aggregate endpoint the pages call not built is, in fact, not built", (
 });
 
 test("every browser key is named on /privacy and /cookies, generated from the registry", () => {
-  // THREE keys now. Trust Forward Lite added the third, and the point of this
+  // FOUR keys now. The fourth arrived when the YY judgment ledger got its own
+  // key rather than a field inside the v1 dataset, and the point of this
   // assertion is that neither legal page needed editing for it to appear:
-  // both render `BrowserKeyList`, which reads the registry. The count is
-  // pinned so a fourth key cannot arrive silently.
+  // both render `BrowserKeyList`, which reads the registry. Updating this list
+  // is the whole cost of adding a key, and it is deliberate — the count is
+  // pinned so a fifth key cannot arrive silently.
   assert.deepEqual(
     [...BROWSER_KEY_NAMES],
-    [WYS_STORAGE_KEY, "benchantech:trust-forward-lite:state", "bct_analytics_consent"]
+    [
+      WYS_STORAGE_KEY,
+      "benchantech:trust-forward-lite:state",
+      "benchantech:trust-forward-lite:yy",
+      "bct_analytics_consent"
+    ]
   );
   const list = read("components/BrowserKeyList.tsx");
   assert.ok(list.includes("BROWSER_KEYS"), "the key list is hand-maintained again");

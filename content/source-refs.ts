@@ -233,7 +233,7 @@ export const externalSourceRefs = [
     id: "tf-supersession-42",
     kind: "tf-package",
     locator:
-      "02_read-last-supersession/CORPUS_COUNT_42_SUPERSESSION.json — internal corpus authority 42; superseded for learner-facing copy by layer 07's \"30+ real cases\""
+      "02_read-last-supersession/CORPUS_COUNT_42_SUPERSESSION.json — internal corpus authority 42; superseded for learner-facing copy by layer 07's \"30+ real cases\", itself raised to \"40+\" by Ben on 2026-09-08"
   }
 ] as const satisfies readonly ExternalSourceRef[];
 
