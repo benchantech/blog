@@ -1,7 +1,5 @@
 import Link from "next/link";
 import { stakeholderRoutes } from "@/content/site-config";
-import { claimById } from "@/content/claims";
-import { gatedCanonicalText } from "@/lib/wys/content-gate";
 import {
   LANDING_INCOMPLETE,
   TRUST_STRIP
@@ -11,9 +9,7 @@ import {
   landingAntiFeatures,
   landingDataHref,
   landingDataLinkLabel,
-  landingHowRunBodyText,
-  landingLabels,
-  landingShipChips
+  landingLabels
 } from "@/content/watch-your-step/landing";
 import { ActionPill } from "@/components/ui/ActionPill";
 import { Pill } from "@/components/ui/Pill";
@@ -93,9 +89,6 @@ import styles from "./home.module.css";
  */
 
 export default function Home() {
-  const howRunHeadline = gatedCanonicalText(claimById("ai-role-boundaries"), "short");
-  const howRunBody = gatedCanonicalText(landingHowRunBodyText, "full");
-
   return (
     <>
       <section className={cx(styles.section, styles.hero)} aria-labelledby="trust-forward-heading">
@@ -212,28 +205,26 @@ export default function Home() {
         </section>
       </div>
 
-      <div className={styles.section}>
-        <section className={styles.howRun} aria-labelledby="how-run-heading">
-          <div>
-            <p className={styles.howRunEyebrow}>{landingLabels.howRunEyebrow}</p>
-            {howRunHeadline ? (
-              <h2 className={styles.howRunHeadline} id="how-run-heading">
-                {howRunHeadline.text}
-              </h2>
-            ) : null}
-            {howRunBody ? <p className={styles.howRunBody}>{howRunBody.text}</p> : null}
-          </div>
-          <ul className={styles.chips}>
-            {landingShipChips.map((chip) => (
-              <li key={chip.href}>
-                <Link className={styles.chip} href={chip.href}>
-                  {chip.label}
-                </Link>
-              </li>
-            ))}
-          </ul>
-        </section>
-      </div>
+      {/* ====================================================================
+          "HOW THE SITE IS RUN" WAS REMOVED 2026-09-08, on Ben's instruction,
+          in the same consolidation that took the foyer and the floor plan.
+
+          It carried an eyebrow, the `ai-role-boundaries` claim as its heading,
+          a body paragraph, and four chips linking to /standing-orders,
+          /bridge, /ships-log and /crew — which, after the menu consolidation
+          the commit before this one, were the last in-page links to those four
+          pages. They are NOT now unreachable: all five ship routes stay in
+          `canonicalSurfaces`, so they remain in the sitemap and in /llms.txt,
+          and each still serves its own page. What they lost is a link from the
+          home page, which is what "consolidating" means here.
+
+          NOTHING WAS DELETED. `claimById("ai-role-boundaries")` still renders
+          on /ai-disclosure, which is the page that exists to carry it, so the
+          claim keeps a surface. `landingShipChips` and `landingHowRunBodyText`
+          stay exported from `content/watch-your-step/landing.ts`, and the
+          `.howRun*` rules stay in `home.module.css` — a module stylesheet, so
+          no orphan scan is owed an entry for them.
+          ==================================================================== */}
 
       {/* ====================================================================
           PRESERVED — the home page as it shipped, restyled by the token
