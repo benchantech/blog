@@ -39,7 +39,14 @@
  * (plan Phase 0, Q15).
  */
 
-import { ecosystemNav, lessonZeroCta, shipNav, trustForwardNav } from "@/content/nav";
+import {
+  SHIP_NAV_CONSOLIDATED,
+  ecosystemNav,
+  lessonZeroCta,
+  publicShipNav,
+  shipNav,
+  trustForwardNav
+} from "@/content/nav";
 import { WYS_NAV_RETIRED } from "@/content/watch-your-step/config";
 import { courseTabs, stopDisplayName } from "@/content/watch-your-step/tabs";
 import { WYS_STOP_IDS, wysWeekById } from "@/content/watch-your-step/weeks";
@@ -86,7 +93,19 @@ const LEGAL_SURFACES: readonly CanonicalSurface[] = [
 const PRESERVED_SURFACES: readonly CanonicalSurface[] = ecosystemNav
   .filter((item) => !item.external)
   .map((item) => ({ path: item.href, label: item.label, group: "preserved" as const, human: true }))
-  .concat([{ path: "/system", label: "System", group: "preserved" as const, human: true }]);
+  .concat(
+    /*
+     * `/system` joined the consolidation on 2026-09-08 and is listed in
+     * `CONSOLIDATED_SURFACES` below rather than here. It is the only page
+     * outside the ship group that met Ben's rule — *"nothing is reachable that
+     * isn't linked in the main pages"* — because the only thing that ever
+     * pointed at it was the `/about` redirect. `/studio` and `/neon` stay:
+     * both are in the header menu.
+     */
+    SHIP_NAV_CONSOLIDATED
+      ? []
+      : [{ path: "/system", label: "System", group: "preserved" as const, human: true }]
+  );
 
 /** The two machine mirrors. Renderings of the same objects, not second nodes. */
 export const MACHINE_SURFACE_PATHS = {
@@ -153,15 +172,44 @@ const TRUST_FORWARD_SURFACES: readonly CanonicalSurface[] = [
  * discovery without also being quietly redirected, which is the failure this
  * register is really guarding against.
  */
-export const RETIRED_SURFACES: readonly string[] = WYS_NAV_RETIRED
-  ? [
-      "/watch-your-step",
-      lessonZeroCta.href,
-      ...courseTabs.map((tab) => tab.href),
-      ...WYS_STOP_IDS.map((id) => `/watch-your-step/stop/${id}`),
-      "/watch-your-step/end"
-    ]
+/**
+ * The six surfaces the 2026-09-08 consolidation withdrew from discovery.
+ *
+ * Ben's rule was mechanical: *"nothing is reachable that isn't linked in the
+ * main pages."* Applied to the roster it selects exactly these — the five ship
+ * pages, whose last in-page links went with the "How the site is run" block,
+ * and `/system`, which only the `/about` redirect ever pointed at. Everything
+ * else in the roster is linked from the header menu, the footer, or
+ * `/trust-forward`.
+ *
+ * RETIRED IS NOT DELETED, AND IT IS NOT "JUST UNLISTED" EITHER. Every page file
+ * is still on disk and `tests/preserved-surfaces.test.ts` still asserts all six
+ * exist. What changed is that each now has a `permanent: false` redirect in
+ * `next.config.ts`, which is what makes "unreachable" true rather than merely
+ * claimed: a page that 200s at a known URL is reachable whether or not a
+ * sitemap admits it, and dropping it from the sitemap alone would have hidden
+ * it from crawlers while leaving it live for anyone with the link.
+ * `tests/machine-surfaces.test.ts` enforces the pairing in both directions.
+ *
+ * `SHIP_NAV_CONSOLIDATED` is the single flag. Flip it and the menu entries, the
+ * roster rows and — via this constant — the redirects all come back together.
+ */
+const CONSOLIDATED_SURFACES: readonly string[] = SHIP_NAV_CONSOLIDATED
+  ? [...shipNav.filter((item) => item.href !== "/watch-your-step").map((item) => item.href), "/system"]
   : [];
+
+export const RETIRED_SURFACES: readonly string[] = [
+  ...(WYS_NAV_RETIRED
+    ? [
+        "/watch-your-step",
+        lessonZeroCta.href,
+        ...courseTabs.map((tab) => tab.href),
+        ...WYS_STOP_IDS.map((id) => `/watch-your-step/stop/${id}`),
+        "/watch-your-step/end"
+      ]
+    : []),
+  ...CONSOLIDATED_SURFACES
+];
 
 /**
  * Every current canonical surface, human pages first.
@@ -173,30 +221,24 @@ export const canonicalSurfaces: readonly CanonicalSurface[] = [
   { path: "/", label: "BenChanTech", group: "home", human: true },
   ...TRUST_FORWARD_SURFACES,
   /*
-   * THE INVENTORY, NOT THE MENU (changed 2026-09-08 with
-   * `SHIP_NAV_CONSOLIDATED`).
+   * THE MENU AGAIN, BECAUSE THE ROUTES ARE NOW SHADOWED (2026-09-08, second
+   * pass).
    *
-   * This mapped `publicShipNav` — the filtered view the chrome renders — which
-   * was right while the two lists agreed. They stopped agreeing when Ben pulled
-   * Bridge, Standing Orders, Ship's Log, Crew and Ben out of the top menu:
-   * `publicShipNav` went down to Trust Forward alone, and mapping it here would
-   * have dropped five LIVE, UNREDIRECTED pages out of the sitemap and
-   * /llms.txt in the same edit. Not retired, not canonical, still served —
-   * the one state a URL must never be in, and the state
-   * `tests/machine-surfaces.test.ts` exists to make impossible.
+   * For one commit this mapped the full `shipNav` INVENTORY rather than
+   * `publicShipNav`. That was the correct reading of the first instruction:
+   * Ben had emptied the menu but the five pages were still served, and mapping
+   * the menu would have dropped five live, unredirected URLs out of the sitemap
+   * — neither retired nor canonical, the one state a URL must never be in.
    *
-   * A menu is a discovery decision for humans. This roster is the site's URL
-   * inventory, and the two are allowed to differ: `RETIRED_SURFACES` is how a
-   * URL leaves the inventory, and it requires a redirect to actually shadow the
-   * page. Nothing redirects these five, so they stay.
-   *
-   * Watch Your Step is the exception, filtered for the opposite reason: it IS
-   * retired and IS shadowed, and the same test fails if a route is both retired
-   * and canonical.
+   * The second instruction closed that gap from the other end: *"hide the links
+   * themselves and update the site map so nothing is reachable that isn't
+   * linked in the main pages."* The five now have `permanent: false` redirects
+   * in `next.config.ts` and sit in `CONSOLIDATED_SURFACES`, so they are
+   * genuinely retired — shadowed AND unlisted — and mapping the menu is right
+   * again. Nothing about the invariant changed; the world caught up to it.
    */
-  ...shipNav
+  ...publicShipNav
     .filter((item) => item.href !== trustForwardNav.href)
-    .filter((item) => !(WYS_NAV_RETIRED && item.href === "/watch-your-step"))
     .map((item) => ({
       path: item.href,
       label: item.label,

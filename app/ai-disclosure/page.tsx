@@ -66,9 +66,22 @@ export default function AiDisclosurePage() {
         be incomplete, outdated, or wrong. Human review remains primary.
       </p>
       <LegalProse lines={crew} />
-      <p>
-        <Link href="/crew">Crew Manifest</Link> lists each one.
-      </p>
+      {/*
+        "Crew Manifest lists each one." was REMOVED 2026-09-08 with the link it
+        carried. `/crew` is retired behind a redirect to `/`
+        (content/canonical-surfaces.ts, CONSOLIDATED_SURFACES), so the sentence
+        had become a disclosure page pointing at a document a reader cannot
+        open — and on this page of all pages, since the whole point of it is to
+        be checkable.
+
+        The SENTENCE went with the LINK rather than the link alone: "Crew
+        Manifest lists each one" with no way to reach the manifest is a claim
+        about evidence that is not produced, which is a worse failure than the
+        dead link. What survives is `crew` (the LegalProse above), which
+        describes the AI crew in the copy itself rather than by reference.
+
+        Restore both when `SHIP_NAV_CONSOLIDATED` is flipped back.
+      */}
       <h2>What has been approved</h2>
       <LegalProse lines={boundaries} />
       <p>

@@ -193,8 +193,22 @@ export function disclosureApprovalLine(): DisclosureApprovalLine {
   if (!approvalState.stamp) {
     return {
       text: "Nothing here is published as Ben's position until he stamps it.",
-      href: "/ships-log",
-      linkLabel: "Ship's Log"
+      /*
+       * THE LINK WAS DROPPED 2026-09-08, NOT THE SENTENCE. It pointed at
+       * `/ships-log`, which the consolidation retired behind a redirect to `/`,
+       * so keeping it would have put a link to the homepage — labelled "Ship's
+       * Log" — on every page of the site. A label that names a destination it
+       * no longer reaches is worse than no link: it is a promise the chrome
+       * cannot keep.
+       *
+       * The sentence stands on its own and is the part that matters: it says
+       * nothing here is Ben's stamped position. The Ship's Log was the evidence
+       * for it, and when that page returns (flip `SHIP_NAV_CONSOLIDATED`) this
+       * is the fourth place to restore — `href: "/ships-log"`, label
+       * "Ship's Log". The type still carries both fields for exactly that.
+       */
+      href: null,
+      linkLabel: null
     };
   }
   return { text: "Every published word was approved by Ben.", href: null, linkLabel: null };

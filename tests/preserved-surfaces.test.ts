@@ -139,7 +139,12 @@ test("preserved redirects and launch redirects survive in next.config.ts", () =>
   const config = readRepoFile("next.config.ts");
   const redirects = [
     { source: "/lab", destination: "/neon" },
-    { source: "/about", destination: "/system" },
+    /*
+     * `/about` pointed at `/system` until 2026-09-08, when the consolidation
+     * retired `/system` behind its own redirect to `/`. Repointed rather than
+     * left as a chain — see next.config.ts.
+     */
+    { source: "/about", destination: "/" },
     { source: "/posts", destination: "https://benchanviolin.substack.com" },
     { source: "/upwork", destination: "https://www.upwork.com/freelancers/~01a10f284f33009412" },
     /*
@@ -154,17 +159,39 @@ test("preserved redirects and launch redirects survive in next.config.ts", () =>
      */
     { source: "/watch-your-step", destination: "/" },
     { source: "/watch-your-step/:path+", destination: "/" },
+    /*
+     * THE 2026-09-08 CONSOLIDATION. Six surfaces left the roster (Ben:
+     * "nothing is reachable that isn't linked in the main pages") and a route
+     * may only leave discovery with a redirect behind it — see
+     * `CONSOLIDATED_SURFACES` and `tests/machine-surfaces.test.ts`, which
+     * enforces the pairing from the other side. Listed here so the redirects
+     * cannot be dropped without the roster noticing, and vice versa.
+     */
+    { source: "/bridge", destination: "/" },
+    { source: "/standing-orders", destination: "/" },
+    { source: "/ships-log", destination: "/" },
+    { source: "/crew", destination: "/" },
+    { source: "/ben", destination: "/" },
+    { source: "/system", destination: "/" },
     /* The Trust Forward bridge. One line to change when Studio moves. */
     { source: "/tf", destination: "https://studio.com/benchanviolin/trust-forward" }
   ];
+  /*
+   * PAIRED, from 2026-09-08. This asserted the two strings SEPARATELY — that
+   * `source: "/about"` appeared somewhere and `destination: "/system"` appeared
+   * somewhere — which was adequate while every destination in the table was
+   * distinct. It stopped being adequate the moment eight redirects pointed at
+   * `/`: any one of them satisfied the destination half for all the others, so
+   * a redirect could have been repointed at the wrong place and this would have
+   * stayed green. The pair is what the register is actually claiming.
+   */
+  const declared = [...config.matchAll(/source:\s*"([^"]+)"[\s\S]*?destination:\s*"([^"]+)"/g)].map(
+    (match) => `${match[1]} -> ${match[2]}`
+  );
   for (const redirect of redirects) {
     assert.ok(
-      config.includes(`source: "${redirect.source}"`),
-      `redirect source ${redirect.source} was dropped from next.config.ts`
-    );
-    assert.ok(
-      config.includes(`destination: "${redirect.destination}"`),
-      `redirect destination ${redirect.destination} was dropped from next.config.ts`
+      declared.includes(`${redirect.source} -> ${redirect.destination}`),
+      `next.config.ts no longer redirects ${redirect.source} to ${redirect.destination}`
     );
   }
   assert.equal(occurrences(config, "source:"), redirects.length, "redirect count changed without test coverage");
@@ -508,7 +535,26 @@ test("the disclosure strip is mounted on every page and reads its sentence from 
   // component (§6.6, R8). tests/governance-strings.test.ts bans the literal
   // from app/ and components/; this asserts the positive form.
   assert.equal(/approved by ben/i.test(strip), false, "the strip hardcodes the approval sentence");
-  assert.ok(strip.includes('href="/crew"'), 'the strip\'s "Crew Manifest →" target was dropped');
+  /*
+   * THE "Crew Manifest →" LINK IS GONE, AND ITS ABSENCE IS NOW THE ASSERTION.
+   *
+   * This strip is mounted in the root layout, so that one anchor appeared on
+   * every page of the site. `/crew` was retired behind a redirect to `/` on
+   * 2026-09-08, which would have left a link labelled "Crew Manifest" landing
+   * every reader on the homepage — a label naming a destination it no longer
+   * reaches, which is worse than no link.
+   *
+   * Asserted as absence rather than simply deleted, because this file's job is
+   * to notice chrome changing: the anchor silently coming back while /crew
+   * still redirects is exactly the regression the original assertion existed to
+   * catch, pointed the other way. `stripComments` so the component's own note
+   * about the removal does not read as the link returning.
+   */
+  assert.equal(
+    stripComments(strip).includes('href="/crew"'),
+    false,
+    'the strip links "/crew" again, which redirects to / — restore it only with SHIP_NAV_CONSOLIDATED'
+  );
 });
 
 test("every root metadata value survives verbatim", () => {

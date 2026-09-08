@@ -68,9 +68,18 @@ export function DisclosureStrip() {
           </>
         ) : null}
       </p>
-      <Link className={styles.crew} href="/crew">
-        Crew Manifest →
-      </Link>
+      {/*
+        THE CREW MANIFEST LINK WAS REMOVED 2026-09-08. `/crew` is retired behind
+        a redirect to `/` (content/canonical-surfaces.ts, CONSOLIDATED_SURFACES),
+        and this strip is mounted in the root layout — so leaving it would have
+        put a link labelled "Crew Manifest" on EVERY page of the site, landing
+        every reader on the homepage. It is the widest-reaching of the links the
+        consolidation had to withdraw, which is why it went with them rather
+        than after them.
+
+        `styles.crew` stays in the stylesheet, unreferenced, so restoring this
+        is one element and not a rebuild. See `SHIP_NAV_CONSOLIDATED`.
+      */}
     </aside>
   );
 }

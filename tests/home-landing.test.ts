@@ -353,11 +353,36 @@ test("\"AI you can trust\" exists only as a struck anti-feature pill", () => {
   assert.ok(homePage.includes("StruckPill"), "the anti-feature pills are no longer struck through");
 });
 
+/*
+ * `/` DROPPED OUT OF THIS CHECK ON 2026-09-08, and the one-name rule did not.
+ *
+ * Q6's rule is that the Data page has ONE name wherever it is linked — `4a`
+ * desktop wrote "exactly what this site stores about you" and the phone wrote
+ * "See what this site knows about you", and two names for one node is what this
+ * guards. The home page no longer links the Data page at all: the page is
+ * retired behind the course's wildcard redirect, and a home-page link promising
+ * to show a visitor what the site knows about them, that lands them back on the
+ * home page, is a broken promise about privacy specifically.
+ *
+ * So `/` is checked for ABSENCE and the surviving linkers are checked for the
+ * name. The second name stays banned everywhere, which is the half of the rule
+ * that never depended on who links it.
+ *
+ * /privacy and /cookies still link the retired Data page and are NOT listed
+ * here, deliberately: there the sentence is load-bearing — it is where those
+ * documents tell a reader how to download or clear what this browser holds —
+ * and the fix is either to un-retire the page or to rewrite two legal
+ * paragraphs. Both are Ben's call. Asserting them green here would file the
+ * problem as solved.
+ */
 test("both breakpoints render one link label for the Data page (Q6)", () => {
-  // `4a` desktop writes "exactly what this site stores about you" and the phone
-  // writes "See what this site knows about you". One node, one name.
+  assert.equal(
+    homeMarkup.includes("landingDataLinkLabel"),
+    false,
+    "/ links the retired Data page again — restore it only when the page is reachable"
+  );
+  assert.ok(landingPage.includes("landingDataLinkLabel"), "/watch-your-step does not use the pinned Data link label");
   for (const [name, source] of [["/", homePage], ["/watch-your-step", landingPage]] as const) {
-    assert.ok(source.includes("landingDataLinkLabel"), `${name} does not use the pinned Data link label`);
     assert.ok(!source.includes("stores about you"), `${name} reintroduces the second Data page name`);
   }
   assert.equal(wysLabels.dataPageLinkLabel, "See what this site knows about you");

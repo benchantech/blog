@@ -7,8 +7,6 @@ import {
 import { ROUTES } from "@/content/trust-forward/stamp/v1-1-0";
 import {
   landingAntiFeatures,
-  landingDataHref,
-  landingDataLinkLabel,
   landingLabels
 } from "@/content/watch-your-step/landing";
 import { ActionPill } from "@/components/ui/ActionPill";
@@ -196,12 +194,28 @@ export default function Home() {
             */}
             <StruckPill labels={landingAntiFeatures} tone="onInk" />
           </div>
-          <p className={styles.willFind}>
-            {landingLabels.whatYouWillFind}{" "}
-            <Link className={styles.willFindLink} href={landingDataHref}>
-              {landingDataLinkLabel} →
-            </Link>
-          </p>
+          {/*
+            "What you will find: See what this site knows about you →" was
+            REMOVED 2026-09-08. It pointed at `landingDataHref` —
+            /watch-your-step/data — which the course's wildcard redirect has
+            been sending to `/` since the retirement. A link on the home page
+            promising to show a visitor what the site knows about them, that
+            lands them back on the home page, is a broken promise about privacy
+            specifically, which is the worst subject to be wrong about.
+
+            The label and the href stay exported from
+            `content/watch-your-step/landing.ts`; this is a link removed, not a
+            name deleted. `.willFind` and `.willFindLink` stay in
+            `home.module.css` for the same reason.
+
+            NOT THE WHOLE STORY: /privacy and /cookies still link the same
+            retired Data page, and there the sentence is load-bearing — it is
+            where those documents tell a reader how to download or clear what
+            this browser holds. That is a pre-existing defect and its fix is
+            either to un-retire the Data page or to rewrite two legal
+            paragraphs; both are Ben's call, so neither is made here. Reported
+            rather than silently patched.
+          */}
         </section>
       </div>
 
