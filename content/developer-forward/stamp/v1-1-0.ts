@@ -113,6 +113,29 @@ export const ROUTES = {
   publicAlternate: "/developer-forward-lite",
   redirect: "/df",
   fullTarget: "https://studio.com/benchanviolin/trust-forward",
+  /*
+   * THE COUPON LINK, supplied by Ben on 2026-09-09 — and the reason a sentence
+   * already on the page stopped being a promise the product could not keep.
+   *
+   * `/developer-forward`'s close reads "Access your coupon immediately upon
+   * completion via hyperlink". That shipped before any such hyperlink existed,
+   * and was flagged as a claim about behaviour the product did not have. This
+   * is the behaviour.
+   *
+   * IT CARRIES THE CODE IN THE QUERY (`?c=…`) AND THAT IS FINE HERE, BUT WORTH
+   * KNOWING. It is a marketing coupon meant to be published, not a credential —
+   * anyone who reaches the completion screen is meant to have it, and it is
+   * committed to a public repository. What it must NOT become is a per-learner
+   * value: this site has no accounts and no server state, so a code that
+   * differed per learner could only come from the URL or from storage, and
+   * `send_page_view: true` means a URL is telemetry. One shared code, defined
+   * once, is the shape that stays compatible with that.
+   *
+   * The path also still says `trust-forward` on `fullTarget` above while this
+   * one says `judgment-…`: both are Studio's URLs, and neither is ours to
+   * rename (docs/adr/0009).
+   */
+  couponTarget: "https://studio.com/benchanviolin/judgment-7745c7?c=NCSSS3pA",
   learnerStateInUrl: false
 } as const;
 

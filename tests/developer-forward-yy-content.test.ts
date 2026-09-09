@@ -21,6 +21,7 @@ import {
 } from "@/content/developer-forward/yy/evidence-tags";
 import {
   DECISION_LAYER_PROVENANCES,
+  REVEAL_PROVENANCES,
   RESONANCE_THRESHOLD,
   YY_PROVENANCES,
   type YYCase,
@@ -133,17 +134,50 @@ function wordCount(text: string): number {
 }
 
 /** Every decision-layer string, with a label naming where it came from. */
-function decisionLayerFields(): { where: string; text: string; provenance: YYProvenance }[] {
-  const out: { where: string; text: string; provenance: YYProvenance }[] = [];
+/*
+ * THE DECISION LAYER HAS TWO RULES AS OF 2026-09-09, so the walker reports
+ * which one each field is under. Options and conditions are the case's own
+ * material and stay Ben-only; Ben THEN and Ben NOW are his judgment in prose
+ * that may be AI-written from it. See `REVEAL_PROVENANCES`.
+ */
+type DecisionField = {
+  where: string;
+  text: string;
+  provenance: YYProvenance;
+  allowed: readonly YYProvenance[];
+};
+
+function decisionLayerFields(): DecisionField[] {
+  const out: DecisionField[] = [];
   for (const c of CASES) {
     for (const cp of c.checkpoints) {
       for (const choice of cp.choices) {
-        out.push({ where: `${cp.id} choice ${choice.label}`, text: choice.text, provenance: choice.provenance });
+        out.push({
+          where: `${cp.id} choice ${choice.label}`,
+          text: choice.text,
+          provenance: choice.provenance,
+          allowed: DECISION_LAYER_PROVENANCES
+        });
       }
-      out.push({ where: `${cp.id} BEN THEN`, text: cp.benThen.reasoning, provenance: cp.benThen.provenance });
-      out.push({ where: `${cp.id} BEN NOW`, text: cp.benNow.reasoning, provenance: cp.benNow.provenance });
+      out.push({
+        where: `${cp.id} BEN THEN`,
+        text: cp.benThen.reasoning,
+        provenance: cp.benThen.provenance,
+        allowed: REVEAL_PROVENANCES
+      });
+      out.push({
+        where: `${cp.id} BEN NOW`,
+        text: cp.benNow.reasoning,
+        provenance: cp.benNow.provenance,
+        allowed: REVEAL_PROVENANCES
+      });
       for (const cond of cp.conditions) {
-        out.push({ where: `${cp.id} condition ${cond.label}`, text: cond.condition, provenance: cond.provenance });
+        out.push({
+          where: `${cp.id} condition ${cond.label}`,
+          text: cond.condition,
+          provenance: cond.provenance,
+          allowed: DECISION_LAYER_PROVENANCES
+        });
       }
     }
   }
@@ -226,10 +260,27 @@ test("every learner-facing string matches the committed fixture", () => {
 test("no decision-layer field is marked composite", () => {
   const offenders: string[] = [];
   for (const field of decisionLayerFields()) {
-    if (!DECISION_LAYER_PROVENANCES.includes(field.provenance)) {
+    if (!field.allowed.includes(field.provenance)) {
       offenders.push(`${field.where}: ${field.provenance}`);
     }
   }
+
+  /*
+   * AND THE HALF THE SPLIT COULD LOSE. Widening the reveal's list is only safe
+   * while the OPTIONS keep the narrow one, so that is asserted directly rather
+   * than left to the loop above — a future edit that pointed choices at
+   * `REVEAL_PROVENANCES` would pass every check in that loop.
+   */
+  assert.deepEqual(
+    [...DECISION_LAYER_PROVENANCES],
+    ["ben_authored"],
+    "the option/condition rule widened; an AI-written option makes the exercise a test of AI, not of Ben's work"
+  );
+  assert.equal(
+    REVEAL_PROVENANCES.includes("ben_authored_composite"),
+    false,
+    "a composited Ben THEN or Ben NOW would make the product's central claim untrue (docs/adr/0002)"
+  );
   assert.deepEqual(
     offenders,
     [],

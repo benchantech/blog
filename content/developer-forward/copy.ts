@@ -1329,7 +1329,19 @@ export const DEVELOPER_FORWARD_TEASER = {
      * will send it" it replaced. Recorded here, in
      * `DEVELOPER_FORWARD_IMPLEMENTATION_AUTHORED_LABELS`, and reported to Ben.
      */
-    access: "Access your coupon immediately upon completion via hyperlink."
+    access: "Access your coupon immediately upon completion via hyperlink.",
+    /*
+     * THE COMPLETION SCREEN'S OWN WORDS, added 2026-09-09 with the link that
+     * made the promise above keepable. Short by construction: the learner has
+     * just finished five cases and is reading their own evidence, so this is a
+     * door beside that, not a second pitch.
+     *
+     * IMPLEMENTATION-AUTHORED. The offer is Ben's and the URL is Ben's; these
+     * two sentences are not, and they are registered as such.
+     */
+    earnedHeading: "You earned your coupon.",
+    earnedBody: "It applies to Developer Forward on Studio. The link is yours — no account, nothing to sign up for.",
+    earnedCta: "Open your coupon →"
   },
 
   /** The arrow is Ben's, typed in his brief. */

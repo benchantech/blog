@@ -214,6 +214,47 @@
    surface at the end of the run. `inline-flex` rather than more padding,
    because `min-height` on a button leaves the label at the top of the box
    without it. `tests/legal-claims.test.ts` now asserts this rule by name. */
+/* -------------------------------------------------------------------------- */
+/* The coupon, on the completion screen                                       */
+/* -------------------------------------------------------------------------- */
+/* Teal tint and an accent rule, the two devices this repo already uses for a
+   block that is an offer rather than evidence — it must not read as another
+   derived statement about the run, which is what everything above it is. */
+.coupon {
+  margin-top: 28px;
+  padding: 20px 22px;
+  border-left: 2px solid var(--accent-text-on-tint);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  background: var(--tint-teal);
+}
+
+.couponHeading {
+  margin: 0 0 6px;
+  color: var(--ink);
+  font: 600 17px / 1.35 var(--sans);
+}
+
+.couponBody {
+  margin: 0 0 14px;
+  color: var(--body);
+  font: 400 15px / 1.55 var(--sans);
+}
+
+/* 44px, like every other control on this site — the /accessibility statement
+   says so and tests/legal-claims.test.ts asserts the rules by name. */
+.couponLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 44px;
+  padding: 10px 20px;
+  border-radius: var(--radius-pill);
+  background: var(--ink);
+  color: var(--white);
+  font: 600 15px / 1.2 var(--sans);
+  text-decoration: none;
+}
+
 .replayAction {
   align-items: center;
   background: none;

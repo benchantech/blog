@@ -185,13 +185,13 @@ export const case1: YYCase = {
         choiceLabel: "C",
         reasoning:
           "Ben wanted enough internal context to understand what was actually being requested before committing to the external deadline.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "A",
         reasoning:
           "With AI, Ben would be more willing to accept the short window initially because the cost of rapidly investigating and closing important ambiguity is much lower.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
 
       conditions: [
@@ -272,13 +272,13 @@ export const case1: YYCase = {
         choiceLabel: "B",
         reasoning:
           "Ben trusted the long-running permission model enough to move forward, but treated the financially load-bearing columns as sufficiently consequential to exclude them until they could receive more scrutiny.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "C",
         reasoning:
           "With AI, the cost of investigating the authorization model is much lower, so Ben would close that uncertainty before committing to the export behavior.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
 
       conditions: [
@@ -347,13 +347,13 @@ export const case1: YYCase = {
         choiceLabel: "A",
         reasoning:
           "Ben considered the representative role testing sufficient to move the feature into production and verify it there.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "D",
         reasoning:
           "With AI, broader cross-client verification is much cheaper, so Ben would test the wider active-client surface before shipping.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
 
       conditions: [

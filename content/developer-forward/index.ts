@@ -188,5 +188,12 @@ export const DEVELOPER_FORWARD_IMPLEMENTATION_AUTHORED_LABELS: readonly string[]
    */
   "copy.ts: FULL_OFFER.bridge (Ben raised the approved \"30+\" floor to \"40+\")",
   "copy.ts: TRUST_STRIP (every claim verified against the code; wording unapproved)",
-  "components/developer-forward/LiteSandbox.tsx: REVEAL_ACTION_LABELS"
+  "components/developer-forward/LiteSandbox.tsx: REVEAL_ACTION_LABELS",
+  /*
+   * Added 2026-09-09 with the coupon link. The OFFER is Ben's and so is the
+   * URL; the three strings the completion screen says around it are this
+   * build's. They ship because a learner who has just finished five cases and
+   * is owed a coupon should be handed it rather than told to go and ask.
+   */
+  "copy.ts: DEVELOPER_FORWARD_TEASER.coupon.earnedHeading / earnedBody / earnedCta"
 ];

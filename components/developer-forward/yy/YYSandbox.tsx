@@ -41,6 +41,8 @@ import { ChoiceList } from "@/components/developer-forward/yy/ChoiceList";
 import { CommitBar } from "@/components/developer-forward/yy/CommitBar";
 import type { CommitBarCopy } from "@/components/developer-forward/yy/CommitBar";
 import { EvidenceSummary } from "@/components/developer-forward/yy/EvidenceSummary";
+import { DEVELOPER_FORWARD_TEASER } from "@/content/developer-forward/copy";
+import { ROUTES } from "@/content/developer-forward/stamp/v1-1-0";
 import { ReflectBox } from "@/components/developer-forward/yy/ReflectBox";
 import { RevealPanel } from "@/components/developer-forward/yy/RevealPanel";
 import { WhyNotStep } from "@/components/developer-forward/yy/WhyNotStep";
@@ -1084,6 +1086,31 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
    * below it is a list of CASES and not a list of results: nothing here reports
    * how a case went, and nothing is ordered by anything a learner did.
    */
+  /**
+   * The coupon, handed over on the screen that proves it was earned.
+   *
+   * `/developer-forward` says "Access your coupon immediately upon completion
+   * via hyperlink"; this is the hyperlink, and until 2026-09-09 it did not
+   * exist — the sentence shipped ahead of the mechanism and was reported as a
+   * claim the product could not keep. It is rendered UNCONDITIONALLY on the
+   * summary, not gated on a completion count, because the summary is only
+   * reachable by walking the five cases and a gate would be a second, weaker
+   * definition of "finished" beside the one `isRevealUnlocked` already owns.
+   *
+   * An anchor, not a button: it leaves the site, and it carries no learner
+   * state — the code is one shared marketing value in `ROUTES`, and this site
+   * has no account to attach a per-learner one to. See `ROUTES.couponTarget`.
+   */
+  const renderCoupon = () => (
+    <section className={styles.coupon}>
+      <p className={styles.couponHeading}>{DEVELOPER_FORWARD_TEASER.coupon.earnedHeading}</p>
+      <p className={styles.couponBody}>{DEVELOPER_FORWARD_TEASER.coupon.earnedBody}</p>
+      <a className={styles.couponLink} href={ROUTES.couponTarget}>
+        {DEVELOPER_FORWARD_TEASER.coupon.earnedCta}
+      </a>
+    </section>
+  );
+
   const renderSummary = () => (
     <div className={styles.summary}>
       <EvidenceSummary
@@ -1095,6 +1122,7 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
         records={records}
         cases={CASES}
       />
+      {renderCoupon()}
       <section className={styles.replay}>
         <p className={styles.replayLabel}>{SHELL_LABELS.replayHeading}</p>
         <ul className={styles.replayList}>

@@ -172,13 +172,13 @@ export const case3: YYCase = {
         choiceLabel: "C",
         reasoning:
           "I chose C because I could grab and group the production data for catalog to see patterns without having to review the full CMS or database up front.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "D",
         reasoning:
           "I would choose D with AI because it's very good at generating plausible causes while helping eliminate large groups of noise",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       conditions: []
     },
@@ -231,13 +231,13 @@ export const case3: YYCase = {
         choiceLabel: "B",
         reasoning:
           "I chose B so that we could observe which systems produced which categories of new keys before making any architectural decisions while preserving the ingested data.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "D",
         reasoning:
           "With AI I would choose D because it's something we missed in the original design that could be retrofitted and future proofed at a much lower cost and in reduced timeframe.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       conditions: []
     },
@@ -290,13 +290,13 @@ export const case3: YYCase = {
         // The source supplies the choice and no reasoning. Left empty on
         // purpose; see the header note on §29.
         reasoning: "",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "D",
         reasoning:
           "D remains the governing authority decision.\n\nWith AI, Ben would also attempt A, B, and C in isolated branches as experiments while consensus continued.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       conditions: []
     },
@@ -350,13 +350,13 @@ export const case3: YYCase = {
         choiceLabel: "B",
         reasoning:
           "I chose to prioritize by business value as those were items that were most visible in the ecosystem that were currently shallow and could benefit the most views.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "A",
         reasoning:
           "With AI I would have chosen A because it would cover the most variation up front",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       conditions: []
     }

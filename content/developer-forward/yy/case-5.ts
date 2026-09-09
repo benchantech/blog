@@ -168,13 +168,13 @@ export const case5: YYCase = {
         reasoning:
           "Ben knowingly accepted deployment risk because he could not otherwise keep pace with the client's expansion.\n\n" +
           "The choice was not technically safe.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "C",
         reasoning:
           "With AI, Ben would establish the roadmap and authority boundary first, then use AI-assisted implementation speed.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
 
       conditions: []
@@ -236,14 +236,14 @@ export const case5: YYCase = {
         choiceLabel: "B",
         reasoning:
           "Ben continued optimizing for revenue velocity without adding substantial immediate cost.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "D",
         reasoning:
           "Once the helper is becoming authoritative, the question is no longer purely implementation.\n\n" +
           "Leadership needs to establish what the system is becoming.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
 
       conditions: []
@@ -304,7 +304,7 @@ export const case5: YYCase = {
         choiceLabel: "B",
         reasoning:
           "Ben tried to distribute responsibility because the hybrid system had exceeded what he could personally keep supporting.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         // §29: this must not become universal doctrine. The last two lines are
@@ -314,7 +314,7 @@ export const case5: YYCase = {
           "With AI, Ben would freeze feature expansion and build a parallel replacement because he possessed unusually deep context and could see the target architecture.\n\n" +
           "This is case-specific judgment.\n\n" +
           "It is not doctrine that rewrites are generally preferable.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
 
       conditions: []

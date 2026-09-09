@@ -61,7 +61,7 @@ function choice(checkpointOrdinal: number, label: YYChoice["label"], text: strin
 }
 
 function judgment(choiceLabel: BenJudgment["choiceLabel"], reasoning: string): BenJudgment {
-  return { choiceLabel, reasoning, provenance: "ben_authored" };
+  return { choiceLabel, reasoning, provenance: "ai_synthesis_from_ben_reasoning" };
 }
 
 function condition(label: AlternativeCondition["label"], text: string): AlternativeCondition {

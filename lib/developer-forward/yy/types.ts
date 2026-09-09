@@ -56,8 +56,42 @@ export const YY_PROVENANCES: readonly YYProvenance[] = [
   "deterministic_derivation"
 ];
 
-/** The provenances the DECISION layer may carry. Never composite, never AI. */
+/**
+ * The provenances the DECISION layer may carry — now SPLIT BY FIELD, because
+ * one of the two halves changed on 2026-09-09 and the other must not.
+ *
+ * This was a single list, `["ben_authored"]`, applied to every decision-layer
+ * field alike: the four option texts, Ben THEN, Ben NOW, and the conditions.
+ * Ben then confirmed what the reveal's third-person voice had been hinting at —
+ * "those are AI produced" — meaning the PROSE explaining each judgment was
+ * written by AI from his reasoning, which is exactly what
+ * `ai_synthesis_from_ben_reasoning` exists to say and what nothing in this
+ * build had ever used.
+ *
+ * WIDENING THE ONE LIST WOULD HAVE WIDENED IT FOR THE OPTIONS TOO, and the
+ * options are the thing the guard was written to protect: an option a learner
+ * chooses between is the case's own material, and an AI-written option would
+ * make the exercise a test of AI's imagination rather than of Ben's work. Two
+ * constants, so the reveal can move without taking the choices with it.
+ *
+ * NEITHER LIST ADMITS `ben_authored_composite`. That remains the original rule:
+ * Ben authorized compositing of NARRATIVE only (docs/adr/0002), and a
+ * composited judgment would make the product's central claim untrue.
+ */
+
+/** Option text and conditions: the case's own material. Ben, and only Ben. */
 export const DECISION_LAYER_PROVENANCES: readonly YYProvenance[] = ["ben_authored"];
+
+/**
+ * Ben THEN and Ben NOW: his judgment, in prose that may be AI-written from it.
+ *
+ * `ben_authored` stays permitted so a hand-written reveal needs no ruling to
+ * ship. What the pairing forbids is a composite, in either field.
+ */
+export const REVEAL_PROVENANCES: readonly YYProvenance[] = [
+  "ben_authored",
+  "ai_synthesis_from_ben_reasoning"
+];
 
 /* -------------------------------------------------------------------------- */
 /* 2. The method declaration (§6)                                             */

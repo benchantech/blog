@@ -219,3 +219,42 @@ test("a new step scrolls to the top once, never on re-render and never on resume
     "screenKey must not depend on activeRunId — it resolves late and would fire a second scroll"
   );
 });
+
+
+/**
+ * The coupon is handed over on the completion screen, from one definition.
+ *
+ * `/developer-forward` publishes "Access your coupon immediately upon
+ * completion via hyperlink". That sentence shipped on 2026-09-08 with no such
+ * hyperlink anywhere in the product and was reported as a claim the product
+ * could not keep; Ben supplied the URL on 2026-09-09. This asserts the three
+ * things that keep the sentence true.
+ *
+ * THE URL HAS EXACTLY ONE DEFINITION. A coupon code copied into a component is
+ * a second place it can go stale, and the failure mode is silent: a learner
+ * follows a dead link at the one moment they were promised something.
+ */
+test("the completion screen hands over the coupon, and the URL is defined once", () => {
+  const sandbox = readFileSync(path.join(yyDir, "YYSandbox.tsx"), "utf8");
+  const code = sandbox.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+
+  assert.ok(/ROUTES\.couponTarget/.test(code), "the completion screen does not link the coupon");
+  assert.equal(
+    /judgment-|[?]c=/.test(code),
+    false,
+    "the coupon URL or its code is typed into the component; ROUTES owns the one definition"
+  );
+
+  // Rendered on the SUMMARY, which is only reachable by finishing the run.
+  const summary = code.slice(code.indexOf("const renderSummary"));
+  assert.ok(
+    summary.includes("renderCoupon()"),
+    "the coupon is not on the summary — the promise is 'upon completion'"
+  );
+
+  // And the control meets the touch target /accessibility publishes.
+  const css = readFileSync(path.join(yyDir, "yy.module.css"), "utf8");
+  const rule = css.slice(css.indexOf(".couponLink {"), css.indexOf("}", css.indexOf(".couponLink {")));
+  assert.ok(rule.length > 0, "the .couponLink rule no longer exists");
+  assert.match(rule, /min-height: 44px/, ".couponLink is under the 44px /accessibility claims");
+});

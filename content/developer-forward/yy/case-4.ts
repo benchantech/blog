@@ -141,13 +141,13 @@ export const case4: YYCase = {
         choiceLabel: "A",
         reasoning:
           "Ben transferred execution because the work was expanding and the individual implementation requirements appeared delegable.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "D",
         reasoning:
           "With AI, Ben would ask how much repeated implementation should require developers at all.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       conditions: []
     },
@@ -197,13 +197,13 @@ export const case4: YYCase = {
         choiceLabel: "B",
         reasoning:
           "Ben wanted the developer to inherit more of the architecture and system patterns through joint work.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "A",
         reasoning:
           "With AI, Ben could temporarily reclaim the implementation, harden and clarify it, capture the context, and hand it back.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       conditions: []
     },
@@ -252,13 +252,13 @@ export const case4: YYCase = {
         choiceLabel: "C",
         reasoning:
           "Ben knowingly accepted code sprawl because his attention was required elsewhere and the templates still delivered business value.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       benNow: {
         choiceLabel: "D",
         reasoning:
           "With AI, Ben would make a larger temporary architectural investment because extracting patterns and transferring context is much cheaper.",
-        provenance: "ben_authored"
+        provenance: "ai_synthesis_from_ben_reasoning"
       },
       conditions: []
     }
