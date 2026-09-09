@@ -1,501 +1,849 @@
 /*
- * `/trust-forward` — the canonical public node (layer 07 routes ruling).
+ * `/trust-forward` — Ben's 2026-09-08 redesign brief, adapted.
  *
- * SCOPED, per the §4.1 CSS Modules boundary. `.hero`, `.title`, `.lede`,
- * `.body` and `.block` are all names the legacy global layer already owns or
- * could plausibly own, and `body` in particular is an ELEMENT selector in
- * `app/globals.css` — a global rule by any of these names here would restyle
- * the eleven preserved routes with no compile error and no test failure. Every
- * class below is reached only through `styles.<key>`, which
- * `tests/class-contract.test.ts` mode 2 checks against this file.
+ * NOTHING GLOBAL IS TOUCHED, WHICH WAS THE INSTRUCTION. The brief's palette and
+ * its three typefaces are custom properties declared on `.page` and nowhere
+ * else, so they cascade into this route and stop at its edge. `app/globals.css`
+ * keeps every token it had; no preserved route, no legal page and no course
+ * screen moves because of anything in this file. That is also why the names are
+ * prefixed `--tf-`: a bare `--ink` here would read as a redefinition of the
+ * site token to the next person to open the file, even though a module cannot
+ * leak one.
  *
- * WHAT IS NOT RESTATED HERE. `Pill` carries the time and status badges,
- * `CardShell fill="teal"` the completion promise, `CardShell fill="grey"` the
- * offer, `ActionPill variant="ink" full` the dominant CTA and `LinkRow` the
- * reopen row. Their geometry — radius, padding, 44px touch target, the pill
- * radius — belongs to `components/ui/primitives.module.css` and duplicating any
- * of it here would create a second place the same measurement can drift. What
- * this file owns is the reading column, the heading stack, the block rhythm,
- * and the four kinds of paragraph this page has that no primitive covers.
+ * SCOPED, per the §4.1 CSS Modules boundary. `.hero`, `.title`, `.badge`,
+ * `.stat` and `.chip` are all names the legacy global layer already owns or
+ * could plausibly own; every class below is reached only through `styles.<key>`,
+ * which `tests/class-contract.test.ts` mode 2 checks against this file.
  *
  * MOBILE-FIRST, AND THE BASE RULES ARE THE PHONE. Built against 320, 375, 390
- * and 430. The measure is `min(calc(100% - 2 * var(--gutter)), 640px)`, and
- * `--gutter` is already 22px at <=700px in `app/globals.css`, so the narrowest
- * target lands at 276px of content rather than at an overflow. There is one
- * `min-width` block and it only widens the column and lifts the type ramp: no
- * second column, no reordered blocks, no new IA. Nothing here uses a fixed
- * width, so the layout cannot overflow a 320px viewport.
+ * and 430. Every multi-column arrangement in the brief is written here as a
+ * single column first and opened in ONE `min-width: 701px` block — the
+ * breakpoint `app/globals.css` already steps `--gutter` at, so this file adds
+ * no third rhythm to the site. Nothing uses a fixed width, `min-width: 0` is
+ * set where a grid child could otherwise refuse to shrink, and the type ramps
+ * with `clamp()` from a phone-first floor rather than down from a desktop one.
  *
- * THERE IS NO ARTBOARD FOR THIS PAGE. `/trust-forward` is not one of the
- * sixteen approved screens; the type ramp is taken from the two nearest
- * approved surfaces rather than invented — the 38px/1.05 centred hero headline
- * from the Watch Your Step landing (`4a`) and the 15px/1.5 body register from
- * the ship pages (`5d`). Recorded as an extrapolation in the same register the
- * other unapproved desktop renderings are.
+ * TWO COLOURS IN THE BRIEF DID NOT MEET AA AND WERE MOVED, both by the smallest
+ * amount that clears it:
  *
- * LIGHT-ONLY, deliberately, like the rest of this stylesheet's world (§4.2).
- * No `prefers-color-scheme` block and no inverted palette: the ink slabs are a
- * compositional device on white, not a theme.
+ *   #b8471b on the #eae5da band measured 4.23:1 — the section eyebrows are
+ *   11.5px, so 4.5 is the bar. `--tf-rust` ships at #ad4318, which measures
+ *   5.18 on paper, 4.65 on the band and 5.51 on the card. One token rather than
+ *   two, because an eyebrow that changes colour with its ground is a second
+ *   thing to keep in step for no gain.
+ *
+ *   The sequence rail's step numbers were cream at 45% on ink — 4.13:1 at 11px.
+ *   They are gone entirely rather than lightened: an `<ol>` supplies the
+ *   numbering, so the brief's hand-typed 01–05 were a second copy of what the
+ *   list already says. `::before` draws them from the counter at 55% (5.50:1).
+ *
+ * Everything else is measured and passing: `--tf-body` 8.95 on paper, 9.52 on
+ * the card, 8.04 on the band; `--tf-muted` 4.74 on the card; `--tf-tan` 8.68 on
+ * ink; the cream alphas 10.40 / 8.20 / 6.32 / 5.50.
+ *
+ * LIGHT-ONLY, deliberately, like the rest of this repo's world (§4.2). The ink
+ * slabs are a compositional device on paper, not a theme.
  */
 
-/* -------------------------------------------------------------------------- */
-/* The reading column                                                         */
-/* -------------------------------------------------------------------------- */
-.landing {
-  width: min(calc(100% - 2 * var(--gutter)), 640px);
-  margin-inline: auto;
-  padding-block: 40px 32px;
+.page {
+  /* Ground and ink */
+  --tf-paper: #f4f1ea;
+  --tf-card: #faf8f3;
+  --tf-band: #eae5da;
+  --tf-ink: #14181f;
+  --tf-body: #3d424b;
+  --tf-muted: #6b6f78;
+  /* Accents. `--tf-rust` is the AA-corrected #b8471b; see the header. */
+  --tf-rust: #ad4318;
+  --tf-tan: #e8a77a;
+  /* Cream on ink, at the four alphas the brief uses. */
+  --tf-cream: #f4f1ea;
+  --tf-cream-80: rgba(244, 241, 234, 0.8);
+  --tf-cream-70: rgba(244, 241, 234, 0.7);
+  --tf-cream-60: rgba(244, 241, 234, 0.6);
+  --tf-cream-55: rgba(244, 241, 234, 0.55);
+  --tf-hair: rgba(244, 241, 234, 0.18);
+  --tf-hair-ink: rgba(20, 24, 31, 0.16);
+  /* Type */
+  --tf-serif-stack: var(--tf-serif), Georgia, "Times New Roman", serif;
+  --tf-sans-stack: var(--tf-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
+  --tf-mono-stack: var(--tf-mono), SFMono-Regular, Menlo, Consolas, monospace;
+  /* The measure and the phone gutter. */
+  --tf-max: 1140px;
+  --tf-pad: clamp(20px, 5vw, 64px);
+  --tf-block: clamp(56px, 8vw, 112px);
+
+  background: var(--tf-paper);
+  color: var(--tf-ink);
+  font-family: var(--tf-sans-stack);
+  text-wrap: pretty;
 }
 
 /* -------------------------------------------------------------------------- */
-/* The heading stack                                                          */
+/* Shared: measures, eyebrows, headings, actions                              */
 /* -------------------------------------------------------------------------- */
+
+.inner,
+.heroInner,
+.stats,
+.innerSplit,
+.closeInner {
+  width: 100%;
+  max-width: var(--tf-max);
+  margin-inline: auto;
+}
+
+.closeInner {
+  max-width: 900px;
+  text-align: center;
+}
+
+/* The uppercase mono label above each section heading. Letter-spaced because it
+   is set in caps, which is the one case where tracking is legibility and not
+   decoration. */
+.eyebrow,
+.eyebrowOnInk {
+  margin: 0 0 18px;
+  font-family: var(--tf-mono-stack);
+  font-size: 11.5px;
+  letter-spacing: 0.16em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.eyebrow {
+  color: var(--tf-rust);
+}
+
+.eyebrowOnInk {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  color: var(--tf-tan);
+}
+
+.dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--tf-tan);
+  flex: none;
+}
+
+.sectionHeading {
+  margin: 0 0 32px;
+  max-width: 20ch;
+  color: var(--tf-ink);
+  font-family: var(--tf-serif-stack);
+  font-weight: 400;
+  font-size: clamp(30px, 7vw, 54px);
+  line-height: 1.06;
+  letter-spacing: -0.02em;
+  text-wrap: balance;
+}
+
+/* Both actions are 44px+ by construction: 16px of padding on a 16px/1 label is
+   48px, which is the touch target /accessibility publishes for every control on
+   this site. Full-width on the phone so a primary action is never a target a
+   thumb has to aim for; `auto` once there is room for two side by side. */
+.ctaFilled,
+.ctaOutlined {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  min-height: 48px;
+  padding: 16px 26px;
+  border-radius: 2px;
+  font-family: var(--tf-sans-stack);
+  font-weight: 600;
+  font-size: 16px;
+  line-height: 1.2;
+  text-align: center;
+  text-decoration: none;
+}
+
+.ctaFilled {
+  background: var(--tf-ink);
+  border: 1px solid var(--tf-ink);
+  color: var(--tf-cream);
+}
+
+.ctaOutlined {
+  background: transparent;
+  border: 1px solid rgba(20, 24, 31, 0.4);
+  color: var(--tf-ink);
+}
+
+/* On an ink ground the pair inverts: the filled one becomes the paper. */
+.hero .ctaFilled,
+.cardInk .ctaFilled,
+.close .ctaFilled {
+  background: var(--tf-cream);
+  border-color: var(--tf-cream);
+  color: var(--tf-ink);
+}
+
+.hero .ctaOutlined,
+.cardInk .ctaOutlined,
+.close .ctaOutlined {
+  border-color: rgba(244, 241, 234, 0.4);
+  color: var(--tf-cream);
+}
+
+.ctaRow,
+.ctaRowCentred {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin: 0 0 20px;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 1 — Hero                                                                   */
+/* -------------------------------------------------------------------------- */
+
+/* The vertical rule field the brief draws over the hero. Decorative and
+   `pointer-events: none`; it carries no meaning and no contrast requirement,
+   and it is a background rather than an element so nothing can focus it. */
 .hero {
-  margin-bottom: 24px;
+  position: relative;
+  overflow: hidden;
+  background: var(--tf-ink);
+  background-image: repeating-linear-gradient(
+    90deg,
+    rgba(244, 241, 234, 0.04) 0 1px,
+    transparent 1px 88px
+  );
+  color: var(--tf-cream);
+  padding: clamp(56px, 9vw, 128px) var(--tf-pad) clamp(48px, 7vw, 96px);
+}
+
+.heroInner {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(36px, 6vw, 80px);
+  align-items: center;
+}
+
+.heroLead {
+  min-width: 0;
 }
 
 .title {
-  margin: 0 0 14px;
-  font: 600 38px / 1.05 var(--sans);
-  letter-spacing: -0.03em;
-  color: var(--ink);
-  text-wrap: balance;
+  margin: 0 0 22px;
+  font-family: var(--tf-serif-stack);
+  font-weight: 400;
+  font-size: clamp(46px, 13vw, 92px);
+  line-height: 0.98;
+  letter-spacing: -0.025em;
 }
 
-/* The one sentence that has to land: the em-dash clause is set as one phrase,
-   so `text-wrap: pretty` rather than a hard max-width. */
-.lede {
-  margin: 0 0 16px;
-  color: var(--body);
-  font: 400 18px / 1.45 var(--sans);
-  text-wrap: pretty;
-}
-
-.body {
-  margin: 0 0 14px;
-  color: var(--body);
-  font: 400 15px / 1.55 var(--sans);
-}
-
-/* The approved Lite descriptor. Three clipped sentences; set in --muted so it
-   reads as specification under the lede rather than as a second lede. */
-.descriptor {
-  margin: 0 0 18px;
-  color: var(--muted);
-  font: 500 14px / 1.5 var(--sans);
-}
-
-.timeRow,
-.statusRow {
-  margin: 0;
-}
-
-/* -------------------------------------------------------------------------- */
-/* Block rhythm                                                               */
-/* -------------------------------------------------------------------------- */
-.block {
-  margin-bottom: 20px;
-}
-
-/* -------------------------------------------------------------------------- */
-/* The completion promise (inside CardShell fill="teal")                      */
-/* -------------------------------------------------------------------------- */
-.revealLead {
-  margin: 0 0 10px;
-  color: var(--ink);
-  font: 500 15px / 1.4 var(--sans);
-}
-
-/* A real list, marked as one. The items are sentence fragments in the source
-   ("your local export", "and a completion offer…"), so the marker is what makes
-   them parse as three promises instead of one broken sentence. */
-.revealList {
-  margin: 0;
-  padding-left: 20px;
-  color: var(--body);
-  font: 400 15px / 1.6 var(--sans);
-}
-
-.revealList li {
-  margin-bottom: 4px;
-}
-
-.revealList li:last-child {
-  margin-bottom: 0;
-}
-
-/* -------------------------------------------------------------------------- */
-/* The teaser: three sections, one argument                                   */
-/* -------------------------------------------------------------------------- */
-/* Added 2026-09-08 with the teaser rewrite. Lite, then Full, then the method
-   that governs both. The sections are separated by space alone — no rules, no
-   cards, no tint. Three boxed blocks in a 640px column would read as three
-   offers, and the page makes ONE offer; the sections are stages of a single
-   argument, so what divides them is a paragraph gap and a heading. */
-.section {
-  margin-bottom: 26px;
-}
-
-/* 22px against the 38px page title and the 15px body: a clear second rank that
-   still reads as a sentence, because every one of these headings IS a sentence
-   ("Trust Forward Lite is the deterministic introduction."). Sentence case and
-   a full stop, not a label — the headings carry the argument's three claims and
-   a reader who skims only them has read it. */
-.sectionHeading {
-  margin: 0 0 10px;
-  color: var(--ink);
-  font: 600 22px / 1.25 var(--sans);
-  letter-spacing: -0.015em;
-  text-wrap: balance;
-}
-
-.sectionBody {
-  margin: 0 0 12px;
-  color: var(--body);
-  font: 400 15px / 1.6 var(--sans);
-  text-wrap: pretty;
-}
-
-.sectionBody:last-child {
-  margin-bottom: 0;
-}
-
-/* The product's own prompt, quoted. Set at the heading's weight and larger than
-   body, with the accent rule the evidence line uses, because it is the one
-   sentence on this page that a reader will meet again inside the product —
-   seventeen times. Left rule rather than quotation marks: the marks are part of
-   the sentence's punctuation in some renderings and not others, and a border
-   cannot be copied into a paste. */
 .prompt {
-  margin: 0 0 14px;
-  padding-left: 14px;
-  border-left: 2px solid var(--accent);
-  color: var(--ink);
-  font: 500 18px / 1.4 var(--sans);
+  margin: 0 0 20px;
+  color: var(--tf-cream);
+  font-family: var(--tf-serif-stack);
+  font-style: italic;
+  font-size: clamp(22px, 5.5vw, 32px);
+  line-height: 1.25;
 }
 
-.boundedLead {
-  margin: 0 0 8px;
-  color: var(--ink);
-  font: 500 15px / 1.4 var(--sans);
+.heroBody {
+  margin: 0 0 32px;
+  max-width: 540px;
+  color: var(--tf-cream-80);
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.5;
 }
 
-/* Marked, for the same reason `.revealList` is: the three items are sentence
-   fragments joined by commas and a final "and", so without markers they parse
-   as one broken sentence rather than three refusals. */
-.boundedList {
+/* The coupon, said once in the hero so the free door has a reason attached to
+   it before the reader scrolls. The full offer is on the Lite card. */
+.couponHeroLine {
   margin: 0;
-  padding-left: 20px;
-  color: var(--body);
-  font: 400 15px / 1.6 var(--sans);
+  color: var(--tf-tan);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-.boundedList li {
-  margin-bottom: 4px;
+.sequence {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: clamp(22px, 3vw, 34px);
+  border: 1px solid rgba(244, 241, 234, 0.22);
 }
 
-.boundedList li:last-child {
-  margin-bottom: 0;
+/* NUMBERED BY THE LIST, NOT BY HAND. The brief typed 01–05 beside the labels;
+   an `<ol>` already says the same thing, and the typed copy shipped at 4.13:1.
+   `counter` at 55% measures 5.50:1 and cannot fall out of step with the order. */
+.sequenceList {
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  counter-reset: tf-stage;
+  display: grid;
+  gap: 2px;
 }
 
-/* THE PASSES ARE NUMBERED IN THE COPY, SO THE MARKER IS SUPPRESSED. Ben's own
-   labels read "Pass 1 — Draw From the Well"; an `ol` marker beside them would
-   print the number twice. The element stays an `ol` because the ORDER is the
-   claim (see the page file) — this is a presentational suppression of a marker,
-   never a downgrade of the semantics. */
-.passList {
-  margin: 0 0 12px;
+.sequenceItem {
+  display: flex;
+  align-items: baseline;
+  gap: 14px;
+  padding: 11px 0;
+  border-bottom: 1px solid rgba(244, 241, 234, 0.14);
+  counter-increment: tf-stage;
+}
+
+.sequenceItem:last-child {
+  border-bottom: 0;
+}
+
+.sequenceItem::before {
+  content: "0" counter(tf-stage);
+  flex: none;
+  color: var(--tf-cream-55);
+  font-family: var(--tf-mono-stack);
+  font-size: 11px;
+}
+
+.sequenceName {
+  font-size: 17px;
+  line-height: 1.3;
+}
+
+/* Commit and Timestamp are the two the method turns on. */
+.sequenceItem:nth-child(4) .sequenceName,
+.sequenceItem:nth-child(5) .sequenceName {
+  font-weight: 600;
+}
+
+.sequenceNote {
+  margin: 0;
+  color: var(--tf-cream-60);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* A description list: each number is the term its label defines. Two columns on
+   the phone before four, so a 320px viewport never sets a 13px label to two
+   words per line. */
+.stats {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 22px;
+  margin-top: clamp(40px, 6vw, 80px);
+  padding-top: 26px;
+  border-top: 1px solid var(--tf-hair);
+}
+
+.stat {
+  min-width: 0;
+}
+
+.statValue {
+  font-family: var(--tf-serif-stack);
+  font-size: 38px;
+  line-height: 1;
+}
+
+.statLabel {
+  margin: 4px 0 0;
+  color: var(--tf-cream-60);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 2 and 4 — the paper bands                                                  */
+/* -------------------------------------------------------------------------- */
+
+.band {
+  padding: var(--tf-block) var(--tf-pad);
+}
+
+.doors {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 20px;
+}
+
+.cardLight,
+.cardInk {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: clamp(24px, 3vw, 40px);
+}
+
+.cardLight {
+  border: 1px solid var(--tf-hair-ink);
+  background: var(--tf-card);
+}
+
+.cardInk {
+  border: 1px solid var(--tf-ink);
+  background: var(--tf-ink);
+  color: var(--tf-cream);
+}
+
+.cardMeta,
+.cardMetaOnInk {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+  margin: 0;
+  font-family: var(--tf-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.cardMeta {
+  color: var(--tf-muted);
+}
+
+.cardMetaOnInk {
+  color: var(--tf-tan);
+}
+
+.badge {
+  padding: 4px 10px;
+  border: 1px solid rgba(20, 24, 31, 0.22);
+}
+
+.badgeOnInk {
+  padding: 4px 10px;
+  border: 1px solid rgba(232, 167, 122, 0.5);
+}
+
+.cardHeading,
+.cardHeadingOnInk {
+  margin: 0;
+  font-family: var(--tf-serif-stack);
+  font-weight: 400;
+  font-size: clamp(26px, 6vw, 36px);
+  line-height: 1.12;
+  letter-spacing: -0.015em;
+}
+
+.cardHeadingOnInk {
+  color: var(--tf-cream);
+}
+
+.cardBody,
+.cardBodyOnInk {
+  margin: 0;
+  font-size: 16.5px;
+  line-height: 1.55;
+}
+
+.cardBody {
+  color: var(--tf-body);
+}
+
+.cardBodyOnInk {
+  color: rgba(244, 241, 234, 0.78);
+}
+
+.chips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
   padding: 0;
   list-style: none;
 }
 
-.passItem {
-  padding-left: 14px;
-  border-left: 2px solid var(--border-row);
-  margin-bottom: 14px;
+.chip {
+  padding: 7px 12px;
+  background: var(--tf-ink);
+  color: var(--tf-cream);
+  font-family: var(--tf-mono-stack);
+  font-size: 11.5px;
+  line-height: 1.4;
 }
 
-.passItem:last-child {
-  margin-bottom: 0;
+.boundedLead {
+  margin: 0 0 12px;
+  color: var(--tf-ink);
+  font-size: 14px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.bounded {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.boundedItem {
+  display: flex;
+  gap: 12px;
+  color: var(--tf-body);
+  font-size: 15.5px;
+  line-height: 1.45;
+}
+
+.dash {
+  flex: none;
+  color: var(--tf-rust);
+  font-weight: 600;
+}
+
+/* The coupon block. Marked with the rust rule the method box uses, because both
+   are the page saying "this is the part that costs you something to promise". */
+.coupon {
+  padding: 16px 18px;
+  border-left: 2px solid var(--tf-rust);
+  background: var(--tf-paper);
+}
+
+.couponBadge {
+  margin: 0 0 8px;
+  color: var(--tf-rust);
+  font-family: var(--tf-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.14em;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.couponLead {
+  margin: 0 0 8px;
+  color: var(--tf-ink);
+  font-size: 16px;
+  font-weight: 600;
+  line-height: 1.45;
+}
+
+.couponBody {
+  margin: 0;
+  color: var(--tf-body);
+  font-size: 15px;
+  line-height: 1.55;
+}
+
+.passes {
+  display: grid;
+  gap: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.pass {
+  padding: 18px 0;
+  border-top: 1px solid var(--tf-hair);
+}
+
+.pass:last-child {
+  border-bottom: 1px solid var(--tf-hair);
+}
+
+.passHead {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 0 0 6px;
+}
+
+.passStep {
+  color: var(--tf-tan);
+  font-family: var(--tf-mono-stack);
+  font-size: 11px;
+  letter-spacing: 0.08em;
 }
 
 .passLabel {
-  margin: 0 0 4px;
-  color: var(--ink);
-  font: 600 15px / 1.35 var(--sans);
+  font-size: 18px;
+  font-weight: 600;
+  line-height: 1.3;
 }
 
 .passBody {
   margin: 0;
-  color: var(--body);
-  font: 400 15px / 1.6 var(--sans);
-  text-wrap: pretty;
+  color: var(--tf-cream-70);
+  font-size: 15.5px;
+  line-height: 1.5;
 }
 
-/* The four extras. Muted and smaller: they are a list of what SOME cases add,
-   and setting them at body weight would read as a promise about every case. */
 .alsoLine {
-  margin: 0;
-  color: var(--muted);
-  font: 400 14px / 1.6 var(--sans);
-  text-wrap: pretty;
+  margin: 0 0 auto;
+  color: var(--tf-cream-60);
+  font-size: 15px;
+  line-height: 1.5;
 }
 
-/* CAPTURE -> WHY -> WHY-NOT -> COMMIT -> TIMESTAMP. The five stages are a
-   grammar, not prose, so they are set apart from the paragraph that explains
-   them: ink, tracked out slightly, and allowed to wrap on a phone rather than
-   scroll. `text-wrap: balance` keeps a two-line wrap from orphaning one stage. */
+/* -------------------------------------------------------------------------- */
+/* 3 — The method                                                             */
+/* -------------------------------------------------------------------------- */
+
+.method {
+  padding: var(--tf-block) var(--tf-pad);
+  background: var(--tf-band);
+  border-top: 1px solid rgba(20, 24, 31, 0.12);
+  border-bottom: 1px solid rgba(20, 24, 31, 0.12);
+}
+
+.innerSplit {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: clamp(32px, 5vw, 72px);
+  align-items: start;
+}
+
+/* The grammar wraps on a phone rather than scrolling: five marked stages and
+   four arrows do not fit 320px in one line, and a horizontally scrolling
+   sentence is a sentence a reader can miss the end of. */
 .grammar {
-  margin: 0 0 12px;
-  color: var(--ink);
-  font: 600 16px / 1.5 var(--sans);
-  letter-spacing: 0.005em;
-  text-wrap: balance;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+  font-family: var(--tf-mono-stack);
+  font-size: 13px;
+  letter-spacing: 0.04em;
 }
 
-/* The only sentence that says what any of this is FOR, so it sits alone between
-   the three sections and the couplet, at body size on a tint rather than in a
-   card — a card would make it a fourth section and it is a conclusion. */
+.grammarItem {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.stage {
+  padding: 9px 14px;
+  border: 1px solid rgba(20, 24, 31, 0.25);
+}
+
+.stageSolid {
+  padding: 9px 14px;
+  background: var(--tf-ink);
+  color: var(--tf-cream);
+}
+
+.arrow {
+  color: var(--tf-rust);
+}
+
+.methodBody {
+  display: grid;
+  gap: 22px;
+  min-width: 0;
+}
+
+.methodLead {
+  margin: 0;
+  color: var(--tf-ink);
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.5;
+}
+
 .goal {
-  margin: 0 0 22px;
-  padding: 16px 18px;
-  border-radius: 12px;
-  background: var(--tint-grey);
-  color: var(--body);
-  font: 400 15px / 1.6 var(--sans);
-  text-wrap: pretty;
+  margin: 0;
+  color: var(--tf-body);
+  font-size: 16.5px;
+  line-height: 1.55;
 }
 
-/* The couplet, and it only works as a pair: the second line is a concession
-   that the first line's signal might not survive. Both lines take the same
-   weight — ranking them typographically would answer the question the pair is
-   asking. */
-.positioning {
-  margin: 0 0 20px;
+.goalStrong {
+  color: var(--tf-ink);
+  font-weight: 600;
 }
 
-.positioningLine {
-  margin: 0 0 8px;
-  color: var(--ink);
-  font: 500 17px / 1.45 var(--sans);
-  text-wrap: pretty;
+/* The claim and the limit that makes it publishable, as one marked unit. */
+.offer {
+  padding: 20px 22px;
+  border-left: 2px solid var(--tf-rust);
+  background: var(--tf-paper);
 }
 
-.positioningLine:last-child {
-  margin-bottom: 0;
-}
-
-/* The way back to the free doorway. Below the offer, not beside the primary
-   CTA: two controls of similar weight side by side would make the reader
-   choose between products, and the page's argument is that Lite comes first. */
-.secondary {
-  margin-bottom: 4px;
-}
-
-/* -------------------------------------------------------------------------- */
-/* The dominant CTA                                                           */
-/* -------------------------------------------------------------------------- */
-/* Full-width at every phone width: the primary action must never be a target a
-   thumb has to aim for. `ActionPill full` supplies the 100% and the 17px
-   padding; this rule only reserves the space around it. */
-.cta {
-  margin: 4px 0 20px;
-}
-
-/* -------------------------------------------------------------------------- */
-/* The evidence line                                                          */
-/* -------------------------------------------------------------------------- */
-/* The doctrine boundary in one line — "evidence, never doctrine" said to the
-   learner. It is a rule about the whole product, so it sits alone between the
-   CTA and the offer rather than inside either, and takes the accent-on-tint
-   colour that this repo reserves for text that is not body copy. Q23: the
-   plain --accent misses AA on a tint; this value is the ratified replacement. */
-.evidence {
-  margin: 0 0 22px;
-  padding-left: 14px;
-  border-left: 2px solid var(--accent);
-  color: var(--accent-text-on-tint);
-  font: 500 15px / 1.5 var(--sans);
-}
-
-/* -------------------------------------------------------------------------- */
-/* The full Trust Forward offer (inside CardShell fill="grey")                */
-/* -------------------------------------------------------------------------- */
-/* Two paragraphs, one unit. The claim is set at body weight and the limit that
-   makes it publishable directly under it in --muted — smaller, never hidden,
-   never collapsed behind a disclosure. See the page's file header. */
 .offerBridge {
-  margin: 0 0 10px;
-  color: var(--ink);
-  font: 500 16px / 1.45 var(--sans);
-  text-wrap: pretty;
+  margin: 0 0 8px;
+  color: var(--tf-ink);
+  font-size: 15.5px;
+  line-height: 1.55;
 }
 
 .offerLimit {
   margin: 0;
-  color: var(--muted);
-  font: 400 13px / 1.55 var(--sans);
+  color: var(--tf-body);
+  font-size: 15.5px;
+  line-height: 1.55;
 }
 
 /* -------------------------------------------------------------------------- */
-/* The answer-first wedge and the landing FAQ                                 */
+/* 4 — FAQ                                                                    */
 /* -------------------------------------------------------------------------- */
-/* Layer 07's SEO material, and the reason this route is prerendered. It sits
-   last because it is written for a reader arriving from a search rather than
-   for the visitor already reading down the page. */
-.wedge {
-  margin-top: 28px;
-  padding-top: 20px;
-  border-top: 1px solid var(--line);
-}
 
-/* The semantic wedge, and the FAQ's own lead-in. 20px rather than the block's
-   14px: the next thing under it is an `h2`, and a heading needs more air above
-   it than a sibling paragraph would. */
-.wedgeLead {
-  margin: 0 0 20px;
-  color: var(--body);
-  font: 400 15px / 1.55 var(--sans);
-  text-wrap: pretty;
-}
-
-/* QUESTIONS AND ANSWERS NOW (layer 09 `landing-faq-answers.BEN_APPROVED.json`).
-   The old rule set styled the six clusters as unmarked tinted rows because no
-   approved answer existed to put under them. An answered question is a
-   different object: it is a heading with a paragraph, so the tinted row is
-   gone and the type does the work instead.
-
-   NO BOXES, ON PURPOSE. At 320px the reading column is 276px wide, and a card
-   with 14px of side padding would spend 28px of that on decoration around the
-   longest paragraphs on the page. Hairlines separate the entries and cost
-   nothing horizontally.
-
-   NOTHING HERE COLLAPSES. There is no `max-height`, no `display: none` and no
-   disclosure state: layer 07 puts this material on the landing because
-   "personalized local summaries are not the crawlable SEO surface", and copy a
-   stylesheet can hide is copy a reader can be denied. The answers are visible
-   at every width. */
-.faqList {
+.faq {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr);
+  gap: 0 clamp(32px, 5vw, 64px);
   margin: 0;
   padding: 0;
   list-style: none;
-  display: flex;
-  flex-direction: column;
-  gap: 18px;
 }
 
-/* The rule goes BETWEEN entries, never above the first: `.wedge` already draws
-   a border-top for the whole block, and a second line directly under it would
-   read as an empty row. */
-.faqItem + .faqItem {
-  padding-top: 18px;
-  border-top: 1px solid var(--line);
+.faqItem {
+  min-width: 0;
+  padding: 26px 0;
+  border-top: 1px solid var(--tf-hair-ink);
 }
 
-/* An `h2`. The question is the thing a screen-reader user jumps between and the
-   thing a crawler indexes, so it is a real heading and not a bolded paragraph.
-   `text-wrap: balance` because five of the six wrap to two lines at 320px. */
 .faqQuestion {
-  margin: 0 0 6px;
-  color: var(--ink);
-  font: 600 16px / 1.3 var(--sans);
+  margin: 0 0 10px;
+  font-family: var(--tf-serif-stack);
+  font-weight: 400;
+  font-size: 24px;
+  line-height: 1.2;
   letter-spacing: -0.01em;
+}
+
+.faqAnswer {
+  margin: 0;
+  color: var(--tf-body);
+  font-size: 16px;
+  line-height: 1.55;
+}
+
+/* -------------------------------------------------------------------------- */
+/* 5 — Close                                                                  */
+/* -------------------------------------------------------------------------- */
+
+.close {
+  padding: var(--tf-block) var(--tf-pad);
+  background: var(--tf-ink);
+  color: var(--tf-cream);
+}
+
+.closeHeading {
+  margin: 0 0 20px;
+  font-family: var(--tf-serif-stack);
+  font-weight: 400;
+  font-size: clamp(34px, 9vw, 64px);
+  line-height: 1.04;
+  letter-spacing: -0.02em;
   text-wrap: balance;
 }
 
-/* Set at the page's body register rather than smaller. These are answers, not
-   footnotes to the questions above them — the longest runs to 46 words, and
-   1.6 is the leading that survives it on a phone. */
-.faqAnswer {
+.closeBody {
+  margin: 0 auto 32px;
+  max-width: 600px;
+  color: rgba(244, 241, 234, 0.78);
+  font-size: clamp(17px, 1.4vw, 20px);
+  line-height: 1.5;
+}
+
+.couponClose {
+  margin: 24px 0 6px;
+  color: var(--tf-tan);
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+/* Underlined, not a pill: it is a claim path inside a sentence, and a third
+   button here would compete with the two that just made the offer. */
+.couponClaim {
+  color: var(--tf-cream);
+  font-weight: 600;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+
+.couponNote {
   margin: 0;
-  color: var(--body);
-  font: 400 15px / 1.6 var(--sans);
-  text-wrap: pretty;
+  color: var(--tf-cream-60);
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.noAi {
+  margin: 40px auto 0;
+  padding-top: 26px;
+  max-width: 620px;
+  border-top: 1px solid var(--tf-hair);
+  color: var(--tf-cream-55);
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.noAiLead {
+  color: rgba(244, 241, 234, 0.85);
+  font-weight: 600;
 }
 
 /* -------------------------------------------------------------------------- */
-/* The completed state                                                        */
+/* Desktop: the brief's columns open at the site's own breakpoint             */
 /* -------------------------------------------------------------------------- */
-/* The sentence that earns the onward CTA, immediately above it. It concedes
-   that the pattern may not hold, so it is set as body copy and not as a boast. */
-.completeBridge {
-  margin: 0 0 18px;
-  color: var(--body);
-  font: 400 16px / 1.5 var(--sans);
-  text-wrap: pretty;
-}
-
-/* -------------------------------------------------------------------------- */
-/* Desktop: the same composition, a wider measure                             */
-/* -------------------------------------------------------------------------- */
-/* 701px is the breakpoint `app/globals.css` already steps --gutter at, and
-   `app/watch-your-step/(shell)/landing.module.css` already uses. A third
+/* 701px is where `app/globals.css` steps --gutter and where
+   `app/watch-your-step/(shell)/landing.module.css` already opens. A third
    breakpoint would be a third place the site's rhythm can drift. */
 @media (min-width: 701px) {
-  .landing {
-    padding-block: 56px 44px;
+  .ctaFilled,
+  .ctaOutlined {
+    width: auto;
   }
 
-  .title {
-    font-size: 52px;
+  .ctaRow {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
   }
 
-  .lede {
-    max-width: 34em;
-    font-size: 20px;
+  .ctaRowCentred {
+    flex-direction: row;
+    flex-wrap: wrap;
+    justify-content: center;
   }
 
-  .body,
-  .wedgeLead,
-  .faqAnswer {
-    max-width: 40em;
-    font-size: 16px;
+  .heroInner {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
   }
 
-  /* The teaser's ramp, one step each, exactly as the blocks above: a wider
-     measure and one size up. No new composition at desktop. */
+  .sequence {
+    max-width: 460px;
+    width: 100%;
+    justify-self: end;
+  }
+
+  .stats {
+    grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  }
+
+  .doors,
+  .innerSplit {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  }
+
+  .innerSplit {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  }
+
+  .faq {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+  }
+
   .sectionHeading {
-    font-size: 26px;
+    max-width: 24ch;
   }
 
-  .sectionBody,
-  .passBody,
-  .boundedList,
-  .goal {
-    max-width: 40em;
-    font-size: 16px;
-  }
-
-  .prompt {
-    font-size: 20px;
-  }
-
-  .positioningLine {
-    max-width: 38em;
-    font-size: 19px;
-  }
-
-  .cta {
-    max-width: 360px;
-  }
-
-  .offerBridge {
-    font-size: 17px;
-  }
-
-  /* ONE COLUMN AT EVERY WIDTH. The two-column grid the bare question index used
-     was right for six short labels and is wrong for six paragraphs: a 40em
-     measure in a 640px column cannot be halved and still be read. Desktop gets
-     more air between entries and a larger question, not a second column. */
-  .faqList {
-    gap: 24px;
-  }
-
-  .faqItem + .faqItem {
-    padding-top: 24px;
-  }
-
-  .faqQuestion {
-    font-size: 18px;
+  /* The Studio card's action sits on the baseline of the pair, so two cards of
+     different length still line their buttons up. */
+  .cardInk .ctaFilled,
+  .cardLight .ctaFilled {
+    align-self: flex-start;
   }
 }

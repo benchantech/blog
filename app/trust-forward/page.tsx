@@ -1,211 +1,359 @@
 import type { Metadata } from "next";
-import { FULL_OFFER, LANDING_FAQ, LANDING_INCOMPLETE, TRUST_FORWARD_TEASER } from "@/content/trust-forward/copy";
+import Link from "next/link";
+import { Hanken_Grotesk, Instrument_Serif, JetBrains_Mono } from "next/font/google";
+import { FULL_OFFER, LANDING_FAQ, TRUST_FORWARD_TEASER } from "@/content/trust-forward/copy";
 import { ROUTES } from "@/content/trust-forward/stamp/v1-1-0";
-import { ActionPill } from "@/components/ui/ActionPill";
-import { CardShell } from "@/components/ui/CardShell";
-import { LinkRow } from "@/components/ui/LinkRow";
 import styles from "./trust-forward.module.css";
 
 /**
- * `/trust-forward` — the canonical public node for Trust Forward (layer 07's
- * routes ruling; `ROUTES.canonical`).
+ * `/trust-forward` — the canonical public node (layer 07's routes ruling;
+ * `ROUTES.canonical`).
  *
- * WHAT THIS PAGE IS NOW, AND WHAT IT STOPPED BEING. Ben's instruction of
- * 2026-09-08: *"Create a simple `/trust-forward` teaser page explaining the
- * relationship between Trust Forward Lite and the full Trust Forward
- * experience… Keep this page compact. It should feel like a teaser, not a
- * duplicate landing page."* It used to be the landing page that SOLD Lite —
- * lede, body, descriptor, time estimate, a reveal list and a full-width Start
- * button. The homepage now carries that pitch, so this page carrying it too was
- * the duplication the instruction names. Every sentence of the teaser comes
- * from `TRUST_FORWARD_TEASER`, which records the ruling and the one edit made
- * to Ben's words.
+ * BUILT TO BEN'S 2026-09-08 REDESIGN BRIEF (`bct-facelift/Trust Forward
+ * redesign brief/Trust Forward.dc.html`), adapted rather than transcribed. Five
+ * sections in the brief's order — hero, the two doors, the method, the FAQ, the
+ * close — and every sentence is the brief's, with one exception recorded at
+ * `TRUST_FORWARD_TEASER.lite.chips`: the brief says "15–30 min" twice, and that
+ * figure was measured against a product with eleven decisions rather than
+ * seventeen checkpoints.
  *
- * THE ONE-STATE DECISION, WHICH WAS FORCED RATHER THAN CHOSEN. This page used
- * to render two trees through `LandingCompletion`, an island that swaps in a
- * "Lite complete" state when the browser holds a finished run. That island
- * reads `TRUST_FORWARD_LITE_STORAGE_KEY` and gates on `result_viewed`,
- * `export_markdown` and three other SHIP-era ledger events. The YY runtime
- * writes `TRUST_FORWARD_YY_STORAGE_KEY` and emits none of them, so since the
- * YY rewrite the complete tree has been unreachable for every learner: a person
- * who finished all five cases still saw "Complete Lite to reveal:". Shipping a
- * teaser through a state machine with one live state would have been shipping
- * the appearance of a second door. So there is one page for everybody, and the
- * dead branch is reported rather than re-plumbed — `LandingCompletion` and
- * `LANDING_COMPLETE` are both still exported and neither is deleted, so the fix
- * is a rewire when someone rules on what "complete" means under YY.
+ * NOTHING GLOBAL CHANGED, which was the instruction and is also the reason this
+ * page can look nothing like the rest of the site without risk. The brief's
+ * palette and its three typefaces exist ONLY as custom properties on the
+ * `.page` element in `trust-forward.module.css`; `app/globals.css` is untouched,
+ * so no token, no preserved route and no other surface moves. The fonts come
+ * through `next/font/google` — the same mechanism `app/layout.tsx` already uses
+ * for IBM Plex — rather than through a stylesheet `@import`, so they are
+ * self-hosted, preloaded and scoped to this route instead of being fetched by
+ * every page on the site.
  *
- * TWO SENTENCES STOPPED RENDERING HERE AND THAT IS A REPAIR, NOT A LOSS.
- * `LANDING_INCOMPLETE.revealItems` promised "your observed SHIP developer
- * pattern" and `LANDING_COMPLETE.bridge` opened "SHIP gives you a place to
- * start looking at how you decide." SHIP was removed from the required path by
- * the YY rewrite (docs/adr/0001), so both were approved copy that had become
- * false — the same defect as the homepage's "five fictional cases", which was
- * fixed on 2026-09-08 in a pass that did not reach this route. They remain
- * exported and unrendered rather than edited, because rewriting an approved
- * sentence to describe a product it was not written about is how a false claim
- * survives a review: it looks like maintenance.
+ * MOBILE-FIRST, AND THE BASE RULES ARE THE PHONE. Every `grid-template-columns`
+ * in the brief is a desktop instruction written as `repeat(auto-fit, minmax(…))`;
+ * this build states the single column as the base and opens it at 701px, which
+ * is the breakpoint `app/globals.css` already steps `--gutter` at and the one
+ * the rest of this repo uses. Built against 320, 375, 390 and 430. The hero
+ * type ramps with `clamp()` from a phone-first floor, the stat row wraps to two
+ * columns before it wraps to four, and no fixed width appears anywhere, so the
+ * layout cannot overflow a 320px viewport.
  *
- * A SERVER COMPONENT, PRERENDERED, AND THAT IS A PRODUCT REQUIREMENT RATHER
- * THAN A PERFORMANCE ONE. Layer 07's SEO ruling puts the answer-first material
- * — the semantic wedge and the six intent questions — on this page precisely
- * because "personalized local summaries are not the crawlable SEO surface". The
- * teaser is compact; the FAQ below it is not a second landing page but the
- * crawlable surface that ruling requires, and it is the only place on the site
- * those six answers exist. Dropping it to satisfy "compact" would have been
- * this build overruling a ruling. With the completion island gone, the whole
- * page is now static HTML with nothing to hide behind an effect, which is a
- * stronger version of what the ruling asked for.
+ * THE TWO CTAs ARE ON EVERY SCREEN OF THE PAGE, and their weighting is the
+ * argument. Studio is the paid destination and takes the filled pill in the
+ * hero and in the close; Lite takes the outlined one. In the two-door section
+ * they swap, because there the reader is choosing rather than being sold to.
+ * Both hrefs come from `ROUTES` — the brief writes them as absolute
+ * `benchantech.com` URLs, which would be a same-site absolute link, and
+ * `ROUTES.fullTarget` already holds the Studio URL character for character.
  *
- * COMPLETION NO LONGER CHANGES THIS PAGE AT ALL, so the privacy note that used
- * to sit here is narrower than it was: this file reads no browser state, fires
- * no telemetry, and takes no query, hash or segment.
- * `tf_full_trust_forward_clicked` is still owned by Lite's four gated cards and
- * is NOT fired by the primary CTA below — this page has no client boundary to
- * fire it from, and adding one to measure a click would undo the paragraph
- * above. That is a real gap in the funnel and it is named here rather than
- * silently accepted. `components/GoogleAnalytics.tsx` is byte-frozen with
- * `send_page_view: true`, so a URL is telemetry whether or not the adapter
- * knows about it.
- *
- * THE CTA POINTS AT `ROUTES.fullTarget`, NOT AT `/tf`. Ben's instruction gives
- * the destination as a literal URL, and `ROUTES.fullTarget` already holds
- * exactly that string — so this links to the one definition rather than to the
- * redirect that resolves to it, and `TRUST_FORWARD_PROVENANCE.md`'s requirement
- * that the Full target keep a single definition under `content/trust-forward/`
- * is met either way. `/tf` stays live and stays the short link.
+ * THE COUPON IS THE ONE THING HERE THAT IS NOT YET REAL. Ben asked for Lite to
+ * be "an easy to justify thing that clearly will earn them a coupon toward
+ * studio". No code on this site issues, stores or validates a coupon, and there
+ * is no account to attach one to — so the offer is written as a promise a
+ * person keeps rather than a system, and it points at `/contact`, which works
+ * today. See `TRUST_FORWARD_TEASER.coupon`.
  *
  * EVERY SENTENCE COMES FROM `content/trust-forward/copy.ts`.
  * `tests/canonical-text.test.ts` fails on any prose literal or JSX text node of
- * twelve words or more under `app/`, and that mechanism is what makes "all
- * learner-facing prose is governed content" true rather than aspirational.
+ * twelve words or more under `app/`, which is what makes "all learner-facing
+ * prose is governed content" true rather than aspirational.
  *
- * THE BRIDGE AND ITS CONFIDENTIALITY SENTENCE ARE RENDERED AS ONE UNIT.
- * "40+ real cases drawn from Ben Chan's actual professional experience" is a
- * claim about real clients, employers and colleagues; the sentence that says
- * how they are protected is what makes the first sentence publishable. copy.ts
- * states it plainly — a renderer that shows `bridge` without `confidentiality`
- * has published the claim without its limit — so there is no code path here
- * that can show one without the other.
+ * THE BRIDGE AND ITS CONFIDENTIALITY SENTENCE ARE ONE UNIT, in the method
+ * section's marked box, exactly as the brief sets them. "40+ real cases drawn
+ * from Ben Chan's actual professional experience" is a claim about real clients
+ * and colleagues, and the sentence saying how they are protected is what makes
+ * the first publishable; there is no code path here that shows one without the
+ * other.
  *
- * A HEADING AND A PARAGRAPH, INSIDE A LIST. The FAQ question is an `h2` because
- * it is what a screen-reader user jumps between and what a crawler indexes, and
- * a bolded paragraph is neither. The six sit in a `ul` so assistive technology
- * announces how many there are before the reader commits to the first; the
- * marker is removed in the stylesheet, not the semantics.
- *
- * MOBILE-FIRST. The base rules in the stylesheet are the phone; 320, 375, 390
- * and 430 are the widths this was built against, and the desktop block only
- * widens the measure and lifts the type ramp.
+ * STILL A SERVER COMPONENT WITH NO CLIENT BOUNDARY. Layer 07's SEO ruling puts
+ * the answer-first material on this page because "personalized local summaries
+ * are not the crawlable SEO surface", so the six FAQ answers ship in the served
+ * HTML with nothing to expand and no effect to run. This file reads no browser
+ * state, fires no telemetry and takes no query, hash or segment.
  */
+
+/*
+ * The brief's three typefaces. `display: "swap"` so a slow font never blanks
+ * the hero, and a real fallback stack on each so the page is legible if Google
+ * Fonts is blocked — which it is, for a non-trivial share of readers.
+ */
+const serif = Instrument_Serif({
+  subsets: ["latin"],
+  weight: "400",
+  style: ["normal", "italic"],
+  display: "swap",
+  variable: "--tf-serif",
+  fallback: ["Georgia", "Times New Roman", "serif"]
+});
+
+const sans = Hanken_Grotesk({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--tf-sans",
+  fallback: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"]
+});
+
+const mono = JetBrains_Mono({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--tf-mono",
+  fallback: ["SFMono-Regular", "Menlo", "Consolas", "monospace"]
+});
 
 export const metadata: Metadata = {
   title: "Trust Forward - BenChanTech",
   alternates: { canonical: "/trust-forward" }
 };
 
-/**
- * The offer's two public sentences, as one block. Never rendered apart — see
- * the file header.
+const teaser = TRUST_FORWARD_TEASER;
+
+/*
+ * THE CALLER PASSES THE CLASS, NOT A TONE NAME. An earlier version took
+ * `tone: "filled" | "outlined"` and resolved it in the className expression —
+ * and `tests/class-contract.test.ts` mode 1 read the bare `"filled"` inside
+ * that expression as a className token with no rule behind it. It was right to:
+ * a scanner cannot tell a discriminator from a global class name, and the way
+ * to keep it able to tell is to put no bare strings in a className at all.
  */
-function FullOffer() {
+
+/** Studio. The paid destination, and the page's primary action. */
+function StudioCta({ className }: { className: string }) {
   return (
-    <CardShell fill="grey">
-      <p className={styles.offerBridge}>{FULL_OFFER.bridge}</p>
-      <p className={styles.offerLimit}>{FULL_OFFER.confidentiality}</p>
-    </CardShell>
+    <a className={className} href={ROUTES.fullTarget}>
+      {teaser.primaryCta}
+    </a>
+  );
+}
+
+/** Lite. Free, local, and the thing the coupon is attached to. */
+function LiteCta({ className }: { className: string }) {
+  return (
+    <Link className={className} href={ROUTES.publicAlternate}>
+      {teaser.liteCta}
+    </Link>
+  );
+}
+
+/**
+ * `goal`, with two words set solid.
+ *
+ * Split on the phrase rather than stored as three strings: the sentence is one
+ * governed record and must stay diffable against the brief. If the emphasis
+ * ever stops appearing in the sentence the split yields one part and the
+ * paragraph still renders whole, which is the correct failure.
+ */
+function Goal() {
+  const parts = teaser.goal.split(teaser.goalEmphasis);
+  return (
+    <p className={styles.goal}>
+      {parts[0]}
+      {parts.length > 1 ? <strong className={styles.goalStrong}>{teaser.goalEmphasis}</strong> : null}
+      {parts.slice(1).join(teaser.goalEmphasis)}
+    </p>
   );
 }
 
 export default function TrustForwardPage() {
-  const teaser = TRUST_FORWARD_TEASER;
   return (
-    <article className={styles.landing}>
-      <header className={styles.hero}>
-        <h1 className={styles.title}>{teaser.heading}</h1>
-      </header>
+    <div className={[styles.page, serif.variable, sans.variable, mono.variable].join(" ")}>
+      {/* 1 — Hero */}
+      <section className={styles.hero}>
+        <div className={styles.heroInner}>
+          <div className={styles.heroLead}>
+            <p className={styles.eyebrowOnInk}>
+              <span className={styles.dot} aria-hidden="true" />
+              {teaser.eyebrow}
+            </p>
+            <h1 className={styles.title}>{teaser.heading}</h1>
+            <p className={styles.prompt}>{teaser.prompt}</p>
+            <p className={styles.heroBody}>{teaser.heroBody}</p>
+            <div className={styles.ctaRow}>
+              <StudioCta className={styles.ctaFilled} />
+              <LiteCta className={styles.ctaOutlined} />
+            </div>
+            <p className={styles.couponHeroLine}>{teaser.coupon.lead}</p>
+          </div>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionHeading}>{teaser.lite.heading}</h2>
-        <p className={styles.sectionBody}>{teaser.lite.body}</p>
-        {/*
-          The product's own words, in the product's own punctuation. It is a
-          `blockquote` and not a styled paragraph because it is a quotation of a
-          surface the reader has not seen yet, and the seventeen checkpoints ask
-          it verbatim.
-        */}
-        <blockquote className={styles.prompt}>{teaser.lite.prompt}</blockquote>
-        <p className={styles.boundedLead}>{teaser.lite.boundedLead}</p>
-        <ul className={styles.boundedList}>
-          {teaser.lite.boundedItems.map((item) => (
-            <li key={item}>{item}</li>
+          {/*
+            The five stages as a numbered rail. An ordered list, because the
+            order IS the method — Commit before Timestamp is the whole claim —
+            and the numbers are the list's own, not typed beside the labels.
+          */}
+          <div className={styles.sequence}>
+            <p className={styles.eyebrowOnInk}>{teaser.sequence.label}</p>
+            <ol className={styles.sequenceList}>
+              {teaser.sequence.stages.map((stage) => (
+                <li className={styles.sequenceItem} key={stage}>
+                  <span className={styles.sequenceName}>{stage}</span>
+                </li>
+              ))}
+            </ol>
+            <p className={styles.sequenceNote}>{teaser.sequence.note}</p>
+          </div>
+        </div>
+
+        <dl className={styles.stats}>
+          {teaser.stats.map((stat) => (
+            <div className={styles.stat} key={stat.value + stat.label}>
+              <dt className={styles.statValue}>{stat.value}</dt>
+              <dd className={styles.statLabel}>{stat.label}</dd>
+            </div>
           ))}
-        </ul>
+        </dl>
       </section>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionHeading}>{teaser.full.heading}</h2>
-        <p className={styles.sectionBody}>{teaser.full.body}</p>
-        {/*
-          An ordered list, because the three passes ARE an order: Pass 3 asks
-          the learner to transfer a pattern they can only have formed in passes
-          1 and 2. A `ul` would say these are three things you can do; `ol` says
-          what the curriculum actually claims.
-        */}
-        <ol className={styles.passList}>
-          {teaser.full.passes.map((pass) => (
-            <li className={styles.passItem} key={pass.label}>
-              <p className={styles.passLabel}>{pass.label}</p>
-              <p className={styles.passBody}>{pass.body}</p>
-            </li>
-          ))}
-        </ol>
-        <p className={styles.alsoLine}>{teaser.full.alsoLine}</p>
+      {/* 2 — Two doors */}
+      <section className={styles.band}>
+        <div className={styles.inner}>
+          <p className={styles.eyebrow}>{teaser.ladder.eyebrow}</p>
+          <h2 className={styles.sectionHeading}>{teaser.ladder.heading}</h2>
+
+          <div className={styles.doors}>
+            <article className={styles.cardLight}>
+              <p className={styles.cardMeta}>
+                <span>{teaser.lite.name}</span>
+                <span className={styles.badge}>{teaser.lite.badge}</span>
+              </p>
+              <h3 className={styles.cardHeading}>{teaser.lite.cardHeading}</h3>
+              <p className={styles.cardBody}>{teaser.lite.body}</p>
+              <ul className={styles.chips}>
+                {teaser.lite.chips.map((chip) => (
+                  <li className={styles.chip} key={chip}>
+                    {chip}
+                  </li>
+                ))}
+              </ul>
+              <div>
+                <p className={styles.boundedLead}>{teaser.lite.boundedLead}</p>
+                <ul className={styles.bounded}>
+                  {teaser.lite.boundedItems.map((item) => (
+                    <li className={styles.boundedItem} key={item}>
+                      <span className={styles.dash} aria-hidden="true">
+                        —
+                      </span>
+                      {item}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+              {/*
+                The coupon, on the card it belongs to. It sits above the Lite
+                CTA rather than beside the Studio one because it is the reason
+                to press THIS button — see TRUST_FORWARD_TEASER.coupon for what
+                is and is not real about the offer.
+              */}
+              <div className={styles.coupon}>
+                <p className={styles.couponBadge}>{teaser.coupon.badge}</p>
+                <p className={styles.couponLead}>{teaser.coupon.lead}</p>
+                <p className={styles.couponBody}>{teaser.coupon.body}</p>
+              </div>
+              <LiteCta className={styles.ctaFilled} />
+            </article>
+
+            <article className={styles.cardInk}>
+              <p className={styles.cardMetaOnInk}>
+                <span>{teaser.full.name}</span>
+                <span className={styles.badgeOnInk}>{teaser.full.badge}</span>
+              </p>
+              <h3 className={styles.cardHeadingOnInk}>{teaser.full.cardHeading}</h3>
+              <p className={styles.cardBodyOnInk}>{teaser.full.body}</p>
+              <ol className={styles.passes}>
+                {teaser.full.passes.map((pass) => (
+                  <li className={styles.pass} key={pass.step}>
+                    <p className={styles.passHead}>
+                      <span className={styles.passStep}>{pass.step}</span>
+                      <span className={styles.passLabel}>{pass.label}</span>
+                    </p>
+                    <p className={styles.passBody}>{pass.body}</p>
+                  </li>
+                ))}
+              </ol>
+              <p className={styles.alsoLine}>{teaser.full.alsoLine}</p>
+              <StudioCta className={styles.ctaFilled} />
+            </article>
+          </div>
+        </div>
       </section>
 
-      <section className={styles.section}>
-        <h2 className={styles.sectionHeading}>{teaser.method.heading}</h2>
-        <p className={styles.grammar}>{teaser.method.grammar}</p>
-        <p className={styles.sectionBody}>{teaser.method.body}</p>
+      {/* 3 — The method */}
+      <section className={styles.method}>
+        <div className={styles.innerSplit}>
+          <div>
+            <p className={styles.eyebrow}>{teaser.method.eyebrow}</p>
+            <h2 className={styles.sectionHeading}>{teaser.method.heading}</h2>
+            {/*
+              The grammar as five marked stages with separators between them.
+              The arrows are `aria-hidden`: a screen reader reads five list
+              items in order, which is the same statement without five spoken
+              "right arrow"s in the middle of it.
+            */}
+            <ol className={styles.grammar}>
+              {teaser.sequence.stages.map((stage, index) => (
+                <li className={styles.grammarItem} key={stage}>
+                  <span className={index > 2 ? styles.stageSolid : styles.stage}>{stage}</span>
+                  {index < teaser.sequence.stages.length - 1 ? (
+                    <span className={styles.arrow} aria-hidden="true">
+                      →
+                    </span>
+                  ) : null}
+                </li>
+              ))}
+            </ol>
+          </div>
+          <div className={styles.methodBody}>
+            <p className={styles.methodLead}>{teaser.method.body}</p>
+            <Goal />
+            <div className={styles.offer}>
+              <p className={styles.offerBridge}>{FULL_OFFER.bridge}</p>
+              <p className={styles.offerLimit}>{FULL_OFFER.confidentiality}</p>
+            </div>
+          </div>
+        </div>
       </section>
 
-      <p className={styles.goal}>{teaser.goal}</p>
+      {/* 4 — FAQ */}
+      <section className={styles.band}>
+        <div className={styles.inner}>
+          <p className={styles.eyebrow}>{teaser.faq.eyebrow}</p>
+          <h2 className={styles.sectionHeading}>{teaser.faq.heading}</h2>
+          {/*
+            A heading and a paragraph, inside a list. The question is an `h3`
+            because it is what a screen-reader user jumps between and what a
+            crawler indexes; the six sit in a `ul` so assistive technology
+            announces how many there are before the reader commits to the first.
+            No `<details>`, no accordion, no client reveal — layer 07's rule is
+            answer-first content a machine can read without executing anything.
+          */}
+          <ul className={styles.faq}>
+            {LANDING_FAQ.map((entry) => (
+              <li className={styles.faqItem} key={entry.question}>
+                <h3 className={styles.faqQuestion}>{entry.question}</h3>
+                <p className={styles.faqAnswer}>{entry.answer}</p>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
 
-      <div className={styles.positioning}>
-        {teaser.positioning.map((line) => (
-          <p className={styles.positioningLine} key={line}>
-            {line}
+      {/* 5 — Close */}
+      <section className={styles.close}>
+        <div className={styles.closeInner}>
+          <h2 className={styles.closeHeading}>{teaser.close.heading}</h2>
+          <p className={styles.closeBody}>{teaser.close.body}</p>
+          <div className={styles.ctaRowCentred}>
+            <LiteCta className={styles.ctaFilled} />
+            <StudioCta className={styles.ctaOutlined} />
+          </div>
+          <p className={styles.couponClose}>
+            {teaser.coupon.lead}{" "}
+            <Link className={styles.couponClaim} href="/contact">
+              {teaser.coupon.claimLabel}
+            </Link>
           </p>
-        ))}
-      </div>
-
-      <div className={styles.cta}>
-        <ActionPill href={ROUTES.fullTarget} variant="ink" full>
-          {teaser.primaryCta}
-        </ActionPill>
-      </div>
-
-      <div className={styles.block}>
-        <FullOffer />
-      </div>
-
-      <div className={styles.secondary}>
-        <LinkRow href={ROUTES.publicAlternate} size="lg">
-          {teaser.liteCta}
-        </LinkRow>
-      </div>
-
-      <section className={styles.wedge}>
-        <p className={styles.wedgeLead}>{LANDING_INCOMPLETE.semanticWedge}</p>
-        <ul className={styles.faqList}>
-          {LANDING_FAQ.map((entry) => (
-            <li key={entry.question} className={styles.faqItem}>
-              <h2 className={styles.faqQuestion}>{entry.question}</h2>
-              <p className={styles.faqAnswer}>{entry.answer}</p>
-            </li>
-          ))}
-        </ul>
+          <p className={styles.couponNote}>{teaser.coupon.claimNote}</p>
+          <p className={styles.noAi}>
+            <strong className={styles.noAiLead}>{teaser.close.noAiLead}</strong> {teaser.close.noAiBody}
+          </p>
+        </div>
       </section>
-    </article>
+    </div>
   );
 }

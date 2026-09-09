@@ -918,38 +918,95 @@ export const TRUST_STRIP = {
  * because it is the sentence a reader should be holding when they click.
  */
 export const TRUST_FORWARD_TEASER = {
+  eyebrow: "Developer judgment for AI-assisted engineering",
   heading: "Trust Forward",
+  /** The product's own prompt, quoted. Set in italic serif in the hero. */
+  prompt: "What would you do in my shoes?",
+  heroBody:
+    "What to trust, what to verify, what to delegate, what to promise, and when to take the wheel back. Authored professional situations that require you to commit your judgment before you see what Ben actually did.",
+
+  /** The five stages as a numbered rail beside the hero. */
+  sequence: {
+    label: "The YY Method™ sequence",
+    stages: ["Capture", "Why", "Why-Not", "Commit", "Timestamp"],
+    note: "You commit first. Ben's historical judgment comes afterward."
+  },
+
+  /*
+   * THE FOUR NUMBERS UNDER THE HERO, AND WHERE EACH ONE IS PINNED.
+   * "40+" is `FULL_OFFER.bridge`'s floor and "42" the count the teaser states
+   * outright — `tests/trust-forward-content.test.ts` asserts both by name, so
+   * these labels cannot drift from the sentences that carry the same figures.
+   * "3" is `full.passes.length` and "90" is the curriculum length in `full.body`.
+   */
+  stats: [
+    { value: "40+", label: "real cases from lived professional experience" },
+    { value: "42", label: "canonical case families" },
+    { value: "3", label: "passes per underlying problem" },
+    { value: "90", label: "days, AI-assisted curriculum" }
+  ],
+
+  ladder: {
+    eyebrow: "Two doors",
+    /*
+     * SUPERSEDES THE TWO-LINE COUPLET. Ben's 2026-09-08 brief sets the section
+     * heading as one sentence and shortens the second clause — "Trust Forward
+     * tests whether it survives" for "helps you test whether it survives
+     * another perspective, another condition, and eventually your own real
+     * work". Same claim, and the shorter form is the one that can be a heading.
+     */
+    heading:
+      "Trust Forward Lite helps you hear your own signal. Trust Forward tests whether it survives."
+  },
 
   lite: {
-    heading: "Trust Forward Lite is the deterministic introduction.",
+    name: "Trust Forward Lite",
+    badge: "Deterministic",
+    cardHeading: "The deterministic introduction.",
     body:
       "It gives you authored professional situations, asks what you would do in Ben's shoes, and requires you to commit your judgment before you see what Ben actually did. It preserves an auditable record of your decisions.",
-    /** The prompt itself, quoted, because it is the product's actual words. */
-    prompt: "What would you do in my shoes?",
+    /*
+     * THE MIDDLE CHIP IS NOT THE BRIEF'S. The brief says "15–30 min", twice.
+     * That figure was measured against ELEVEN decisions with three options
+     * each; the shipped product has seventeen checkpoints with four options, a
+     * closest-alternative selection, a commit, a two-part reveal and an
+     * optional note at every one. It is not a rounding error, it is roughly
+     * half, and it is already recorded as superseded at
+     * `LANDING_INCOMPLETE.timeEstimate`. An under-promise on time is the kind
+     * of small dishonesty a learner notices exactly once — and on a page whose
+     * whole pitch is "commit before you see the answer", it is the wrong thing
+     * to be wrong about. Everything else on this page is the brief verbatim.
+     */
+    chips: ["5 fixed cases", "About 30–45 minutes", "Stays in your browser"],
     boundedLead: "It is deliberately bounded:",
     boundedItems: [
-      "no AI interprets your free text,",
-      "no personality score is produced,",
-      "and no AI gets to decide what you believe."
+      "No AI interprets your free text.",
+      "No personality score is produced.",
+      "No AI gets to decide what you believe."
     ]
   },
 
   full: {
-    heading: "Trust Forward is the 90-day curriculum.",
+    name: "Trust Forward",
+    badge: "90 days",
+    cardHeading: "The 90-day curriculum.",
     body:
-      "It is the deeper 90-day AI-assisted judgment curriculum, built from 42 canonical case families grounded in Ben Chan's lived professional experience. You encounter each case across multiple rounds.",
+      "The deeper 90-day AI-assisted judgment curriculum, built from 42 canonical case families grounded in Ben Chan's lived professional experience. You encounter each case across multiple rounds.",
     passes: [
       {
-        label: "Pass 1 — Draw From the Well",
+        step: "Pass 1",
+        label: "Draw From the Well",
         body: "Make an independent call before seeing Ben's historical decision and outcome."
       },
       {
-        label: "Pass 2 — Study the Map",
+        step: "Pass 2",
+        label: "Study the Map",
         body:
           "Revisit the same underlying problem after a meaningful condition, incentive, perspective, or role changes."
       },
       {
-        label: "Pass 3 — Build Your Compass",
+        step: "Pass 3",
+        label: "Build Your Compass",
         body:
           "Transfer the pattern into a sufficiently different situation where simply copying Ben — or your own earlier answer — can fail."
       }
@@ -959,24 +1016,60 @@ export const TRUST_FORWARD_TEASER = {
   },
 
   method: {
+    eyebrow: "The rule",
     heading: "Every consequential decision follows the YY Method™.",
-    /** The case grammar, as five stages. Rendered as one line, arrows included. */
-    grammar: "Capture → Why → Why-Not → Commit → Timestamp",
     body:
       "You commit first. Ben's historical judgment comes afterward. Ben's current judgment may disagree with his past judgment. The AI Coach can retrieve, compare, challenge, and pressure-test, but it does not make your decision for you."
   },
 
   goal:
     "The goal is not to teach you to copy Ben. It is to help you accumulate enough real judgment evidence, corrections, disagreements, verification rules, delegation boundaries, and recovery principles that you build a Developer Judgment Playbook of your own.",
+  /** The two words set solid inside `goal`. Rendered by splitting on it. */
+  goalEmphasis: "Developer Judgment Playbook",
 
-  /** Both lines render. The second only lands because the first came first. */
-  positioning: [
-    "Trust Forward Lite helps you hear your own signal.",
-    "Trust Forward helps you test whether it survives another perspective, another condition, and eventually your own real work."
-  ],
+  faq: {
+    eyebrow: "Developer judgment, answered",
+    heading: "What to trust, what to verify, what to delegate."
+  },
+
+  close: {
+    heading: "Commit your judgment first.",
+    body: "Five cases. About 30–45 minutes. Everything stays in your browser.",
+    noAiLead: "You're not talking to AI anywhere on this site.",
+    noAiBody:
+      "No chatbot, no coach, no generated answers. AI executes inside boundaries; human judgment sets them."
+  },
+
+  /*
+   * THE COUPON. Ben's instruction, 2026-09-08: make Lite *"an easy to justify
+   * thing that clearly will earn them a coupon toward studio."*
+   *
+   * IT IS AN OFFER THIS SITE HAS NO CODE FOR, AND THAT IS THE THING TO KNOW
+   * ABOUT IT. Nothing in `app/`, `components/` or `lib/` issues, stores or
+   * validates a coupon; there is no account, no email capture and no payment
+   * integration, by design. So the promise is only as good as the person who
+   * answers the claim, and the wording says exactly that rather than implying a
+   * system: you finish Lite, you ask, Ben sends it. `claimHref` points at
+   * `/contact`, which is a real page that already works — a coupon a reader
+   * cannot claim would be a broken promise on the one page whose entire pitch
+   * is that judgment gets committed before the answer is shown.
+   *
+   * NEEDS BEN'S WORDING AND HIS FULFILMENT DECISION. Registered as
+   * implementation-authored in `TRUST_FORWARD_IMPLEMENTATION_AUTHORED_LABELS`:
+   * the intent is his, the sentences are not, and a commercial commitment is
+   * not something this build should be phrasing on his behalf.
+   */
+  coupon: {
+    badge: "Free · earns a coupon",
+    lead: "Finishing Lite earns you a coupon toward Trust Forward on Studio.",
+    body:
+      "It costs nothing, it stays in your browser, and it is the cheapest way to find out whether the full curriculum is worth your ninety days.",
+    claimLabel: "Ask for your coupon",
+    claimNote: "Finish Lite, then send a note. There is no account and nothing to sign up for."
+  },
 
   /** The arrow is Ben's, typed in his brief. */
   primaryCta: "Continue to Trust Forward →",
-  /** The way back to the free doorway, secondary by construction. */
-  liteCta: "Start Trust Forward Lite"
+  /** The way back to the free doorway. */
+  liteCta: "Start Trust Forward Lite →"
 } as const;
