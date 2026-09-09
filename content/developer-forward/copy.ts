@@ -1048,15 +1048,22 @@ export const DEVELOPER_FORWARD_TEASER = {
      * enough that a reader could not picture a single screen.
      *
      * `prompt` is the checkpoint's real question, quoted, and `body` walks the
-     * four steps that follow it. Written against the shipped run rather than
-     * from the brief: `ChoiceList` renders four options, `WhyNotStep` requires
-     * the closest alternative before `CommitBar` will enable, the reveal is
-     * gated on that commit, and `ReflectBox` comes last and is optional. If any
-     * of those change, this sentence is wrong and has to move with them.
+     * loop that follows it — in Ben's first person, as of 2026-09-09, matching
+     * the coupon block below rather than the third-person register the rest of
+     * the card uses.
+     *
+     * IT NAMES FOUR OF THE FIVE STEPS AND SKIPS ONE. `ChoiceList` renders four
+     * options ("four possibilities"), the reveal shows Ben THEN and Ben NOW
+     * ("what I did then, what I would do now"), and `ReflectBox` closes it
+     * ("decide what to take forward"). What is not mentioned is `WhyNotStep`,
+     * which REQUIRES a closest alternative before `CommitBar` will enable — so
+     * a learner meets a mandatory step this card did not advertise. That is a
+     * deliberate compression of a card, not an error, but it is the sentence to
+     * revisit if anyone reports the commit button feeling stuck.
      */
     prompt: "What would you do in my shoes?",
     body:
-      "Every checkpoint asks it and gives you four ways to answer. Pick one, then name the option that came closest and what kept you from it. Commit — and only then does Ben's call appear, with what he would do differently now. Anything you write afterward stays yours.",
+      "Read my case, choose your response from four possibilities. See what I did then, what I would do now, and decide what to take forward with you.",
     /*
      * THE MIDDLE CHIP IS NOT THE BRIEF'S. The brief says "15–30 min", twice.
      * That figure was measured against ELEVEN decisions with three options
@@ -1069,8 +1076,16 @@ export const DEVELOPER_FORWARD_TEASER = {
      * whole pitch is "commit before you see the answer", it is the wrong thing
      * to be wrong about. Everything else on this page is the brief verbatim.
      */
-    chips: ["5 fixed cases", "About 15–25 minutes", "Stays in your browser"],
-    boundedLead: "It is deliberately bounded:",
+    chips: ["5 real cases", "About 15–25 minutes", "Stays in your browser"],
+    /*
+     * NAMED, NOT PRONOUNED (Ben, 2026-09-09). "It is deliberately bounded:"
+     * sits six lines below the card's last mention of the product, under a
+     * heading that no longer contains the word "Lite" — so "it" had drifted
+     * far enough from its antecedent that the three refusals underneath could
+     * read as limits on Developer Forward itself, which is the opposite of what
+     * they say.
+     */
+    boundedLead: "Developer Forward Lite is deliberately bounded:",
     boundedItems: [
       "No AI interprets your free text.",
       "No personality score is produced.",
@@ -1129,7 +1144,25 @@ export const DEVELOPER_FORWARD_TEASER = {
 
   faq: {
     eyebrow: "Developer judgment, answered",
-    heading: "What to trust, what to verify, what to delegate."
+    /*
+     * A PROVENANCE CLAIM WHERE A TOPIC HEADING WAS (Ben, 2026-09-09). It read
+     * "What to trust, what to verify, what to delegate." — the three-clause
+     * summary of the six questions underneath. The topic is still stated: the
+     * eyebrow above it says "Developer judgment, answered", and the questions
+     * are their own headings. What this line does now is answer the question a
+     * reader actually has about a page of AI-judgment copy, which is who wrote
+     * it.
+     *
+     * IT SITS BESIDE AN UNSTAMPED SITE, and the two are compatible but worth
+     * reading together. `DisclosureStrip` publishes "Nothing here is published
+     * as Ben's position until he stamps it" on every page, because
+     * `approvalState.stamp` is null. This sentence claims editorial CONTROL —
+     * AI drafts, Ben decides — not approval, so it does not trip the gate in
+     * `tests/developer-forward-content.test.ts` that bans a shipped string
+     * asserting Ben approved or stamped anything. If the stamp is ever set,
+     * check that these two still say different things.
+     */
+    heading: "Written by a real developer. AI drafts, but I decide what sticks."
   },
 
   close: {
@@ -1162,8 +1195,18 @@ export const DEVELOPER_FORWARD_TEASER = {
   coupon: {
     badge: "Free · earn your coupon",
     lead: "Finishing Lite earns you a coupon toward Developer Forward on Studio.",
+    /*
+     * BEN'S VOICE, 2026-09-09, replacing this build's own sentence ("It costs
+     * nothing, it stays in your browser, and it is the cheapest way to find out
+     * whether the full curriculum is worth your ninety days"). Two things
+     * changed beyond the words: it says "no obligation to buy" outright, which
+     * the old one only implied, and it drops into FIRST PERSON — "walk in my
+     * shoes" — which nothing else on this page does. That is the right voice
+     * for this block: the coupon is a promise Ben keeps personally, and the
+     * cases are his.
+     */
     body:
-      "It costs nothing, it stays in your browser, and it is the cheapest way to find out whether the full curriculum is worth your ninety days.",
+      "No obligation to buy, just an opportunity to walk in my shoes for five cases and then decide if the full journey is worth it to you.",
     /*
      * REPLACED 2026-09-09 (Ben). The close used to read "Ask for your coupon"
      * over a link to `/contact`, because nothing on this site could issue one
