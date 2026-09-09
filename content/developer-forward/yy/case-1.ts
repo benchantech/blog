@@ -135,13 +135,28 @@ export const case1: YYCase = {
       id: "case-1-checkpoint-1",
       caseId: "case-1",
       ordinal: 1,
+      /*
+       * BROKEN INTO TWO PARAGRAPHS 2026-09-09 (Ben), at "I had inherited the
+       * system". The break falls where the subject does: the first paragraph is
+       * the relationship and the ask, the second is what the developer already
+       * knew about the thing being asked of.
+       *
+       * NOT AN EDIT TO THE TEXT. Only whitespace changed — `CheckpointScreen`
+       * splits the capture on blank lines, and the fixture in
+       * `text-fixture.json` hashes each string with `\s+` collapsed, so this
+       * deliberately does NOT move the hash. That is the fixture working as
+       * designed rather than a gap in it: it guards the words a learner reads,
+       * and paragraphing is a rendering decision this file is allowed to make.
+       * Change a word here and it still goes red.
+       */
       capture:
         "So this client and I knew each other pretty well. We'd been working " +
         "together for a few years, and they were generally reasonable about " +
         "deadlines I'd set based on the work they needed me to do. At one point, " +
         "we were offering a platform serving external clients, and one of the " +
         "bigger external clients asked us for an export feature. They said they " +
-        "needed it within the next 24-48 hours. I had inherited the system which " +
+        "needed it within the next 24-48 hours.\n\n" +
+        "I had inherited the system which " +
         "was written long ago in an older server-side language. No AI tools " +
         "available yet. I knew there were likely some unexpected landmines " +
         "lurking underneath. But I also knew that the system was live, had been " +
