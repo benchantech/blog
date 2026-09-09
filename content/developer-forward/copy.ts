@@ -707,40 +707,141 @@ export const TODO_SHIP_AXIS_END_LABELS = null;
  * lives in one learner's browser and is worth nothing to a reader arriving from
  * a search for "how do you verify AI-generated code".
  *
- * Third-person site register, never Ben's first person — the same rule every
- * other public surface here follows.
+ * ANSWER-FIRST, AS OF 2026-09-09 — AWAITING BEN'S APPROVAL. He asked for his
+ * four answers to be massaged toward SEO/AEO/GEO targets with minimal rewording,
+ * and every edit here is the same edit: the opening clause now restates the
+ * SUBJECT of the question, so the passage stands alone when an answer engine
+ * quotes it without the heading above it. "It depends on the underlying
+ * judgment" became "AI-generated code is only as trustworthy as the judgment";
+ * "You can ask multiple AI models" became "To verify AI-generated code, ask
+ * several"; "Take what you would normally tell a human developer" gained "AI
+ * can safely own as much work as you can specify" in front of it; and the
+ * whiteboard test now closes by answering the question it was asked instead of
+ * with a bare "now you're ready".
+ *
+ * NOTHING ELSE MOVED. No claim was added, softened or dropped; the pinball
+ * machine, the North Star and the whiteboard are Ben's, word for word. The
+ * substitutions are marked in `tests/developer-forward-content.test.ts` against
+ * both his text and the layer-09 approved text, so what he wrote is recoverable
+ * if he wants any of it back.
+ *
+ * THE THIRD-PERSON RULE IS NO LONGER TRUE OF THIS SECTION, and saying so is
+ * cheaper than leaving a comment that lies. Two of the six answers are still
+ * the approved layer-09 text in the site's third-person register. Four are not:
+ * Ben rewrote them on 2026-09-09 — in direct address ("if you can explain… ship
+ * it under your own name"), in his own first person ("remain my North Star"),
+ * in the second person with a metaphor ("AI is like a pinball machine"), and in
+ * the imperative ("Grab a whiteboard, put the laptops away"). The section's
+ * heading above them is first person outright. The register here is now deliberately mixed — see
+ * `DEVELOPER_FORWARD_TEASER.faq.heading` and the coupon block, which made the
+ * same move on the same day. Update this count as the rest are rewritten.
  */
 export const LANDING_FAQ = [
   {
+    /*
+     * ANSWER REPLACED 2026-09-09 (Ben), superseding the layer-09 approved text:
+     * "AI-generated code can be trusted only to the extent that the parts that
+     * matter have been verified. The required evidence should scale with the
+     * consequence of being wrong, and the developer should understand enough of
+     * the implementation to know what still needs checking."
+     *
+     * Same position, three concrete tests instead of a principle — explain it,
+     * see the results yourself, put your name on it.
+     *
+     * THE QUESTION IS UNCHANGED, DELIBERATELY. Ben's note wrote it as "Can I
+     * trust AI-generated code?"; it ships as "Can you…" because this exact
+     * string is also `LANDING_INCOMPLETE.intentQuestions[0]`, the approved SEO
+     * intent phrasing, and the two are the same node. Rewording it here alone
+     * would give one question two forms. If the "I" phrasing is wanted, both
+     * have to move together.
+     */
     question: "Can you trust AI-generated code?",
     answer:
-      "AI-generated code can be trusted only to the extent that the parts that matter have been verified. The required evidence should scale with the consequence of being wrong, and the developer should understand enough of the implementation to know what still needs checking."
+      "AI-generated code is only as trustworthy as the judgment encoded into it. If you can explain what the code should do in your own words, verify the test results with your own eyes, and ship it under your own name — that is when you can consider it trustworthy."
   },
   {
+    /*
+     * ANSWER REPLACED 2026-09-09 (Ben), superseding the layer-09 approved text:
+     * "Start with the actual promise the code has to keep, then test the
+     * consequential paths against that promise. Review assumptions, inspect the
+     * parts that carry meaningful risk, and use deterministic evidence such as
+     * tests and observed behavior rather than treating a plausible
+     * implementation or an AI claim of completion as proof."
+     *
+     * The approved answer named a method; this one names two things a reader
+     * can do tomorrow, concedes what they cost, and then says what Ben will not
+     * trade away. "My North Star" is first person — the second answer in this
+     * block to move into it, and the register note above the array records that
+     * the section is now deliberately mixed.
+     */
     question: "How do you verify AI-generated code?",
     answer:
-      "Start with the actual promise the code has to keep, then test the consequential paths against that promise. Review assumptions, inspect the parts that carry meaningful risk, and use deterministic evidence such as tests and observed behavior rather than treating a plausible implementation or an AI claim of completion as proof."
+      "To verify AI-generated code, ask several AI models to explain it back to you with no context, or read it start to finish yourself. Time is the main factor in choosing between them. Either way, deterministic unit tests plus validation in production remain my North Star."
   },
   {
+    /*
+     * ANSWER REPLACED 2026-09-09 (Ben), superseding the layer-09 approved text:
+     * "AI can carry a large share of execution. Accountability still needs an
+     * explicit human owner. More work can be delegated when scope is clear,
+     * consequences are bounded, verification is available, and someone remains
+     * responsible for deciding what evidence is enough before the work ships."
+     *
+     * The approved answer listed the four conditions for delegating; this one
+     * answers the question a reader is actually asking — how do I hand work
+     * over — and gives them a calibration ("more specific than you would tell a
+     * human") plus an image for why. The first FIGURATIVE language in this
+     * block, and the only one on the page.
+     *
+     * WHAT THE OLD ANSWER SAID AND THIS ONE DOES NOT: that accountability needs
+     * an explicit human owner. That claim has not left the site — it is the
+     * whole of `claimById("ai-role-boundaries")` on `/ai-disclosure`, and the
+     * footer carries "AI executes inside boundaries; human judgment sets them"
+     * on every page. Worth knowing it moved rather than went.
+     */
     question: "How much work can AI safely own?",
     answer:
-      "AI can carry a large share of execution. Accountability still needs an explicit human owner. More work can be delegated when scope is clear, consequences are bounded, verification is available, and someone remains responsible for deciding what evidence is enough before the work ships."
+      "AI can safely own as much work as you can specify. Take what you would normally tell a human developer and then make it even more specific. AI is like a pinball machine: you have to place the flippers in the right spots to ensure the balls eventually reach their intended positions."
   },
   {
+    /*
+     * ANSWER REPLACED 2026-09-09 (Ben), superseding the layer-09 approved text:
+     * "AI readiness is less about access to AI tools than the judgment
+     * surrounding their use. A ready team can clarify ambiguous work, decide
+     * what to delegate, verify according to consequence, surface uncertainty,
+     * keep ownership visible, and recognize when generated work exceeds the
+     * team's ability to judge responsibly."
+     *
+     * The approved answer defined readiness with a six-item list; this one
+     * hands the reader a test they can run this afternoon and lets the
+     * definition fall out of it. Imperative throughout — the first answer in
+     * this block written as instructions rather than as a position.
+     *
+     * IT ANSWERS A NARROWER QUESTION THAN IT IS ASKED, deliberately and worth
+     * knowing. "Is my team ready" covered six capabilities; the whiteboard test
+     * probes one of them — whether the design is understood well enough to be
+     * explained without the screen. That is the load-bearing one, and the next
+     * answer ("AI readiness assessment") is where the fuller list still lives.
+     */
     question: "Is my engineering team ready for AI?",
     answer:
-      "AI readiness is less about access to AI tools than the judgment surrounding their use. A ready team can clarify ambiguous work, decide what to delegate, verify according to consequence, surface uncertainty, keep ownership visible, and recognize when generated work exceeds the team's ability to judge responsibly."
+      "Here is the readiness test. Grab a whiteboard, put the laptops away. Sketch your design. Does it make sense? Can you explain the plan without looking? If yes, your team is ready for AI."
   },
-  {
-    question: "AI readiness assessment",
-    answer:
-      "An AI readiness assessment should examine how a team handles scope, verification, promises, risk, delegation, and accountability as AI carries more execution. The goal is to expose where AI creates real leverage and where faster implementation could outrun the judgment needed to stand behind the result."
-  },
-  {
-    question: "AI fluency and judgment",
-    answer:
-      "AI fluency is more than knowing how to prompt or generate code. It includes knowing what to ask AI to do, what should remain human, how to test what comes back, when to challenge a plausible answer, and what responsibility still belongs to the person or team using the tool."
-  },
+  /*
+   * TWO ENTRIES WERE WITHDRAWN 2026-09-09, and the reason is visible in the
+   * list itself. "AI readiness assessment" and "AI fluency and judgment" are
+   * not questions — they are the two bare SEARCH TERMS among layer 07's six
+   * intent clusters, and layer 09 authored answers for all six without noticing
+   * that four of them ask something and two just name a keyword. Beside four
+   * real questions they read as exactly what they are.
+   *
+   * Ben: "that just looks like SEO grab and i don't like it."
+   *
+   * Their approved text is not deleted — it is pinned as withdrawn, byte for
+   * byte, in `tests/developer-forward-content.test.ts`, so the artifact cannot
+   * drift while they are off the page and restoring them is a copy-paste.
+   * `LANDING_INCOMPLETE.intentQuestions` still lists all six: that array is the
+   * approved SEO record and it renders nowhere, so it stays as inventory.
+   */
 ]  as const;
 
 /**
@@ -1008,7 +1109,13 @@ export const DEVELOPER_FORWARD_TEASER = {
   ],
 
   ladder: {
-    eyebrow: "Two doors",
+    /*
+     * "Try before you commit" (Ben, 2026-09-09), replacing "Two doors". The old
+     * label described the SHAPE of the section — two cards — which the reader
+     * can already see. This one states the offer, and it puts the free half
+     * first, which is the order the cards are in.
+     */
+    eyebrow: "Try before you commit",
     /*
      * SUPERSEDES THE TWO-LINE COUPLET. Ben's 2026-09-08 brief sets the section
      * heading as one sentence and shortens the second clause — "Developer Forward

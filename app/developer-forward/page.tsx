@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { FULL_OFFER, LANDING_FAQ, DEVELOPER_FORWARD_TEASER } from "@/content/developer-forward/copy";
 import { ROUTES } from "@/content/developer-forward/stamp/v1-1-0";
+import { absoluteUrl } from "@/content/canonical-surfaces";
 import styles from "./developer-forward.module.css";
 
 /**
@@ -78,6 +79,49 @@ import styles from "./developer-forward.module.css";
  * state, fires no telemetry and takes no query, hash or segment.
  */
 
+/**
+ * `FAQPage` structured data, built from `LANDING_FAQ` and never typed.
+ *
+ * WHAT THIS IS FOR, STATED HONESTLY. It is NOT a bid for a Google FAQ rich
+ * result: Google narrowed those to authoritative government and health sites in
+ * 2023, and this page will not get one. What structured data still buys is
+ * EXTRACTION — an answer engine, a crawler, or a model building a retrieval
+ * index gets four unambiguous question/answer pairs instead of having to infer
+ * them from heading levels and sibling paragraphs. That is the whole reason the
+ * four answers were rewritten answer-first, and this is the machine-readable
+ * half of the same move.
+ *
+ * GENERATED, NOT AUTHORED, and that is a governance requirement rather than a
+ * convenience. `tests/canonical-text.test.ts` fails on any prose literal of
+ * twelve words or more under `app/`, so the questions and answers CANNOT be
+ * restated here — a hand-written copy of the FAQ would be a second definition
+ * of six governed strings, free to drift from the one on screen. Deriving it
+ * from the same array the page renders makes the two provably identical.
+ *
+ * `<` IS ESCAPED, AND THAT IS THE ONE SECURITY-RELEVANT LINE IN THIS FILE. The
+ * payload goes in through `dangerouslySetInnerHTML` because JSON-LD has to be
+ * raw text inside a `<script>`; an HTML parser ends that element at the first
+ * `</script>` sequence ANYWHERE in the text, including inside a JSON string. No
+ * copy contains one today, which is exactly why the escape has to be here
+ * rather than added later — the day someone writes "use `<script>` tags
+ * sparingly" into an answer is the day this becomes an injection point, and it
+ * would ship silently. Escaping `<` as `\u003c` is still valid JSON and is
+ * parsed back to the same string.
+ */
+function faqStructuredData(): string {
+  const payload = {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    "@id": `${absoluteUrl(ROUTES.canonical)}#faq`,
+    mainEntity: LANDING_FAQ.map((entry) => ({
+      "@type": "Question",
+      name: entry.question,
+      acceptedAnswer: { "@type": "Answer", text: entry.answer }
+    }))
+  };
+  return JSON.stringify(payload).replace(/</g, "\\u003c");
+}
+
 export const metadata: Metadata = {
   title: "Developer Forward - BenChanTech",
   alternates: { canonical: "/developer-forward" }
@@ -134,6 +178,16 @@ function Goal() {
 export default function DeveloperForwardPage() {
   return (
     <div className={styles.page}>
+      {/*
+        Not rendered visibly and not an alternative to the markup below: the
+        same four pairs ship as real headings and paragraphs in the served HTML,
+        which is what layer 07's answer-first rule requires. This is the same
+        content addressed to machines that read JSON-LD.
+      */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: faqStructuredData() }}
+      />
       {/* 1 — Hero */}
       <section className={styles.hero}>
         <div className={styles.heroInner}>

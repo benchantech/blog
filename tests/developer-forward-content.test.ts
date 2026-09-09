@@ -1063,19 +1063,117 @@ test("LANDING_FAQ is the approved six questions and answers, in order", () => {
   const approved = readApprovedJson<ApprovedFaq>("landing-faq-answers.BEN_APPROVED.json");
 
   assert.equal(approved.items.length, 6, "The approved FAQ artifact no longer holds six items.");
+
+  /*
+   * FOUR SHIP, TWO ARE WITHDRAWN (Ben, 2026-09-09). The artifact still holds
+   * six; "AI readiness assessment" and "AI fluency and judgment" are the two
+   * bare search terms among layer 07's intent clusters, and they read as an SEO
+   * grab beside four real questions.
+   *
+   * Their approved text is pinned below rather than dropped, so the artifact
+   * cannot drift while they are off the page and restoring them is a
+   * copy-paste. The remaining four are still checked position by position
+   * against the artifact, so this is a suffix truncation and not a licence to
+   * reorder.
+   */
+  const WITHDRAWN = [
+    {
+      question: "AI readiness assessment",
+      answer:
+        "An AI readiness assessment should examine how a team handles scope, verification, promises, risk, delegation, and accountability as AI carries more execution. The goal is to expose where AI creates real leverage and where faster implementation could outrun the judgment needed to stand behind the result."
+    },
+    {
+      question: "AI fluency and judgment",
+      answer:
+        "AI fluency is more than knowing how to prompt or generate code. It includes knowing what to ask AI to do, what should remain human, how to test what comes back, when to challenge a plausible answer, and what responsibility still belongs to the person or team using the tool."
+    }
+  ];
+
   assert.equal(
     copyModule.LANDING_FAQ.length,
-    approved.items.length,
-    "LANDING_FAQ and the approved artifact hold different numbers of entries."
+    approved.items.length - WITHDRAWN.length,
+    "LANDING_FAQ no longer holds the four questions that ship."
   );
 
-  approved.items.forEach((item, index) => {
+  WITHDRAWN.forEach((item, offset) => {
+    const index = copyModule.LANDING_FAQ.length + offset;
+    assert.deepEqual(
+      { question: approved.items[index].question, answer: approved.items[index].answer },
+      item,
+      `the approved artifact's entry ${index} changed; this withdrawal record is out of date`
+    );
+    assert.equal(
+      copyModule.LANDING_FAQ.some((entry) => entry.question === item.question),
+      false,
+      `"${item.question}" is back on the page; it was withdrawn as a search term, not a question`
+    );
+  });
+
+  /*
+   * ONE ANSWER IS SUPERSEDED, AND THE SUPERSESSION IS PINNED FROM BOTH SIDES.
+   *
+   * Ben rewrote the first answer on 2026-09-09. Deleting or loosening this
+   * check would have given up the guarantee for all six; instead the one
+   * changed answer is named, its approved text is asserted to still be what the
+   * artifact holds (so this entry cannot go stale unnoticed if the artifact is
+   * ever revised), and the shipped text is asserted to be neither the approved
+   * string nor anything else. A second edit to this answer fails here, and so
+   * does an edit to any of the other five.
+   *
+   * QUESTIONS ARE STILL BYTE-FOR-BYTE, all six. They are the approved SEO
+   * intent phrasings and `LANDING_INCOMPLETE.intentQuestions` carries the same
+   * strings, so a question may not drift in one place only.
+   */
+  const SUPERSEDED_ANSWERS: Readonly<Record<number, { approved: string; shipped: string }>> = {
+    0: {
+      approved:
+        "AI-generated code can be trusted only to the extent that the parts that matter have been verified. The required evidence should scale with the consequence of being wrong, and the developer should understand enough of the implementation to know what still needs checking.",
+      shipped:
+        "AI-generated code is only as trustworthy as the judgment encoded into it. If you can explain what the code should do in your own words, verify the test results with your own eyes, and ship it under your own name — that is when you can consider it trustworthy."
+    },
+    1: {
+      approved:
+        "Start with the actual promise the code has to keep, then test the consequential paths against that promise. Review assumptions, inspect the parts that carry meaningful risk, and use deterministic evidence such as tests and observed behavior rather than treating a plausible implementation or an AI claim of completion as proof.",
+      shipped:
+        "To verify AI-generated code, ask several AI models to explain it back to you with no context, or read it start to finish yourself. Time is the main factor in choosing between them. Either way, deterministic unit tests plus validation in production remain my North Star."
+    },
+    2: {
+      approved:
+        "AI can carry a large share of execution. Accountability still needs an explicit human owner. More work can be delegated when scope is clear, consequences are bounded, verification is available, and someone remains responsible for deciding what evidence is enough before the work ships.",
+      shipped:
+        "AI can safely own as much work as you can specify. Take what you would normally tell a human developer and then make it even more specific. AI is like a pinball machine: you have to place the flippers in the right spots to ensure the balls eventually reach their intended positions."
+    },
+    3: {
+      approved:
+        "AI readiness is less about access to AI tools than the judgment surrounding their use. A ready team can clarify ambiguous work, decide what to delegate, verify according to consequence, surface uncertainty, keep ownership visible, and recognize when generated work exceeds the team's ability to judge responsibly.",
+      shipped:
+        "Here is the readiness test. Grab a whiteboard, put the laptops away. Sketch your design. Does it make sense? Can you explain the plan without looking? If yes, your team is ready for AI."
+    }
+  };
+
+  approved.items.slice(0, copyModule.LANDING_FAQ.length).forEach((item, index) => {
     const shipped = copyModule.LANDING_FAQ[index];
     assert.equal(
       shipped.question,
       item.question,
       `LANDING_FAQ[${index}].question does not match the approved artifact.`
     );
+
+    const superseded = SUPERSEDED_ANSWERS[index];
+    if (superseded) {
+      assert.equal(
+        item.answer,
+        superseded.approved,
+        `the approved artifact's answer ${index} changed; this supersession record is out of date`
+      );
+      assert.equal(
+        shipped.answer,
+        superseded.shipped,
+        `LANDING_FAQ[${index}].answer is neither the approved text nor the recorded supersession`
+      );
+      return;
+    }
+
     assert.equal(
       shipped.answer,
       item.answer,
@@ -1500,4 +1598,59 @@ test("no composition root supplies SHIP axis end captions", () => {
 
   // And the constant that records the ruling stays empty.
   assert.equal(copyModule.TODO_SHIP_AXIS_END_LABELS, null);
+});
+
+/* -------------------------------------------------------------------------- */
+/* 8. The FAQ's structured data                                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * `/developer-forward` publishes its four questions as `FAQPage` JSON-LD.
+ *
+ * THE POINT OF THIS TEST IS THAT THE PAYLOAD IS DERIVED, NOT TYPED. A
+ * hand-written copy of the FAQ inside `page.tsx` would be a second definition
+ * of eight governed strings, free to drift from the one on screen while both
+ * looked fine — and `tests/canonical-text.test.ts` would not catch it, because
+ * it only bans prose of twelve words or more and four of these questions are
+ * shorter than that. So this asserts the SHAPE that makes drift impossible:
+ * the builder maps `LANDING_FAQ`, and no question or answer string appears in
+ * the file at all.
+ *
+ * The `<` escape is asserted separately because it is security-relevant and
+ * currently unexercised: no answer contains a `<` today, so a regression that
+ * removed the escape would pass every other check in this repo and stay
+ * invisible until the first answer that mentions a tag. Escaping is what stops
+ * a `</script>` sequence inside a JSON string from ending the element early.
+ */
+test("the FAQ's JSON-LD is generated from LANDING_FAQ and escapes a script-closing sequence", () => {
+  const page = readFileSync(
+    path.join(repoRoot, "app", "developer-forward", "page.tsx"),
+    "utf8"
+  );
+  const code = page.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+
+  assert.ok(code.includes('"@type": "FAQPage"'), "the page publishes no FAQPage structured data");
+  assert.ok(
+    /LANDING_FAQ\.map\(/.test(code),
+    "the JSON-LD does not map LANDING_FAQ — a typed copy would be a second definition"
+  );
+  assert.ok(
+    /replace\(\/<\/g, *"\\\\u003c"\)/.test(code),
+    "the JSON-LD payload no longer escapes `<`; a `</script>` inside an answer would end the element"
+  );
+
+  // No governed string is restated in the renderer.
+  for (const entry of copyModule.LANDING_FAQ) {
+    for (const text of [entry.question, entry.answer]) {
+      assert.equal(
+        page.includes(text),
+        false,
+        `app/developer-forward/page.tsx restates a governed FAQ string: "${text.slice(0, 48)}…"`
+      );
+    }
+  }
+
+  // And the shape a consumer needs: one Question per entry, each with an answer.
+  assert.ok(/"@type": "Question"/.test(code));
+  assert.ok(/acceptedAnswer: \{ "@type": "Answer", text: entry\.answer \}/.test(code));
 });

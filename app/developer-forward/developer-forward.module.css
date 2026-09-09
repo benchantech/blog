@@ -735,19 +735,35 @@
 /* 4 — FAQ                                                                    */
 /* -------------------------------------------------------------------------- */
 
+/* FOUR ENTRIES, SO THE COLUMN COUNT IS STATED RATHER THAN FITTED. This was
+   `repeat(auto-fit, minmax(min(100%, 320px), 1fr))`, which was right for six —
+   it yielded three columns of two in a 1140px measure. With four it yields
+   three and an orphan: a last row holding one entry under two, with the rule
+   above it running the full width past nothing. Two explicit columns give 2x2,
+   and the pairing is stable if a fifth is ever added (3 + 1 with the orphan on
+   its own row reads as a deliberate last item; 3 + 2 does not). */
 .faq {
   display: grid;
   grid-template-columns: minmax(0, 1fr);
-  gap: 0 clamp(32px, 5vw, 64px);
+  gap: 0;
   margin: 0;
   padding: 0;
   list-style: none;
 }
 
+/* The rule sits on the item, not between rows, so every entry carries its own
+   and the two in a desktop row line up whatever their lengths. */
 .faqItem {
   min-width: 0;
-  padding: 26px 0;
+  padding: 24px 0;
   border-top: 1px solid var(--tf-hair-ink);
+}
+
+/* The last entry closes the block on mobile, where there is no second column to
+   square it off against. Removed at desktop: a bottom rule under only the final
+   row would be asymmetric across the pair. */
+.faqItem:last-child {
+  border-bottom: 1px solid var(--tf-hair-ink);
 }
 
 .faqQuestion {
@@ -882,7 +898,22 @@
   }
 
   .faq {
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 320px), 1fr));
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: clamp(32px, 5vw, 64px);
+  }
+
+  .faqItem {
+    padding: 28px 0 32px;
+  }
+
+  .faqItem:last-child {
+    border-bottom: 0;
+  }
+
+  /* The answer is the thing being read; hold it to a measure rather than
+     letting a half-column of a 1140px page set the line length. */
+  .faqAnswer {
+    max-width: 46ch;
   }
 
   .sectionHeading {
