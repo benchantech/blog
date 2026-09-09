@@ -499,6 +499,74 @@ test("both nav inventories survive in the header", () => {
   }
 });
 
+/**
+ * The mobile menu closes the three ways a disclosure has to.
+ *
+ * `<details>` on its own closes only when its own summary is pressed again, so
+ * a learner who opened the menu and then pressed the page had to find the
+ * button and press it a second time. Ben asked for outside-press and
+ * option-press on 2026-09-09; Escape came with them, because a menu that closes
+ * on a stray tap and not on Escape is worse for a keyboard user than one that
+ * closes on neither.
+ *
+ * ASSERTED FROM SOURCE, because the runner cannot import a component — `node
+ * --import tsx --test` has no CSS loader. The behaviour itself was exercised in
+ * a browser before this landed: opened and pressed outside (closed), pressed
+ * inside the panel (stayed open), clicked an option (closed), clicked the arrow
+ * span nested inside an option (closed), and pressed Escape (closed, focus back
+ * on the summary). What a text scan can hold is the four decisions that make
+ * those outcomes correct rather than accidental.
+ */
+test("the mobile menu closes on an outside press, on a chosen option, and on Escape", () => {
+  const shell = readRepoFile("components/MobileMenuShell.tsx");
+  const code = stripComments(shell);
+
+  assert.ok(code.startsWith('"use client"'), "the shell is not a client component; none of this runs");
+  assert.ok(/<details/.test(code), "the menu stopped being a <details> — it must still work with JS off");
+
+  // Outside press: pointerdown, on capture, and only when already open.
+  assert.ok(
+    /addEventListener\("pointerdown", *onPointerDown, *true\)/.test(code),
+    "the outside-press listener is not on the capture phase; a control that stops propagation would leave the menu open"
+  );
+  assert.ok(
+    /menu\.contains\(target\)/.test(code),
+    "the outside-press handler does not exempt presses inside the menu"
+  );
+
+  // A chosen option, including a press landing on an element nested in the link.
+  assert.ok(
+    /closest\("a"\)/.test(code),
+    "option-close checks the event target rather than its nearest link; the external-arrow span would not close the menu"
+  );
+
+  // Escape, and the focus that has to come back with it.
+  assert.ok(/event\.key !== "Escape"/.test(code), "Escape does not close the menu");
+  assert.ok(
+    /querySelector\("summary"\)\?\.focus\(\)/.test(code),
+    "Escape closes without returning focus, dropping a keyboard user to the top of the document"
+  );
+
+  // Both listeners are removed. A header mounts on every page.
+  assert.equal(
+    occurrences(code, "removeEventListener"),
+    2,
+    "the shell leaks a document listener; this component mounts on every page of the site"
+  );
+
+  // And the split held: the links and the landmark stay server-rendered.
+  const header = readRepoFile("components/SiteHeader.tsx");
+  assert.ok(
+    header.includes('aria-label="Mobile navigation"'),
+    "the mobile landmark moved out of SiteHeader.tsx, where this file's other assertions look for it"
+  );
+  assert.equal(
+    stripComments(shell).includes("publicShipNav"),
+    false,
+    "the nav inventory moved into the client shell; it belongs in the server component"
+  );
+});
+
 test("the footer is a complete mobile path to every header link", () => {
   // The gap this closes is real: `.desktop-nav` is display:none below 700px
   // with no replacement today, so /studio, /neon and yymethod.com are

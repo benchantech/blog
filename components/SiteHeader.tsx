@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { MobileMenuShell } from "@/components/MobileMenuShell";
 import { cx } from "@/components/provenance/cx";
 import { ecosystemNav, publicLessonZeroCta, publicShipNav, type NavItem } from "@/content/nav";
 import styles from "./SiteHeader.module.css";
@@ -108,16 +109,20 @@ export function SiteHeader() {
         </nav>
       </div>
 
-      <details className={styles.menu}>
-        <summary className={styles.menuButton}>
-          Menu
-        </summary>
+      {/*
+        The shell is a client component; everything inside it is still rendered
+        here, on the server. See `components/MobileMenuShell.tsx` for why the
+        split is that way round rather than the whole header becoming a client
+        component — the short version is that this file's structure is asserted
+        by name in tests/preserved-surfaces.test.ts.
+      */}
+      <MobileMenuShell className={styles.menu} summaryClassName={styles.menuButton} label="Menu">
         <nav className={styles.menuPanel} aria-label="Mobile navigation">
           {[...publicShipNav, ...(publicLessonZeroCta ? [publicLessonZeroCta] : []), ...ecosystemNav].map((item) => (
             <NavLink item={item} key={item.href} />
           ))}
         </nav>
-      </details>
+      </MobileMenuShell>
     </header>
   );
 }
