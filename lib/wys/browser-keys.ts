@@ -27,7 +27,7 @@ export const CONSENT_STORAGE_KEY = "bct_analytics_consent";
 export interface BrowserKeyRecord {
   key: string;
   /** Which surface owns it. */
-  owner: "watch-your-step" | "site" | "trust-forward";
+  owner: "watch-your-step" | "site" | "developer-forward";
   /** The module that writes it — the thing that makes this registry checkable. */
   writtenBy: string;
   /** What it holds, in plain terms, for the Data page. */
@@ -37,19 +37,19 @@ export interface BrowserKeyRecord {
 }
 
 /**
- * The Trust Forward Lite dataset key, from the stamped `storage.key`.
+ * The Developer Forward Lite dataset key, from the stamped `storage.key`.
  *
  * `clearedByWysClear: false` is the whole point of the field here. Two products
  * now write local data on this origin and NEITHER may sweep the other's:
  * `wysOwnedKeys()` filters on `WYS_KEY_PREFIX` (`wys:`), and this key does not
  * carry that prefix, so a Watch Your Step clear cannot touch a learner's Trust
- * Forward ledger and Trust Forward's own reset cannot touch Watch Your Step.
+ * Forward ledger and Developer Forward's own reset cannot touch Watch Your Step.
  */
-export const TRUST_FORWARD_STORAGE_KEY = "benchantech:trust-forward-lite:state";
+export const DEVELOPER_FORWARD_STORAGE_KEY = "benchantech:developer-forward-lite:state";
 
 /**
- * The Trust Forward Lite YY ledger key, from `TRUST_FORWARD_YY_STORAGE_KEY` in
- * `lib/trust-forward/yy/records.ts`.
+ * The Developer Forward Lite YY ledger key, from `DEVELOPER_FORWARD_YY_STORAGE_KEY` in
+ * `lib/developer-forward/yy/records.ts`.
  *
  * A FOURTH KEY, AND A SECOND ONE FOR THE SAME PRODUCT. It is not nested inside
  * the v1 dataset because that dataset's serializer drops every undeclared
@@ -69,14 +69,14 @@ export const TRUST_FORWARD_STORAGE_KEY = "benchantech:trust-forward-lite:state";
  * the caller's.
  *
  * THE LITERAL IS RESTATED RATHER THAN IMPORTED, exactly as the v1 key above is.
- * `records.ts` reaches `@/lib/trust-forward/ledger`, `/session` and `/storage`;
+ * `records.ts` reaches `@/lib/developer-forward/ledger`, `/session` and `/storage`;
  * importing it here would pull the whole YY machinery into `/privacy`,
  * `/cookies` and the Data page, all of which need the NAME of the key and
  * nothing else. `tests/wys-local-state.test.ts` reads `records.ts` off disk and
  * asserts the two literals are byte-identical, which is the same mechanism that
  * keeps `CONSENT_STORAGE_KEY` and the frozen `ConsentBanner` literal in step.
  */
-export const TRUST_FORWARD_YY_STORAGE_KEY = "benchantech:trust-forward-lite:yy";
+export const DEVELOPER_FORWARD_YY_STORAGE_KEY = "benchantech:developer-forward-lite:yy";
 
 export const BROWSER_KEYS: readonly BrowserKeyRecord[] = [
   {
@@ -87,17 +87,17 @@ export const BROWSER_KEYS: readonly BrowserKeyRecord[] = [
     clearedByWysClear: true
   },
   {
-    key: TRUST_FORWARD_STORAGE_KEY,
-    owner: "trust-forward",
-    writtenBy: "lib/trust-forward/storage.ts",
+    key: DEVELOPER_FORWARD_STORAGE_KEY,
+    owner: "developer-forward",
+    writtenBy: "lib/developer-forward/storage.ts",
     holds:
       "your five-case answers, the immutable local ledger of what you did, any optional notes you wrote, your optional local handle, unsent drafts and the derived result",
     clearedByWysClear: false
   },
   {
-    key: TRUST_FORWARD_YY_STORAGE_KEY,
-    owner: "trust-forward",
-    writtenBy: "lib/trust-forward/yy/records.ts",
+    key: DEVELOPER_FORWARD_YY_STORAGE_KEY,
+    owner: "developer-forward",
+    writtenBy: "lib/developer-forward/yy/records.ts",
     holds:
       "the judgment you committed at each case checkpoint, the option you named as your closest alternative, any optional notes you wrote before or after committing, and the time and run each one belongs to",
     clearedByWysClear: false

@@ -163,10 +163,10 @@ const PROVENANCE_LABELS = {
     IMPLEMENTATION_PLACEHOLDER: "Implementation placeholder — not Ben's words" // NEW
   },
   /**
-   * TRUST FORWARD LITE (plan §7). A separate kind rather than a reuse of
+   * DEVELOPER FORWARD LITE (plan §7). A separate kind rather than a reuse of
    * `fictional-scenario`, and the reason is one word in that row's labels:
    * every one of them says "authored for Watch Your Step", which would be a
-   * false statement about a Trust Forward case.
+   * false statement about a Developer Forward case.
    *
    * `CASES.md` is explicit that Lite's five scenarios are constructed and
    * "must not be presented as Ben's lived cases", so no Ben origin appears
@@ -179,7 +179,7 @@ const PROVENANCE_LABELS = {
     /* The 27 world-state fragments, the callbacks, closes, cross-case surfaces
      * and the 729 terminal narratives: recovered prior authoring, approved for
      * public render 2026-09-07. NEW label — needs Ben's stamp (SC-TF6 list). */
-    FICTIONAL_AUTHORED: "Constructed developer scenario — authored for Trust Forward Lite", // NEW
+    FICTIONAL_AUTHORED: "Constructed developer scenario — authored for Developer Forward Lite", // NEW
     BEN_APPROVED: "Approved by Ben", // NEW
     /* The 33 receipt phrases: written during implementation under Ben's
      * approved receipt rule, and honestly labelled as such. */

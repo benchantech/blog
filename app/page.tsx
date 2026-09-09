@@ -3,8 +3,8 @@ import { stakeholderRoutes } from "@/content/site-config";
 import {
   LANDING_INCOMPLETE,
   TRUST_STRIP
-} from "@/content/trust-forward/copy";
-import { ROUTES } from "@/content/trust-forward/stamp/v1-1-0";
+} from "@/content/developer-forward/copy";
+import { ROUTES } from "@/content/developer-forward/stamp/v1-1-0";
 import {
   landingAntiFeatures,
   landingLabels
@@ -16,10 +16,10 @@ import { cx } from "@/components/provenance/cx";
 import styles from "./home.module.css";
 
 /**
- * `/` — Trust Forward at the top, and the whole of the previous home page
+ * `/` — Developer Forward at the top, and the whole of the previous home page
  * beneath it.
  *
- * THE PRODUCT ENTRY IS TRUST FORWARD, AND THAT IS A CONSEQUENCE OF A RULING
+ * THE PRODUCT ENTRY IS DEVELOPER FORWARD, AND THAT IS A CONSEQUENCE OF A RULING
  * ALREADY IN FORCE RATHER THAN A NEW ONE. `WYS_NAV_RETIRED` is `true`,
  * `content/canonical-surfaces.ts` moves the course into `RETIRED_SURFACES`, and
  * `next.config.ts` points the course routes at `/` with non-permanent
@@ -56,8 +56,8 @@ import styles from "./home.module.css";
  * in `content/watch-your-step/landing.ts` and belongs to whoever owns the Data
  * page's new home.
  *
- * EVERY SENTENCE IN THE NEW HERO COMES FROM `content/trust-forward/copy.ts`,
- * through `LANDING_INCOMPLETE` — the same object `/trust-forward` renders, in
+ * EVERY SENTENCE IN THE NEW HERO COMES FROM `content/developer-forward/copy.ts`,
+ * through `LANDING_INCOMPLETE` — the same object `/developer-forward` renders, in
  * the same order (heading, lede, body, descriptor, time estimate), so the two
  * surfaces cannot make the offer with different words. `FULL_OFFER.bridge` and
  * its confidentiality sentence are NOT rendered here: copy.ts requires them as
@@ -66,7 +66,7 @@ import styles from "./home.module.css";
  * cases and makes no claim about real clients.
  *
  * THE CTA POINTS AT `ROUTES.canonical`, the door, not at `ROUTES.publicAlternate`,
- * the run. `/trust-forward` is the crawlable node that carries the answer-first
+ * the run. `/developer-forward` is the crawlable node that carries the answer-first
  * material and the completion split; sending the home page past it would skip
  * the one surface that knows whether this browser has already finished.
  *
@@ -77,7 +77,7 @@ import styles from "./home.module.css";
  * its words untouched. `tests/preserved-surfaces.test.ts` and
  * `tests/home-landing.test.ts` execute that promise.
  *
- * TWO `<h1>`s STILL EXIST ON THIS URL. The Trust Forward hero is the page's
+ * TWO `<h1>`s STILL EXIST ON THIS URL. The Developer Forward hero is the page's
  * primary heading and the preserved foyer keeps the one it shipped with,
  * because demoting it would be a semantic edit to preserved markup.
  *
@@ -89,9 +89,9 @@ import styles from "./home.module.css";
 export default function Home() {
   return (
     <>
-      <section className={cx(styles.section, styles.hero)} aria-labelledby="trust-forward-heading">
+      <section className={cx(styles.section, styles.hero)} aria-labelledby="developer-forward-heading">
         <div>
-          <h1 className={styles.heroHeadline} id="trust-forward-heading">
+          <h1 className={styles.heroHeadline} id="developer-forward-heading">
             {LANDING_INCOMPLETE.heading}
           </h1>
           <p className={styles.heroLead}>{LANDING_INCOMPLETE.lede}</p>

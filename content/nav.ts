@@ -49,15 +49,15 @@ export const lessonZeroCta: NavItem = {
 };
 
 /**
- * Trust Forward — the site's primary product entry (layer-01
+ * Developer Forward — the site's primary product entry (layer-01
  * CURRENT_SITE_INTEGRATION_NOTES, "replace primary Watch Your Step product
- * entry with Trust Forward"). `/trust-forward` is the canonical public route
- * under Ben's 2026-09-07 routes ruling; `/trust-forward-lite` is the sandbox
+ * entry with Developer Forward"). `/developer-forward` is the canonical public route
+ * under Ben's 2026-09-07 routes ruling; `/developer-forward-lite` is the sandbox
  * and is reached from it rather than from the chrome.
  */
-export const trustForwardNav: NavItem = {
-  href: "/trust-forward",
-  label: "Trust Forward"
+export const developerForwardNav: NavItem = {
+  href: "/developer-forward",
+  label: "Developer Forward"
 };
 
 /**
@@ -92,10 +92,10 @@ export const SHIP_NAV_CONSOLIDATED = true;
  * inventory intact is what makes each one a constant to reverse.
  */
 export const publicShipNav: readonly NavItem[] = SHIP_NAV_CONSOLIDATED
-  ? [trustForwardNav]
+  ? [developerForwardNav]
   : WYS_NAV_RETIRED
-    ? [trustForwardNav, ...shipNav.filter((item) => item.href !== "/watch-your-step")]
-    : [trustForwardNav, ...shipNav];
+    ? [developerForwardNav, ...shipNav.filter((item) => item.href !== "/watch-your-step")]
+    : [developerForwardNav, ...shipNav];
 
 /** Null while the course is retired, so no chrome can render a dead CTA. */
 export const publicLessonZeroCta: NavItem | null = WYS_NAV_RETIRED ? null : lessonZeroCta;

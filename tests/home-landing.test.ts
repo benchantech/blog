@@ -9,7 +9,7 @@ import { stopCount } from "@/content/watch-your-step/weeks";
 import { wysLabels } from "@/content/watch-your-step/copy";
 import { lessonZeroCta } from "@/content/nav";
 import { policyForCanonicalText } from "@/lib/canonical-text";
-import { ROUTES } from "@/content/trust-forward/stamp/v1-1-0";
+import { ROUTES } from "@/content/developer-forward/stamp/v1-1-0";
 
 /**
  * Phase 10 — `/` and `/watch-your-step` (plan Phase 10; mockup `4a`).
@@ -283,23 +283,23 @@ test("/ no longer advertises the retired course: no hero, no CTA, no stop previe
   assert.equal(/href="\/watch-your-step/.test(homeMarkup), false, "/ links straight into the retired tree");
 });
 
-test("Trust Forward is the home page's primary CTA, in the approved words", () => {
-  // The hero reads `LANDING_INCOMPLETE` — the same object `/trust-forward`
+test("Developer Forward is the home page's primary CTA, in the approved words", () => {
+  // The hero reads `LANDING_INCOMPLETE` — the same object `/developer-forward`
   // renders — so the two surfaces cannot make the offer with different words,
   // and `tests/canonical-text.test.ts`'s one-definition rule keeps it that way.
-  assert.ok(homePage.includes('from "@/content/trust-forward/copy"'), "/ types its own Trust Forward copy");
-  assert.ok(homePage.includes("LANDING_INCOMPLETE.primaryCta"), "/ has no Trust Forward CTA label");
+  assert.ok(homePage.includes('from "@/content/developer-forward/copy"'), "/ types its own Developer Forward copy");
+  assert.ok(homePage.includes("LANDING_INCOMPLETE.primaryCta"), "/ has no Developer Forward CTA label");
   assert.ok(homePage.includes("ROUTES.canonical"), "/ does not send the CTA to the canonical node");
-  assert.equal(ROUTES.canonical, "/trust-forward");
+  assert.equal(ROUTES.canonical, "/developer-forward");
   // The bridge sentence and its confidentiality limit are one unit or neither
-  // (content/trust-forward/copy.ts). The home page shows neither.
+  // (content/developer-forward/copy.ts). The home page shows neither.
   assert.ok(!homeMarkup.includes("fullOffer.bridge"), "/ publishes the real-cases claim without its limit");
   assert.ok(!homeMarkup.includes("confidentiality"), "/ publishes the confidentiality sentence alone");
   /*
    * ONE h1, FROM 2026-09-08 — and this assertion moved from 2 to 1 because the
    * page changed, not because the number was inconvenient.
    *
-   * Q2's stacking put the Trust Forward hero above the preserved foyer, and
+   * Q2's stacking put the Developer Forward hero above the preserved foyer, and
    * each kept its own h1, so this URL carried two: an accepted deviation
    * recorded as such. Ben's withdrawal of the foyer removed the second one, and
    * a single h1 naming the offer is the correct end state rather than a
@@ -310,7 +310,7 @@ test("Trust Forward is the home page's primary CTA, in the approved words", () =
    * second h1 arriving unnoticed, and that is only catchable by pinning the
    * count.
    */
-  assert.ok(homeMarkup.includes('id="trust-forward-heading"'));
+  assert.ok(homeMarkup.includes('id="developer-forward-heading"'));
   assert.equal(homeMarkup.split("<h1").length - 1, 1, "the home page no longer carries exactly one h1");
 });
 

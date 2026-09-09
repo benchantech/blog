@@ -173,8 +173,8 @@ test("preserved redirects and launch redirects survive in next.config.ts", () =>
     { source: "/crew", destination: "/" },
     { source: "/ben", destination: "/" },
     { source: "/system", destination: "/" },
-    /* The Trust Forward bridge. One line to change when Studio moves. */
-    { source: "/tf", destination: "https://studio.com/benchanviolin/trust-forward" }
+    /* The Developer Forward bridge. One line to change when Studio moves. */
+    { source: "/df", destination: "https://studio.com/benchanviolin/trust-forward" }
   ];
   /*
    * PAIRED, from 2026-09-08. This asserted the two strings SEPARATELY — that

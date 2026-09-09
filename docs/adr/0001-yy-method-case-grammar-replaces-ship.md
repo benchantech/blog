@@ -3,7 +3,7 @@
 **Status:** ACCEPTED
 **Decided:** 2026-09-08
 **Supersedes:** the SHIP architecture shipped in commits `47a0cb9` and `fe04361`
-**Stale when:** a Ben ruling reinstates numeric scoring on Trust Forward Lite's required path, or
+**Stale when:** a Ben ruling reinstates numeric scoring on Developer Forward Lite's required path, or
 the YY Method doctrine at <https://yymethod.com/work> supersedes v2.3 in a way that changes the five
 stages.
 
@@ -11,7 +11,7 @@ stages.
 
 ## Context
 
-Trust Forward Lite originally scored five fictional cases through six ternary dimensions into a
+Developer Forward Lite originally scored five fictional cases through six ternary dimensions into a
 four-bit SHIP code: a 729-state lattice, 465 of them reachable, 138 recovered signal tags, 33
 options. It was built, verified against its own source tables, and committed.
 
@@ -22,7 +22,7 @@ dimensions, the 0/.5/1 lattice, the 729-state model, and the 33-option instrumen
 
 ## Decision
 
-Trust Forward Lite implements the **YY Method™** literally, not by reference:
+Developer Forward Lite implements the **YY Method™** literally, not by reference:
 
 > **CAPTURE → WHY → WHY-NOT → COMMIT → TIMESTAMP**
 
@@ -57,9 +57,9 @@ when tools, economics, experience or responsibility change. Merging them would d
   because "recovered prior authoring" and "written during implementation" must not collapse.
 - A tag carried by only one checkpoint can never resonate. That is **signal about the instrument,
   not a defect** — and specifically, it must never be fixed by merging tags until something lights
-  up. `tests/trust-forward-yy-content.test.ts` pins the single-checkpoint set so a change is visible.
+  up. `tests/developer-forward-yy-content.test.ts` pins the single-checkpoint set so a change is visible.
 
 ## Guard
 
-`tests/trust-forward-yy-content.test.ts` — 15 tests: five cases, seventeen checkpoints, 68 choices,
+`tests/developer-forward-yy-content.test.ts` — 15 tests: five cases, seventeen checkpoints, 68 choices,
 both Ben judgments each; the resonance threshold; and the declared single-checkpoint tag set.

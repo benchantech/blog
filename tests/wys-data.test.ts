@@ -195,14 +195,14 @@ test("the key list is generated from BROWSER_KEYS, not written out", () => {
 });
 
 test("every browser key is in the registry, so the sitewide title stays honest (Q6)", () => {
-  // Four now, not two: the two Trust Forward keys are registered alongside the
+  // Four now, not two: the two Developer Forward keys are registered alongside the
   // course dataset and the consent choice, and the page title is a claim about
   // the SITE, so every key an origin holds has to be reachable from this list.
   const keys = BROWSER_KEYS.map((record) => record.key);
   assert.ok(keys.includes(WYS_STORAGE_KEY));
   assert.ok(keys.includes(CONSENT_STORAGE_KEY));
-  assert.ok(keys.includes("benchantech:trust-forward-lite:state"));
-  assert.ok(keys.includes("benchantech:trust-forward-lite:yy"));
+  assert.ok(keys.includes("benchantech:developer-forward-lite:state"));
+  assert.ok(keys.includes("benchantech:developer-forward-lite:yy"));
   assert.equal(keys.length, 4, "a browser key arrived without updating this assertion");
   // Q6's ratified default keeps "What this site knows about you" — a claim
   // about the SITE — and makes it true by listing the consent key too.
@@ -394,12 +394,12 @@ test("the footnote's approved half is unchanged and its addition is separate", (
 });
 
 test("what survives a clear is what the registry says survives", () => {
-  // Trust Forward's dataset survives a Watch Your Step clear, and vice versa:
-  // `wysOwnedKeys()` filters on the `wys:` prefix and the Trust Forward key
+  // Developer Forward's dataset survives a Watch Your Step clear, and vice versa:
+  // `wysOwnedKeys()` filters on the `wys:` prefix and the Developer Forward key
   // does not carry it. Two products, two datasets, neither sweeping the other.
   assert.deepEqual(keysSurvivingWysClear(), [
-    "benchantech:trust-forward-lite:state",
-    "benchantech:trust-forward-lite:yy",
+    "benchantech:developer-forward-lite:state",
+    "benchantech:developer-forward-lite:yy",
     CONSENT_STORAGE_KEY
   ]);
   const survives = resolveVariant(clearingSurvivesText, "short");

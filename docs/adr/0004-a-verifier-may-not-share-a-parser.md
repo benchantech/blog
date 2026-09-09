@@ -55,5 +55,5 @@ claim about decisions.
 
 ## Guard
 
-`tests/trust-forward-yy-content.test.ts` — "no narrative is truncated relative to its source block",
+`tests/developer-forward-yy-content.test.ts` — "no narrative is truncated relative to its source block",
 plus the fixture's word-level coverage assertions in both directions.

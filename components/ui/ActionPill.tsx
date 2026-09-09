@@ -60,9 +60,9 @@ export function ActionPill({
      *
      * An earlier version rendered the anchor without the handler, so a caller
      * that passed BOTH silently got navigation and no callback — no type error,
-     * no test failure, nothing on screen. Trust Forward's four gated cards hit
+     * no test failure, nothing on screen. Developer Forward's four gated cards hit
      * exactly that: they are links to /tf that also need to fire
-     * `tf_full_trust_forward_clicked`, and the event simply never fired.
+     * `df_full_developer_forward_clicked`, and the event simply never fired.
      *
      * The handler must not preventDefault or return false — navigation is the
      * point, and the callback is measurement layered on top of it. Fire-and-go

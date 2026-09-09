@@ -724,15 +724,15 @@ const DATALAYER_CODE_REFERENCE = /\bwindow\s*\.\s*dataLayer\b|\bdataLayer\s*(\?\
  * The rule has never been "one file may touch dataLayer"; it is "nothing may
  * reach dataLayer except through an adapter that enforces a closed event
  * allowlist, closed property VALUE domains, the consent gate and the ga4-init
- * flush rule". Trust Forward is a second product with its own closed
- * allowlist — 17 `tf_`-prefixed events and four properties — and folding its
+ * flush rule". Developer Forward is a second product with its own closed
+ * allowlist — 17 `df_`-prefixed events and four properties — and folding its
  * events into the Watch Your Step adapter would mean one allowlist policing two
  * vocabularies, which is how an allowlist stops being closed.
  *
  * So the exemption is a SET of adapters, and the test below earns each entry by
  * asserting the properties that make it an adapter rather than a bypass.
  */
-const DATALAYER_ADAPTERS = ["lib/wys/telemetry.ts", "lib/trust-forward/telemetry.ts"];
+const DATALAYER_ADAPTERS = ["lib/wys/telemetry.ts", "lib/developer-forward/telemetry.ts"];
 
 test("every dataLayer adapter enforces a closed allowlist and the ga4-init flush rule", () => {
   for (const relative of DATALAYER_ADAPTERS) {

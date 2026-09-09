@@ -36,7 +36,7 @@ the cost of investigation. Those are facts about *his judgment*, not about a cli
 survive compositing intact. The product's central claim is undamaged — which is the entire reason
 for cutting here.
 
-Seven substitutions are approved, span by span, in `content/trust-forward/yy/approved-blurs.ts`.
+Seven substitutions are approved, span by span, in `content/developer-forward/yy/approved-blurs.ts`.
 
 ## Why the guarantee is a diff, not a provenance tag
 
@@ -73,7 +73,7 @@ Party words (`the client`, `my client`) are untouched — role words, not identi
 
 ## Guard
 
-`tests/trust-forward-yy-content.test.ts`, proven against injected faults:
+`tests/developer-forward-yy-content.test.ts`, proven against injected faults:
 
 | Injected | Result |
 |---|---|

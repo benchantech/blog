@@ -7,7 +7,7 @@ import {
   BROWSER_KEYS,
   BROWSER_KEY_NAMES,
   CONSENT_STORAGE_KEY,
-  TRUST_FORWARD_YY_STORAGE_KEY,
+  DEVELOPER_FORWARD_YY_STORAGE_KEY,
   keysSurvivingWysClear,
   wysOwnedKeys
 } from "@/lib/wys/browser-keys";
@@ -675,8 +675,8 @@ test("BROWSER_KEYS registers every key this build writes, with their writers", (
     [...BROWSER_KEY_NAMES].sort(),
     [
       "bct_analytics_consent",
-      "benchantech:trust-forward-lite:state",
-      "benchantech:trust-forward-lite:yy",
+      "benchantech:developer-forward-lite:state",
+      "benchantech:developer-forward-lite:yy",
       "wys:v1"
     ]
   );
@@ -684,8 +684,8 @@ test("BROWSER_KEYS registers every key this build writes, with their writers", (
   // widen what a Watch Your Step clear sweeps.
   assert.deepEqual(wysOwnedKeys(), [WYS_STORAGE_KEY]);
   assert.deepEqual(keysSurvivingWysClear(), [
-    "benchantech:trust-forward-lite:state",
-    "benchantech:trust-forward-lite:yy",
+    "benchantech:developer-forward-lite:state",
+    "benchantech:developer-forward-lite:yy",
     CONSENT_STORAGE_KEY
   ]);
   for (const record of BROWSER_KEYS) {
@@ -701,17 +701,17 @@ test("the registered consent key is byte-identical to the frozen ConsentBanner l
 
 test("the registered YY key is byte-identical to the literal records.ts writes", () => {
   // The registry restates the literal rather than importing it, because
-  // `lib/trust-forward/yy/records.ts` reaches the ledger, the session and the
+  // `lib/developer-forward/yy/records.ts` reaches the ledger, the session and the
   // storage probe, and `/privacy`, `/cookies` and the Data page need the NAME
   // and nothing else. A restated literal is only safe while something asserts
   // the two agree — this is that something, and it is the same mechanism the
   // frozen ConsentBanner literal is held to above.
   const source = readFileSync(
-    path.join(repoRoot, "lib", "trust-forward", "yy", "records.ts"),
+    path.join(repoRoot, "lib", "developer-forward", "yy", "records.ts"),
     "utf8"
   );
   assert.ok(
-    source.includes(`export const TRUST_FORWARD_YY_STORAGE_KEY = "${TRUST_FORWARD_YY_STORAGE_KEY}";`),
+    source.includes(`export const DEVELOPER_FORWARD_YY_STORAGE_KEY = "${DEVELOPER_FORWARD_YY_STORAGE_KEY}";`),
     "the YY ledger writes a key the registry does not name — the Data page key list is now false"
   );
 });

@@ -110,14 +110,15 @@ const nextConfig: NextConfig = {
         permanent: false
       },
       /*
-       * `/tf` is the stable redirect BenChanTech controls (layer-01 README).
-       * Every "continue to full Trust Forward" CTA in the product points here
+       * `/df` is the stable redirect BenChanTech controls (layer-01 README, where it
+       * reads `/tf`; renamed with the product on 2026-09-09).
+       * Every "continue to full Developer Forward" CTA in the product points here
        * rather than at studio.com directly, so when the destination moves this
        * is the only line that changes. Canonical destination confirmed under
        * SC-TF6 (layer 08).
        */
       {
-        source: "/tf",
+        source: "/df",
         destination: "https://studio.com/benchanviolin/trust-forward",
         permanent: false
       }

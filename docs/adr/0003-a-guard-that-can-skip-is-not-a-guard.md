@@ -9,7 +9,7 @@ this ADR's fixture requirement can relax to "source comparison only".
 
 ## Context — the mistake
 
-`tests/trust-forward-yy-content.test.ts` compares shipped case text against a canonical source
+`tests/developer-forward-yy-content.test.ts` compares shipped case text against a canonical source
 document living at an **absolute path outside the repo**. When the file is missing, the checks call
 `t.skip`.
 
@@ -29,7 +29,7 @@ false") — one step worse, because an absent check cannot even go red.
 
 **Any guard whose evidence can be missing must have a second form that always runs.**
 
-Concretely: `content/trust-forward/yy/text-fixture.json` holds the SHA-256 of all 133 learner-facing
+Concretely: `content/developer-forward/yy/text-fixture.json` holds the SHA-256 of all 133 learner-facing
 strings, generated while the source *was* present and full verification passed. It needs no external
 file.
 

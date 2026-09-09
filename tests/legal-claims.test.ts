@@ -476,8 +476,8 @@ test("every browser key is named on /privacy and /cookies, generated from the re
     [...BROWSER_KEY_NAMES],
     [
       WYS_STORAGE_KEY,
-      "benchantech:trust-forward-lite:state",
-      "benchantech:trust-forward-lite:yy",
+      "benchantech:developer-forward-lite:state",
+      "benchantech:developer-forward-lite:yy",
       "bct_analytics_consent"
     ]
   );
@@ -577,7 +577,7 @@ test("every navigation rule the /accessibility sentence names declares its own 4
   assert.match(ruleBody(data, ".summary"), /min-height: 44px/);
 
   /*
-   * TRUST FORWARD LITE'S OWN CONTROLS, ADDED 2026-09-08. The sentence says
+   * DEVELOPER FORWARD LITE'S OWN CONTROLS, ADDED 2026-09-08. The sentence says
    * "course controls", and the YY run is a course: every control a learner
    * touches across seventeen checkpoints and the evidence summary is covered by
    * one of the three shared primitives — except `.replayAction`, which is
@@ -592,7 +592,7 @@ test("every navigation rule the /accessibility sentence names declares its own 4
   assert.match(ruleBody(primitives, ".choice"), /min-height: 44px/);
   assert.match(ruleBody(primitives, ".linkRow"), /min-height: 44px/);
   assert.match(
-    ruleBody(read("components/trust-forward/yy/yy.module.css"), ".replayAction"),
+    ruleBody(read("components/developer-forward/yy/yy.module.css"), ".replayAction"),
     /min-height: 44px/
   );
 });

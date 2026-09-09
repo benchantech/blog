@@ -166,9 +166,9 @@ export const externalSourceRefs = [
       "lib/wys/local-state.ts WYS_DECLARED_KEYS — the declared schema has no score, streak, percentage or grade field, so the serializer cannot persist one"
   },
   /* ---------------------------------------------------------------------- */
-  /* Trust Forward Lite — the 2026-09-07 handoff (plan §7).                   */
+  /* Developer Forward Lite — the 2026-09-07 handoff (plan §7).                   */
   /*                                                                          */
-  /* `tf-package` is added in the Trust Forward phase. Every locator carries  */
+  /* `tf-package` is added in the Developer Forward phase. Every locator carries  */
   /* the artifact's SHA-256 from the handoff's own manifest, because these    */
   /* are the first sources this repo cites that live in a versioned bundle    */
   /* outside it: a filename alone cannot distinguish the layer-07 ruling from */
@@ -179,31 +179,31 @@ export const externalSourceRefs = [
     id: "tf-cases-verbatim",
     kind: "tf-package",
     locator:
-      "06_full-five-case-authoring-extraction/FULL_FIVE_CASES_ALL_TEXT_OPTIONS_VERBATIM.md — the complete five-case prior authoring (digest declared in content/trust-forward/digests.ts)"
+      "06_full-five-case-authoring-extraction/FULL_FIVE_CASES_ALL_TEXT_OPTIONS_VERBATIM.md — the complete five-case prior authoring (digest declared in content/developer-forward/digests.ts)"
   },
   {
     id: "tf-signal-map",
     kind: "tf-package",
     locator:
-      "03_codex-completion-handoff/recovered/fixed-answer-signal-map.recovered.json — 138 recovered posture tags (digest declared in content/trust-forward/digests.ts)"
+      "03_codex-completion-handoff/recovered/fixed-answer-signal-map.recovered.json — 138 recovered posture tags (digest declared in content/developer-forward/digests.ts)"
   },
   {
     id: "tf-variant-composition",
     kind: "tf-package",
     locator:
-      "03_codex-completion-handoff/recovered/55-variant-composition-spec.recovered.json — the 27 world-state fragments (digest declared in content/trust-forward/digests.ts)"
+      "03_codex-completion-handoff/recovered/55-variant-composition-spec.recovered.json — the 27 world-state fragments (digest declared in content/developer-forward/digests.ts)"
   },
   {
     id: "tf-receipt-drafts",
     kind: "tf-package",
     locator:
-      "03_codex-completion-handoff/drafts/33-receipt-phrases.MARKED_DRAFT.json — 33 implementation-authored receipts (digest declared in content/trust-forward/digests.ts)"
+      "03_codex-completion-handoff/drafts/33-receipt-phrases.MARKED_DRAFT.json — 33 implementation-authored receipts (digest declared in content/developer-forward/digests.ts)"
   },
   {
     id: "tf-729-narratives",
     kind: "tf-package",
     locator:
-      "04_reviewed-implementation-plan/recovered/trust_forward_lite_729_profiles_SHIP_recalculated.csv — the recovered terminal narratives (digest declared in content/trust-forward/digests.ts)"
+      "04_reviewed-implementation-plan/recovered/developer_forward_lite_729_profiles_SHIP_recalculated.csv — the recovered terminal narratives (digest declared in content/developer-forward/digests.ts)"
   },
   {
     id: "tf-aggregation-policy",

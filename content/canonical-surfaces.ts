@@ -45,7 +45,7 @@ import {
   lessonZeroCta,
   publicShipNav,
   shipNav,
-  trustForwardNav
+  developerForwardNav
 } from "@/content/nav";
 import { WYS_NAV_RETIRED } from "@/content/watch-your-step/config";
 import { courseTabs, stopDisplayName } from "@/content/watch-your-step/tabs";
@@ -54,7 +54,7 @@ import { WYS_STOP_IDS, wysWeekById } from "@/content/watch-your-step/weeks";
 export type CanonicalSurfaceGroup =
   | "home"
   | "ship"
-  | "trust-forward"
+  | "developer-forward"
   | "course"
   | "legal"
   | "preserved"
@@ -146,15 +146,15 @@ const COURSE_SURFACES: readonly CanonicalSurface[] = [
 ];
 
 /**
- * TRUST FORWARD (plan §9). Two human pages.
+ * DEVELOPER FORWARD (plan §9). Two human pages.
  *
  * `/tf` is deliberately ABSENT. It is a redirect, and this roster's own rule is
  * that redirects are not surfaces — listing one is how a crawler ends up with
  * two nodes for one concept.
  */
-const TRUST_FORWARD_SURFACES: readonly CanonicalSurface[] = [
-  { path: trustForwardNav.href, label: trustForwardNav.label, group: "trust-forward", human: true },
-  { path: "/trust-forward-lite", label: "Trust Forward Lite", group: "trust-forward", human: true }
+const DEVELOPER_FORWARD_SURFACES: readonly CanonicalSurface[] = [
+  { path: developerForwardNav.href, label: developerForwardNav.label, group: "developer-forward", human: true },
+  { path: "/developer-forward-lite", label: "Developer Forward Lite", group: "developer-forward", human: true }
 ];
 
 /**
@@ -180,7 +180,7 @@ const TRUST_FORWARD_SURFACES: readonly CanonicalSurface[] = [
  * pages, whose last in-page links went with the "How the site is run" block,
  * and `/system`, which only the `/about` redirect ever pointed at. Everything
  * else in the roster is linked from the header menu, the footer, or
- * `/trust-forward`.
+ * `/developer-forward`.
  *
  * RETIRED IS NOT DELETED, AND IT IS NOT "JUST UNLISTED" EITHER. Every page file
  * is still on disk and `tests/preserved-surfaces.test.ts` still asserts all six
@@ -219,7 +219,7 @@ export const RETIRED_SURFACES: readonly string[] = [
  */
 export const canonicalSurfaces: readonly CanonicalSurface[] = [
   { path: "/", label: "BenChanTech", group: "home", human: true },
-  ...TRUST_FORWARD_SURFACES,
+  ...DEVELOPER_FORWARD_SURFACES,
   /*
    * THE MENU AGAIN, BECAUSE THE ROUTES ARE NOW SHADOWED (2026-09-08, second
    * pass).
@@ -238,7 +238,7 @@ export const canonicalSurfaces: readonly CanonicalSurface[] = [
    * again. Nothing about the invariant changed; the world caught up to it.
    */
   ...publicShipNav
-    .filter((item) => item.href !== trustForwardNav.href)
+    .filter((item) => item.href !== developerForwardNav.href)
     .map((item) => ({
       path: item.href,
       label: item.label,
@@ -263,7 +263,7 @@ export const canonicalSurfaces: readonly CanonicalSurface[] = [
 export const CANONICAL_SURFACE_GROUP_LABELS = {
   home: "Home",
   ship: "The Author Ship",
-  "trust-forward": "Trust Forward",
+  "developer-forward": "Developer Forward",
   course: "Watch Your Step",
   preserved: "Ecosystem and infrastructure",
   legal: "Legal and disclosure",
@@ -272,7 +272,7 @@ export const CANONICAL_SURFACE_GROUP_LABELS = {
 
 export const CANONICAL_SURFACE_GROUP_ORDER: readonly CanonicalSurfaceGroup[] = [
   "home",
-  "trust-forward",
+  "developer-forward",
   "ship",
   "course",
   "preserved",

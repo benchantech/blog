@@ -141,7 +141,7 @@ test("every roster label is a name the site already uses", () => {
     assert.ok(surface.label.trim().length > 0, `${surface.path} has no label`);
     assert.ok(!surface.label.includes("undefined"));
   }
-  // Seven groups: Trust Forward joined the roster as the site's primary
+  // Seven groups: Developer Forward joined the roster as the site's primary
   // product entry. Pinned so a group cannot be added without a decision.
   assert.equal(Object.keys(CANONICAL_SURFACE_GROUP_LABELS).length, 7);
 });

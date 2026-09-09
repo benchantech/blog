@@ -31,6 +31,7 @@ staleness condition has been met is history, not guidance.
 | [0006](0006-scripted-edits-to-governed-content.md) | Scripted edits to governed content | ACCEPTED | 2026-09-08 | Structured (AST/codemod) editing replaces regex editing |
 | [0007](0007-concurrent-agent-file-ownership.md) | Concurrent agents own files exclusively | ACCEPTED | 2026-09-08 | The harness gains real file locking |
 | [0008](0008-adrs-are-read-on-boot.md) | ADRs are read on boot, by every agent | ACCEPTED | 2026-09-08 | The boot instruction stops naming `docs/adr/README.md` |
+| [0009](0009-the-developer-forward-rebrand.md) | Renaming a product renames its URLs, not its evidence | ACCEPTED | 2026-09-09 | The Studio destination moves, or no browser still holds a pre-rebrand ledger |
 
 ## Origin
 

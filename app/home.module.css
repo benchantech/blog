@@ -35,7 +35,7 @@
 }
 
 /* -------------------------------------------------------------------------- */
-/* Hero — 1fr / 520px, 64px gap. Trust Forward's offer left, the feature right */
+/* Hero — 1fr / 520px, 64px gap. Developer Forward's offer left, the feature right */
 /* -------------------------------------------------------------------------- */
 .hero {
   padding-block: 56px 72px;
@@ -73,7 +73,7 @@
 }
 
 /* The offer's three paragraphs step DOWN in weight — lede, body, descriptor —
-   because `/trust-forward` renders them in that order and the two surfaces are
+   because `/developer-forward` renders them in that order and the two surfaces are
    showing the same block. The descriptor is the quietest of the three: it is
    the honest counterweight ("Five fictional cases"), not the pitch. */
 .heroBody {
