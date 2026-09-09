@@ -235,7 +235,15 @@ const checkpoint4: YYCheckpoint = {
 export const case2: YYCase = {
   id: CASE_ID,
   ordinal: 2,
-  title: "THE FAILURES ARE DROPPING",
+  /*
+   * RETITLED 2026-09-09 (Ben). "THE FAILURES ARE DROPPING" described the
+   * midpoint of the case from Ben's side, and it is the one title that gave
+   * away where the case lands — a learner meets it above checkpoint 1, before
+   * anything has been fixed. The new title is the question the CUSTOMER is
+   * asking, which is the pressure the case is actually about and which stays
+   * true at every one of the four checkpoints it sits above.
+   */
+  title: "WHY CAN'T I PAY?",
   role: "COMMUNICATE / TRIAGE",
   emphasis: "Technical uncertainty and authority uncertainty are not the same thing.",
   checkpoints: [checkpoint1, checkpoint2, checkpoint3, checkpoint4],

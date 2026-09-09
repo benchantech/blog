@@ -84,7 +84,13 @@ import type { YYCase } from "../../../lib/developer-forward/yy/types";
 export const case4: YYCase = {
   id: "case-4",
   ordinal: 4,
-  title: "THE ONE-OFF BECOMES THE FOUNDATION",
+  /*
+   * RETITLED 2026-09-09 (Ben). "THE ONE-OFF BECOMES THE FOUNDATION" stated the
+   * case's own lesson in its title, three checkpoints before the learner could
+   * reach it. "LANDING PAGE SPRAWL" names the situation instead and leaves the
+   * conclusion where it belongs.
+   */
+  title: "LANDING PAGE SPRAWL",
   role: "DELEGATE",
   emphasis:
     "Ownership follows what becomes load-bearing, not merely what was originally assigned.",

@@ -193,6 +193,16 @@ test("every learner-facing string matches the committed fixture", () => {
     else if (want !== digest(text)) drift.push(`${key}: text changed since it was verified`);
   };
   for (const c of CASES) {
+    /*
+     * THE TITLE WAS NOT COVERED UNTIL 2026-09-09, and the gap was found by
+     * walking through it: three case titles were rewritten and this file
+     * reported 726 passed. A title is learner-facing text — `CheckpointScreen`
+     * renders it above EVERY checkpoint in its case and `renderEnding` shows it
+     * again — so it was the most-displayed string in the run and the only one
+     * outside the fixture. It is covered now, which is why the fixture holds
+     * 138 entries rather than 133.
+     */
+    check(`title:${c.id}`, c.title);
     check(`ending:${c.id}`, c.ending);
     for (const cp of c.checkpoints) {
       check(`capture:${cp.id}`, cp.capture);

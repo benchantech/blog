@@ -1,7 +1,7 @@
 {
-  "note": "SHA-256 of every learner-facing string, normalised for whitespace. Regenerated 2026-09-08 after: the seventh blur, case 2 checkpoint 4 paragraph restoration, and case 1 choice-id lowercasing. See tests/developer-forward-yy-content.test.ts.",
+  "note": "SHA-256 of every learner-facing string, normalised for whitespace. Regenerated 2026-09-09 after Ben retitled cases 2, 3 and 4 — and after that change revealed that case TITLES were never covered here, though CheckpointScreen renders one above every checkpoint. The five title: entries are new; the other 133 are unchanged from the 2026-09-08 generation, which followed the seventh blur, case 2 checkpoint 4 paragraph restoration, and case 1 choice-id lowercasing. See tests/developer-forward-yy-content.test.ts.",
   "generatedFrom": "source + the seven approved blurs, verified equal at generation time",
-  "count": 133,
+  "count": 138,
   "hashes": {
     "ending:case-1": "385cc1fad236606a911d91bfb3496fcda80d455e63076450bb0052c97f584a6c",
     "capture:case-1-checkpoint-1": "164c938364797ec4e68d1b63f5271900763358caba3b6baa2d5e9e8186db8694",
@@ -135,6 +135,11 @@
     "choice:case-5-checkpoint-3-c": "8c191e03e8f174cfd8f8869db5fa2bd0d48e8c006d3ed7f6166a90518026ac62",
     "choice:case-5-checkpoint-3-d": "17ed885382bc38e4ffa499b1d180caf82147e20f53c6b63c4902d05a8a858d1c",
     "then:case-5-checkpoint-3": "3056a28dcf275c40057cf9d0554ac7bcaafd284b3e00fab46fac6c94a9ae99cd",
-    "now:case-5-checkpoint-3": "4834171c11c40862543daecec00ed462e3ffe6b86ad00273a89a48276922dc6b"
+    "now:case-5-checkpoint-3": "4834171c11c40862543daecec00ed462e3ffe6b86ad00273a89a48276922dc6b",
+    "title:case-1": "724f2adf4f88e6883536fb7d7b00b70b3b2f8c3a73b3567b2dfb9fa6e5995e6e",
+    "title:case-2": "81690de98628f8063d3317dc3d9e66e5966e5842f4f920c7066e138926e5a75e",
+    "title:case-3": "3c5507cd9a9cc41b23bde6b45c8d755bd5ab7f3a649cca510a4eef01a998ba64",
+    "title:case-4": "9a172868c037349abfc9adc6e8c91a349af99f0d780575de22471dcd8e225be2",
+    "title:case-5": "0df21d50eba8b52c9d42de7801c16eee8e8f0c7965da3493c98af6537575c3ac"
   }
 }

@@ -112,7 +112,13 @@ const CASE_ID = "case-3";
 export const case3: YYCase = {
   id: CASE_ID,
   ordinal: 3,
-  title: "THE LOGIC IS RIGHT",
+  /*
+   * RETITLED 2026-09-09 (Ben). "THE LOGIC IS RIGHT" was a verdict, and the
+   * case is about whether that verdict is enough. "TOO MANY KEYS" names the
+   * thing on screen — the metadata keys arriving from the upstream systems —
+   * without telling the learner what to conclude about them.
+   */
+  title: "TOO MANY KEYS",
   role: "VERIFY",
   emphasis: "The burden of proof belongs to the consequence, not the test count.",
 
