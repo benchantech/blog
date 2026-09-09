@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import type { CaseArt } from "@/content/developer-forward/yy/case-art";
 import { ProgressRail } from "@/components/ui/ProgressRail";
 import styles from "./checkpoint.module.css";
 
@@ -65,6 +66,7 @@ export function CheckpointScreen({
   title,
   capture,
   prompt,
+  art = null,
   children,
   footer
 }: {
@@ -90,6 +92,15 @@ export function CheckpointScreen({
   capture: string;
   /** `What would you do in my shoes?` — fixed across all seventeen checkpoints. */
   prompt: string;
+  /**
+   * The case's opening illustration, on the FIRST checkpoint only.
+   *
+   * The caller decides — this component renders what it is handed and has no
+   * opinion about ordinals. It defaults to `null` for that reason: a caller
+   * that forgets to pass art gets a case without a picture, never a picture
+   * repeated on all four checkpoints.
+   */
+  art?: CaseArt | null;
   /** The decision area: the options, the optional WHY prose, WHY-NOT, COMMIT. */
   children: ReactNode;
   /** Whatever follows the commit control on this screen. Never Ben. */
@@ -116,6 +127,34 @@ export function CheckpointScreen({
           </div>
         ) : null}
       </header>
+
+      {/*
+        ABOVE THE FIRST PARAGRAPH, WHICH IS THE POINT (Ben, 2026-09-09): "so
+        they see it first before they read." Below the head, though, so a
+        learner still knows which case and which checkpoint they are on before
+        the scene arrives — a picture with no position is a picture nobody can
+        place.
+
+        `width`/`height` carry the intrinsic size so the browser reserves the
+        box before the file lands and the capture underneath does not jump.
+        `lazy` because four of the five belong to cases the learner has not
+        reached and the sandbox holds every case in memory from the first
+        render.
+      */}
+      {art ? (
+        <picture className={styles.art}>
+          <source media="(max-width: 700px)" srcSet={art.mobile} />
+          <img
+            className={styles.artImage}
+            src={art.desktop}
+            alt={art.alt}
+            width={art.width}
+            height={art.height}
+            loading="lazy"
+            decoding="async"
+          />
+        </picture>
+      ) : null}
 
       <div className={styles.capture}>
         {paragraphs.map((paragraph, index) => (

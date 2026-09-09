@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { createHash } from "node:crypto";
-import { readFileSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
@@ -11,6 +11,7 @@ import { case3 } from "@/content/developer-forward/yy/case-3";
 import { case4 } from "@/content/developer-forward/yy/case-4";
 import { case5 } from "@/content/developer-forward/yy/case-5";
 import { APPROVED_BLURS, applyApprovedBlurs } from "@/content/developer-forward/yy/approved-blurs";
+import { caseArtFor } from "@/content/developer-forward/yy/case-art";
 import {
   EVIDENCE_TAGS,
   EVIDENCE_TAG_INDEX,
@@ -54,6 +55,8 @@ import {
  */
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
+/** The YY components, read as text: the runner cannot import a `.css` importer. */
+const yyDir = path.join(repoRoot, "components", "developer-forward", "yy");
 
 /**
  * The canonical source lives outside the repo, in the handoff bundle.
@@ -563,4 +566,86 @@ test("every declared tag has a definition and appears on at least one choice", (
       `${tag} is declared but carried by no choice — a vocabulary entry that guards nothing`
     );
   }
+});
+
+/* -------------------------------------------------------------------------- */
+/* 6. The opening illustrations                                               */
+/* -------------------------------------------------------------------------- */
+
+/**
+ * `content/developer-forward/yy/case-art.ts` — five scenes, one per case.
+ *
+ * THE ALT TEXT IS THE POINT OF THIS TEST. Ben's instruction was that the
+ * picture lands "above the first paragraph of each case so they see it first
+ * before they read", which makes it the first thing in the case — and a reader
+ * who cannot see it would start with less than a reader who can unless the
+ * description carries the same setting. So an empty `alt` is a failure here
+ * rather than the decorative default it is elsewhere on this site.
+ *
+ * The files are asserted to EXIST because a `<picture>` with a missing source
+ * fails silently: the layout still reserves its box, the page still renders,
+ * and the only symptom is a scene nobody sees. Both variants, because the
+ * mobile one is served to phones alone and would be the last to be noticed.
+ */
+test("every case has an opening illustration, with both files on disk and real alt text", () => {
+  const seen = new Set<string>();
+  for (const c of CASES) {
+    const art = caseArtFor(c.id);
+    assert.ok(art, `${c.id} has no opening illustration`);
+    if (!art) continue;
+    seen.add(c.id);
+
+    for (const src of [art.desktop, art.mobile]) {
+      assert.ok(src.startsWith("/"), `${c.id}: ${src} is not a site-absolute path`);
+      assert.ok(
+        existsSync(path.join(repoRoot, "public", src.slice(1))),
+        `${c.id}: ${src} is referenced but not in public/ — a <picture> fails silently`
+      );
+    }
+
+    // A description, not a filename and not a label.
+    assert.ok(art.alt.trim().length > 0, `${c.id} ships an empty alt on a non-decorative image`);
+    assert.ok(
+      art.alt.split(/\s+/).length >= 20,
+      `${c.id}'s alt is too short to stand in for the picture: "${art.alt}"`
+    );
+    assert.equal(/\.webp|\.png|image of|picture of/i.test(art.alt), false, `${c.id}'s alt describes the file, not the scene`);
+
+    // The intrinsic size the layout reserves has to be the real one.
+    assert.ok(art.width > 0 && art.height > 0, `${c.id} declares no intrinsic size`);
+  }
+  assert.equal(seen.size, CASES.length, "a case lost its illustration");
+
+  // Five cases, five distinct images — a copy-paste would show the wrong scene.
+  const sources = CASES.map((c) => caseArtFor(c.id)?.desktop);
+  assert.equal(new Set(sources).size, CASES.length, "two cases share an illustration");
+});
+
+/**
+ * The scene is set ONCE, on checkpoint 1.
+ *
+ * Ben asked for it "just above the first paragraph of each case", and then
+ * narrowed it himself: "it only shows on the first step of each case, then
+ * hides." Repeating it above checkpoints 2, 3 and 4 would re-establish a
+ * setting the learner is already inside, and would push the situation they are
+ * being asked to judge below the fold on a phone.
+ *
+ * Asserted from source, since the runner cannot import a component. What the
+ * scan holds is the ordinal test itself — the component has no opinion about
+ * ordinals by design, so if the caller stops checking, nothing else will.
+ */
+test("the opening illustration renders on the first checkpoint of a case and no other", () => {
+  const sandbox = readFileSync(path.join(yyDir, "YYSandbox.tsx"), "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/^\s*\/\/.*$/gm, " ");
+  assert.match(
+    sandbox,
+    /art=\{checkpoint\.ordinal === 1 \? caseArtFor\(kase\.id\) : null\}/,
+    "the sandbox no longer gates the illustration on the first checkpoint"
+  );
+
+  const screen = readFileSync(path.join(yyDir, "CheckpointScreen.tsx"), "utf8");
+  assert.match(screen, /art = null/, "the art prop lost its null default; a caller that forgets would repeat the scene");
+  assert.match(screen, /loading="lazy"/, "the illustrations load eagerly; four of five belong to unreached cases");
+  assert.match(screen, /width=\{art\.width\}/, "no intrinsic width — the capture will jump as the image arrives");
 });

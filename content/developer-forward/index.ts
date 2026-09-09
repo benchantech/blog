@@ -103,7 +103,16 @@ export const DEVELOPER_FORWARD_YY_MODULES: readonly string[] = [
   "content/developer-forward/yy/case-4.ts",
   "content/developer-forward/yy/case-5.ts",
   "content/developer-forward/yy/evidence-tags.ts",
-  "content/developer-forward/yy/approved-blurs.ts"
+  "content/developer-forward/yy/approved-blurs.ts",
+  /*
+   * Added 2026-09-09 with the five opening illustrations. It belongs on the YY
+   * list rather than in `developerForwardRegistry` for the reason above: it
+   * carries `YYProvenance`, not `ContentOrigin`. The images are Ben's; the alt
+   * text is this build's and is registered separately in
+   * `DEVELOPER_FORWARD_IMPLEMENTATION_AUTHORED_LABELS`, because it is
+   * learner-facing prose he has not read.
+   */
+  "content/developer-forward/yy/case-art.ts"
 ];
 
 export const DEVELOPER_FORWARD_RECORD_FREE_MODULES: readonly string[] = [
@@ -195,5 +204,12 @@ export const DEVELOPER_FORWARD_IMPLEMENTATION_AUTHORED_LABELS: readonly string[]
    * build's. They ship because a learner who has just finished five cases and
    * is owed a coupon should be handed it rather than told to go and ask.
    */
-  "copy.ts: DEVELOPER_FORWARD_TEASER.coupon.earnedHeading / earnedBody / earnedCta"
+  "copy.ts: DEVELOPER_FORWARD_TEASER.coupon.earnedHeading / earnedBody / earnedCta",
+  /*
+   * Added 2026-09-09. The five illustrations are Ben's; their ALT TEXT is not.
+   * It was written by reading the image files, and it is learner-facing — a
+   * reader who cannot see the picture gets this instead of it, which is a
+   * stronger reason to register it than most entries here have.
+   */
+  "yy/case-art.ts: CASE_ART[*].alt (five descriptions, written from the images)"
 ];

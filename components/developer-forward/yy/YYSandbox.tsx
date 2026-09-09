@@ -41,6 +41,7 @@ import { ChoiceList } from "@/components/developer-forward/yy/ChoiceList";
 import { CommitBar } from "@/components/developer-forward/yy/CommitBar";
 import type { CommitBarCopy } from "@/components/developer-forward/yy/CommitBar";
 import { EvidenceSummary } from "@/components/developer-forward/yy/EvidenceSummary";
+import { caseArtFor } from "@/content/developer-forward/yy/case-art";
 import { DEVELOPER_FORWARD_TEASER } from "@/content/developer-forward/copy";
 import { ROUTES } from "@/content/developer-forward/stamp/v1-1-0";
 import { ReflectBox } from "@/components/developer-forward/yy/ReflectBox";
@@ -976,6 +977,7 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
           title={kase.title}
           capture={checkpoint.capture}
           prompt={STEP_COPY.whyPrompt}
+          art={checkpoint.ordinal === 1 ? caseArtFor(kase.id) : null}
         >
           <ChoiceList
             options={checkpoint.choices}

@@ -110,6 +110,26 @@
    longest reading on the screen. It gets the generous measure and the body
    colour; it is not a card, because boxing it would make it look like an
    exhibit beside the question rather than the ground the question stands on. */
+/* The case's opening scene. Full width of the reading column, its own rounded
+   block, and `aspect-ratio` alongside the intrinsic width/height so the box is
+   reserved whether or not the attributes survive a future edit — a 4:3 image
+   arriving late would otherwise push the whole capture down as it loads. */
+.art {
+  display: block;
+  margin: 0;
+  border-radius: var(--radius-block);
+  overflow: hidden;
+  background: var(--tint-grey);
+}
+
+.artImage {
+  display: block;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+}
+
 .capture {
   display: flex;
   flex-direction: column;
