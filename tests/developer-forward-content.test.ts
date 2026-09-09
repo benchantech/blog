@@ -697,12 +697,25 @@ test("no struck or superseded public claim is reachable from content/developer-f
     "the Full bridge sentence is gone or no longer says 40+; the guards above would then pass vacuously"
   );
 
-  // The other public statement of the same corpus (Ben, 2026-09-08). Pinned by
-  // name for the reason copy.ts's header gives: 40+ and 42 describe one corpus
-  // from two sides, so a change to it has to break BOTH assertions, not one.
+  /*
+   * ONE PUBLIC NUMBER FOR THE CORPUS, SAID IN ONE FORM (Ben, 2026-09-09).
+   *
+   * This pinned "42 canonical case families" for a day, while the teaser stated
+   * the count outright and the bridge stated a floor under it — two public
+   * statements of one corpus, which is why both were pinned. Ben replaced the
+   * count with the floor's own words, so layer 07's rule is back in force (42
+   * is internal; no public string says it) and the ban list above is doing that
+   * work again. What survives here is the positive assertion: the teaser and
+   * the bridge use the SAME words, so they cannot drift apart.
+   */
   assert.ok(
-    copyModule.DEVELOPER_FORWARD_TEASER.full.body.includes("42 canonical case families"),
-    "the teaser no longer states the corpus count; it and FULL_OFFER.bridge must move together"
+    copyModule.DEVELOPER_FORWARD_TEASER.full.body.includes("40+ real cases"),
+    "the teaser no longer states the corpus floor; it and FULL_OFFER.bridge must say the same thing"
+  );
+  assert.equal(
+    /\b42\b/.test(copyModule.DEVELOPER_FORWARD_TEASER.full.body),
+    false,
+    "42 is the internal corpus authority and is back out of learner-facing copy"
   );
 
   // "729" survives ONLY as the artifact filename and reason in the digest

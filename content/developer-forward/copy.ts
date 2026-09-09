@@ -77,19 +77,18 @@
  *     supersession makes every current internal reference 42. Layer 07's
  *     `public-copy-and-full-bridge.BEN_APPROVED.json` is newer and fixed the
  *     PUBLIC bridge sentence at "30+ real cases", while recording 42 as
- *     `internalCanonicalFullCorpusCount`. **SUPERSEDED TWICE ON 2026-09-08, and
- *     the second time the rule went with it.** First Ben raised the public
- *     floor from "30+" to "40+" — the floor moved, the rule held.  Then he
- *     wrote `DEVELOPER_FORWARD_TEASER`, which says "42 canonical case families" in
- *     public, in his own words. Layer 07's rule that 42 is internal-only is
- *     therefore GONE, not narrowed, and any comment in this file claiming 42
- *     does not appear here is out of date the moment you read it.
+ *     `internalCanonicalFullCorpusCount`. **SUPERSEDED THREE TIMES, AND THE
+ *     RULE ENDED UP BACK WHERE IT STARTED.** Ben raised the public floor from
+ *     "30+" to "40+" on 2026-09-08 (the floor moved, the rule held); then wrote
+ *     "42 canonical case families" into the teaser, which killed the
+ *     internal-only rule outright; then on 2026-09-09 replaced that phrase with
+ *     "40+ real cases" and moved the stat off the page entirely.
  *
- *     The two numbers are not in conflict — a floor of 40+ under a count of 42,
- *     and a "case family" is not a "case" — but they ARE two public statements
- *     of one corpus. If that corpus ever changes, both have to change.
- *     `tests/developer-forward-content.test.ts` pins each of them by name so
- *     neither can drift alone.
+ *     So layer 07's rule is in force again: **42 is the internal corpus
+ *     authority and no public string says it.** There is now exactly ONE public
+ *     number for the corpus — the "40+" floor — said in two places that use the
+ *     same words, so they cannot disagree. `tests/developer-forward-content.test.ts`
+ *     bans 42 from learner-facing copy and pins the floor by name.
  *
  * TYPOGRAPHY IS PART OF THE SOURCE. The en dash in "15–30", the unspaced em
  * dashes in "carry—and what still has to remain theirs", the spaced em dash in
@@ -181,7 +180,14 @@ export const LITE_INTRO = {
     "Markdown + JSON export",
     "and a completion offer for full Developer Forward"
   ],
-  timeEstimate: "About 15–30 minutes.",
+  /*
+   * 15–25, from 2026-09-09. This is the layer-01 approved string and it read
+   * "About 15–30 minutes." for the whole of that time; the intro screen was
+   * the last surface still saying it, so a learner met one figure on the way
+   * in and a different one on the landing they came from. Ben set 15–25 for
+   * both. Every time statement the product makes is now the same number.
+   */
+  timeEstimate: "About 15–25 minutes.",
   /** Rendered in this order, each as the shared info marker. */
   infoMarkerKeys: ["localOnly", "deterministic"],
   cta: "Start Case 1"
@@ -434,7 +440,13 @@ export const RESULT = {
  */
 export const FULL_OFFER = {
   descriptor:
-    "Five real cases. Seventeen decision points. Your judgment is recorded before Ben's is revealed.",
+    /*
+     * "Seventeen decision points." was struck by Ben on 2026-09-09. It was
+     * true — the five cases carry seventeen checkpoints — and it is the kind of
+     * true number that reads as a workload rather than an offer. The two
+     * sentences that remain are the ones that say what the exercise IS.
+     */
+    "Five real cases. Your judgment is recorded before Ben's is revealed.",
   bridge: "40+ real cases drawn from Ben Chan’s actual professional experience.",
   confidentiality:
     "Cases may be anonymized or composited where necessary to protect clients, employers, colleagues, confidential information, or identifying details while preserving the underlying decision pressure."
@@ -471,8 +483,16 @@ export const FULL_OFFER = {
  */
 export const LANDING_INCOMPLETE = {
   heading: "Developer Forward",
-  lede:
-    "Hands-dirty judgment practice for developers deciding what AI can carry—and what still has to remain theirs.",
+  /*
+   * REPLACED 2026-09-09 (Ben). The layer-01 lede — "Hands-dirty judgment
+   * practice for developers deciding what AI can carry—and what still has to
+   * remain theirs" — described the MECHANISM. This one names the outcome, and
+   * it is the same promise `closingUpsell.corePromiseHeading` already makes at
+   * the end of a run ("Become The Developer Clients Keep"), moved to the front
+   * where a first-time visitor meets it. The two differ deliberately: clients
+   * for the freelancer close, companies for the landing.
+   */
+  lede: "Become the developer companies keep.",
   /*
    * SUPERSEDED 2026-09-08. "Five fixed developer scenarios" described the
    * fictional instrument; it now understates the product and miscounts the
@@ -481,8 +501,15 @@ export const LANDING_INCOMPLETE = {
    * "The runtime stays deterministic" survives unchanged: it was true then and
    * is true now, and it is the claim the whole architecture exists to keep.
    */
-  body:
-    "Five cases from Ben Chan's own professional work. You decide at each point and commit, before you see what he chose — and how his judgment has changed since. The runtime stays deterministic.",
+  /*
+   * STRUCK 2026-09-09, and kept as an empty string rather than deleted from the
+   * shape. Ben removed the paragraph; `body` is read by `app/page.tsx` and by
+   * `/developer-forward`'s incomplete landing, and dropping the FIELD would
+   * have been an edit to two renderers instead of to one sentence. Both call
+   * sites skip it when it is empty, so nothing renders a blank paragraph and
+   * restoring the copy is one string.
+   */
+  body: "",
   /*
    * SUPERSEDED 2026-09-08, and flagged rather than silently re-estimated.
    *
@@ -498,7 +525,15 @@ export const LANDING_INCOMPLETE = {
    * it feels right — an under-promise on time is the kind of small dishonesty
    * that a learner notices exactly once.
    */
-  timeEstimate: "Expected time: about 30–45 minutes.",
+  /*
+   * "about 15-25 minutes", set by Ben on 2026-09-09, superseding this build's
+   * own 30–45 estimate — which itself superseded layer 01's approved 15–30
+   * after the YY rewrite. The 30–45 figure was reasoned from the checkpoint
+   * count, never measured; Ben's is the one from someone who has run it. Still
+   * an estimate rather than a measurement, and still the only time statement
+   * either landing makes. En dash, matching every other range on the site.
+   */
+  timeEstimate: "Expected time: about 15–25 minutes.",
   revealLead: "Complete Lite to reveal:",
   revealItems: [
     "your observed SHIP developer pattern",
@@ -900,16 +935,12 @@ export const TRUST_STRIP = {
  * the two headline lines, the pass names, the method grammar and the CTA are
  * character-for-character his.
  *
- * WHAT `42` IS DOING IN PUBLIC COPY, GIVEN THAT `FULL_OFFER.bridge` SAYS "40+".
- * Layer 07 ruled that 42 was the INTERNAL corpus authority and that no public
- * string should say it; the plan records that as SC-TF7. Ben superseded both
- * halves of that on 2026-09-08 — first by raising the public floor from "30+"
- * to "40+", then by writing "42 canonical case families" into this page
- * himself. The two numbers do not contradict each other (a floor of 40+ under a
- * count of 42, and a "case family" is not a "case"), but they are two different
- * public statements of the same corpus, and that is a thing to notice rather
- * than to smooth over: if the corpus count ever moves, BOTH have to move, and
- * only one of them is guarded by a test that names the number.
+ * `42` IS NOT ON THIS PAGE ANY MORE. It was, for one day: Ben wrote "42
+ * canonical case families" into the Full card and the stat row on 2026-09-08,
+ * and replaced both with "40+ real cases" on 2026-09-09. Layer 07's rule — 42
+ * is the internal corpus authority, no public string says it — is therefore
+ * back in force, and the corpus now has exactly one public number said in one
+ * form. See the header, conflict (3).
  *
  * THE ORDER OF THE PAGE IS THE ARGUMENT. Lite first, bounded, and honest about
  * what it refuses to do; then Full, which is where the AI Coach appears; then
@@ -920,10 +951,32 @@ export const TRUST_STRIP = {
 export const DEVELOPER_FORWARD_TEASER = {
   eyebrow: "Developer judgment for AI-assisted engineering",
   heading: "Developer Forward",
-  /** The product's own prompt, quoted. Set in italic serif in the hero. */
-  prompt: "What would you do in my shoes?",
-  heroBody:
-    "What to trust, what to verify, what to delegate, what to promise, and when to take the wheel back. Authored professional situations that require you to commit your judgment before you see what Ben actually did.",
+  /*
+   * THE HERO LINE STOPPED QUOTING THE PRODUCT (Ben, 2026-09-09). It was "What
+   * would you do in my shoes?", the checkpoint prompt itself. That prompt is
+   * unchanged and still asked seventeen times inside the run — see
+   * `YYSandbox`'s `STEP_COPY.whyPrompt`, which is the canonical grammar and is
+   * not this string. What changed is the hero's job: it now says why the
+   * exercise exists rather than showing a sample of it.
+   */
+  prompt:
+    "The judgment developers built before AI—and why the next generation needs it now.",
+  /*
+   * THREE LINES, NOT A PARAGRAPH (Ben, 2026-09-09), replacing "What to trust,
+   * what to verify, what to delegate, what to promise, and when to take the
+   * wheel back. Authored professional situations that require you to commit
+   * your judgment before you see what Ben actually did."
+   *
+   * They are an arc and the order carries it: what the corpus is, what you do
+   * with it, what you leave with. The third names the same outcome as the
+   * landing lede and the last stat, which is deliberate repetition rather than
+   * drift — a visitor should meet that promise three times before the CTA.
+   */
+  heroPoints: [
+    "40+ real cases from decades of developer work",
+    "Make your call, pressure test it, then decide what to carry forward",
+    "Build your Developer Judgment playbook—and take it with you"
+  ],
 
   /** The five stages as a numbered rail beside the hero. */
   sequence: {
@@ -941,9 +994,17 @@ export const DEVELOPER_FORWARD_TEASER = {
    */
   stats: [
     { value: "40+", label: "real cases from lived professional experience" },
-    { value: "42", label: "canonical case families" },
     { value: "3", label: "passes per underlying problem" },
-    { value: "90", label: "days, AI-assisted curriculum" }
+    { value: "90", label: "days, AI-assisted curriculum" },
+    /*
+     * LAST, AND IT IS THE ONLY ONE THAT IS NOT A SIZE (Ben, 2026-09-09). The
+     * first three count what the curriculum contains; this one names what the
+     * learner leaves with, which is the thing the other three are for. It
+     * replaced "42 canonical case families" in the row and took the last
+     * position rather than that one's, so the numbers still descend from the
+     * corpus to the reader instead of ending on a duration.
+     */
+    { value: "1", label: "Judgment Playbook that's yours" }
   ],
 
   ladder: {
@@ -955,16 +1016,47 @@ export const DEVELOPER_FORWARD_TEASER = {
      * another perspective, another condition, and eventually your own real
      * work". Same claim, and the shorter form is the one that can be a heading.
      */
+    /*
+     * REWRITTEN 2026-09-09 (Ben), superseding the couplet this section was
+     * built around. The old heading balanced the two products as equals —
+     * "Lite helps you hear your own signal. Developer Forward tests whether it
+     * survives." This one names the paid product's outcome first and casts
+     * Lite as the free sample of it, which is what the section is actually
+     * arranged to argue.
+     */
     heading:
-      "Developer Forward Lite helps you hear your own signal. Developer Forward tests whether it survives."
+      "Developer Forward helps you become the developer companies keep. Lite gives you a free sample up front."
   },
 
   lite: {
     name: "Developer Forward Lite",
     badge: "Deterministic",
-    cardHeading: "The deterministic introduction.",
+    /*
+     * "Real pre-AI judgment calls." (Ben, 2026-09-09), replacing "The
+     * deterministic introduction." The old heading described the RUNTIME; the
+     * badge beside it already says "Deterministic", so the heading was
+     * spending the card's largest type on a word repeated six inches away.
+     * This one says what is inside the cases, and it pairs with the hero line
+     * about judgment built before AI.
+     */
+    cardHeading: "Real pre-AI judgment calls.",
+    /*
+     * THE CARD NOW SHOWS THE MECHANISM INSTEAD OF DESCRIBING IT (Ben,
+     * 2026-09-09). It read "It gives you authored professional situations, asks
+     * what you would do in Ben's shoes, and requires you to commit your
+     * judgment before you see what Ben actually did." — accurate, and abstract
+     * enough that a reader could not picture a single screen.
+     *
+     * `prompt` is the checkpoint's real question, quoted, and `body` walks the
+     * four steps that follow it. Written against the shipped run rather than
+     * from the brief: `ChoiceList` renders four options, `WhyNotStep` requires
+     * the closest alternative before `CommitBar` will enable, the reveal is
+     * gated on that commit, and `ReflectBox` comes last and is optional. If any
+     * of those change, this sentence is wrong and has to move with them.
+     */
+    prompt: "What would you do in my shoes?",
     body:
-      "It gives you authored professional situations, asks what you would do in Ben's shoes, and requires you to commit your judgment before you see what Ben actually did. It preserves an auditable record of your decisions.",
+      "Every checkpoint asks it and gives you four ways to answer. Pick one, then name the option that came closest and what kept you from it. Commit — and only then does Ben's call appear, with what he would do differently now. Anything you write afterward stays yours.",
     /*
      * THE MIDDLE CHIP IS NOT THE BRIEF'S. The brief says "15–30 min", twice.
      * That figure was measured against ELEVEN decisions with three options
@@ -977,7 +1069,7 @@ export const DEVELOPER_FORWARD_TEASER = {
      * whole pitch is "commit before you see the answer", it is the wrong thing
      * to be wrong about. Everything else on this page is the brief verbatim.
      */
-    chips: ["5 fixed cases", "About 30–45 minutes", "Stays in your browser"],
+    chips: ["5 fixed cases", "About 15–25 minutes", "Stays in your browser"],
     boundedLead: "It is deliberately bounded:",
     boundedItems: [
       "No AI interprets your free text.",
@@ -990,8 +1082,16 @@ export const DEVELOPER_FORWARD_TEASER = {
     name: "Developer Forward",
     badge: "90 days",
     cardHeading: "The 90-day curriculum.",
+    /*
+     * "40+ real cases", not "42 canonical case families" (Ben, 2026-09-09).
+     * That returns the page to layer 07's original rule — 42 is the INTERNAL
+     * corpus authority and no public string says it — which Ben himself had
+     * superseded on 2026-09-08 by writing the count into this sentence. It is
+     * superseded back. One public number for the corpus now, the same "40+"
+     * floor `FULL_OFFER.bridge` carries, so the two cannot disagree.
+     */
     body:
-      "The deeper 90-day AI-assisted judgment curriculum, built from 42 canonical case families grounded in Ben Chan's lived professional experience. You encounter each case across multiple rounds.",
+      "The deeper 90-day AI-assisted judgment curriculum, built from 40+ real cases grounded in Ben Chan's lived professional experience. You encounter each case across multiple rounds.",
     passes: [
       {
         step: "Pass 1",
@@ -1034,7 +1134,7 @@ export const DEVELOPER_FORWARD_TEASER = {
 
   close: {
     heading: "Commit your judgment first.",
-    body: "Five cases. About 30–45 minutes. Everything stays in your browser.",
+    body: "Five cases. About 15–25 minutes. Everything stays in your browser.",
     noAiLead: "You're not talking to AI anywhere on this site.",
     noAiBody:
       "No chatbot, no coach, no generated answers. AI executes inside boundaries; human judgment sets them."
@@ -1060,12 +1160,26 @@ export const DEVELOPER_FORWARD_TEASER = {
    * not something this build should be phrasing on his behalf.
    */
   coupon: {
-    badge: "Free · earns a coupon",
+    badge: "Free · earn your coupon",
     lead: "Finishing Lite earns you a coupon toward Developer Forward on Studio.",
     body:
       "It costs nothing, it stays in your browser, and it is the cheapest way to find out whether the full curriculum is worth your ninety days.",
-    claimLabel: "Ask for your coupon",
-    claimNote: "Finish Lite, then send a note. There is no account and nothing to sign up for."
+    /*
+     * REPLACED 2026-09-09 (Ben). The close used to read "Ask for your coupon"
+     * over a link to `/contact`, because nothing on this site could issue one
+     * and a promise a reader cannot claim is a broken promise. Ben's mechanism
+     * is different and better: the coupon is a hyperlink the learner is given
+     * the moment they finish.
+     *
+     * THAT MECHANISM DOES NOT EXIST YET, AND THIS SENTENCE NOW ASSERTS IT.
+     * `EvidenceSummary` — the screen a completed run ends on — renders no
+     * coupon link, and no code in `app/`, `components/` or `lib/` produces a
+     * coupon URL. Until it does, this is a claim about behaviour the product
+     * does not have, which is a heavier thing to publish than the "ask and I
+     * will send it" it replaced. Recorded here, in
+     * `DEVELOPER_FORWARD_IMPLEMENTATION_AUTHORED_LABELS`, and reported to Ben.
+     */
+    access: "Access your coupon immediately upon completion via hyperlink."
   },
 
   /** The arrow is Ben's, typed in his brief. */

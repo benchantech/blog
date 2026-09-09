@@ -65,10 +65,20 @@ import styles from "./home.module.css";
  * `descriptor` is the half that is safe alone — it describes Lite's fictional
  * cases and makes no claim about real clients.
  *
- * THE CTA POINTS AT `ROUTES.canonical`, the door, not at `ROUTES.publicAlternate`,
- * the run. `/developer-forward` is the crawlable node that carries the answer-first
- * material and the completion split; sending the home page past it would skip
- * the one surface that knows whether this browser has already finished.
+ * THE CTA POINTS AT `ROUTES.publicAlternate`, the RUN, changed 2026-09-09 on
+ * Ben's instruction: the button says "Start Developer Forward Lite" and it now
+ * starts it. It pointed at `ROUTES.canonical` — the door — on the reasoning
+ * that `/developer-forward` carries the answer-first material and the
+ * completion split, so skipping it would skip the one surface that knows
+ * whether this browser has already finished.
+ *
+ * That reasoning was already stale when it was written. The completion split
+ * has been dead since the YY rewrite (`LandingCompletion` gates on the SHIP-era
+ * storage key), and the answer-first material exists for CRAWLERS, which reach
+ * `/developer-forward` from the sitemap and the header rather than through this
+ * button. What the old target actually cost was a click: a visitor who pressed
+ * "Start" landed on a page asking them to press Start again. A label that does
+ * not do what it says is the defect; the SEO surface loses nothing.
  *
  * PRESERVED, UNCHANGED. Everything from `.hero-foyer` down is the page as it
  * shipped — the foyer copy, both audience buttons with their live `#router`
@@ -95,13 +105,21 @@ export default function Home() {
             {LANDING_INCOMPLETE.heading}
           </h1>
           <p className={styles.heroLead}>{LANDING_INCOMPLETE.lede}</p>
-          <p className={styles.heroBody}>{LANDING_INCOMPLETE.body}</p>
+          {/*
+            `body` is empty as of 2026-09-09 — Ben struck the paragraph — and
+            the guard is here rather than in the copy so the field can be
+            refilled without touching a renderer. An empty string would
+            otherwise ship an empty <p> carrying the hero's bottom margin.
+          */}
+          {LANDING_INCOMPLETE.body ? (
+            <p className={styles.heroBody}>{LANDING_INCOMPLETE.body}</p>
+          ) : null}
           <p className={styles.heroDescriptor}>{LANDING_INCOMPLETE.fullOffer.descriptor}</p>
           <p className={styles.heroBadge}>
             <Pill variant="status">{LANDING_INCOMPLETE.timeEstimate}</Pill>
           </p>
           <div className={styles.heroActions}>
-            <ActionPill variant="ink" href={ROUTES.canonical}>
+            <ActionPill variant="ink" href={ROUTES.publicAlternate}>
               {LANDING_INCOMPLETE.primaryCta}
             </ActionPill>
           </div>
@@ -127,7 +145,7 @@ export default function Home() {
               <source media="(max-width: 700px)" srcSet="/upwork-cto-mobile.webp" />
               {/*
                 THE ALT CARRIES THE EVIDENCE, because the image IS the evidence.
-                It said "Upwork profile screenshot for the From Upwork to CTO
+                It said "Upwork profile screenshot for the From Freelancer to CTO
                 feature" — which describes the file, not the claim. Everything
                 that makes this section worth putting on a home page is inside
                 the picture: the headline, the rating, the review count and the
@@ -149,8 +167,7 @@ export default function Home() {
             </picture>
           </div>
           <div className={styles.upworkCopy}>
-            <p className={styles.upworkEyebrow}>Recent Graduate</p>
-            <h2 id="upwork-feature-title">From Upwork to CTO</h2>
+            <h2 id="upwork-feature-title">From Freelancer to CTO</h2>
             <Link className={styles.upworkLink} href="/upwork" target="_blank" rel="noreferrer">
               <span>benchantech.com/upwork</span>
               <span aria-hidden="true">↗</span>

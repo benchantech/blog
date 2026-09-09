@@ -162,7 +162,20 @@ test("home renders the Upwork feature, and the course landing keeps the hero dem
     homePage.includes('href="https://www.linkedin.com/in/benchantech/"'),
     "/ does not link to LinkedIn"
   );
-  assert.ok(homePage.includes("From Upwork to CTO"), "/ does not render the Upwork feature");
+  /*
+   * RETITLED 2026-09-09 (Ben): "From Upwork to CTO" -> "From Freelancer to
+   * CTO". The screenshot is still an Upwork profile and its filenames and alt
+   * text still say so — what changed is the headline's claim, which now names
+   * the arc rather than the platform. The eyebrow above it ("Recent Graduate")
+   * was struck in the same pass and is asserted absent below, so the section's
+   * shape cannot drift back without this file noticing.
+   */
+  assert.ok(homePage.includes("From Freelancer to CTO"), "/ does not render the Upwork feature");
+  assert.equal(
+    homeMarkup.includes("Recent Graduate"),
+    false,
+    "/ renders the struck 'Recent Graduate' eyebrow again"
+  );
 });
 
 test("the course landing cannot choose the demo's scenario — the content object does", () => {

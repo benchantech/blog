@@ -144,7 +144,19 @@ export default function DeveloperForwardPage() {
             </p>
             <h1 className={styles.title}>{teaser.heading}</h1>
             <p className={styles.prompt}>{teaser.prompt}</p>
-            <p className={styles.heroBody}>{teaser.heroBody}</p>
+            {/*
+              An unordered list, because the three lines are an arc rather than
+              a ranking or a sequence a reader must follow in order. Markers are
+              drawn in the stylesheet, not typed, so nothing here can put a
+              bullet character into governed copy.
+            */}
+            <ul className={styles.heroPoints}>
+              {teaser.heroPoints.map((point) => (
+                <li className={styles.heroPoint} key={point}>
+                  {point}
+                </li>
+              ))}
+            </ul>
             <div className={styles.ctaRow}>
               <StudioCta className={styles.ctaFilled} />
               <LiteCta className={styles.ctaOutlined} />
@@ -193,6 +205,12 @@ export default function DeveloperForwardPage() {
                 <span className={styles.badge}>{teaser.lite.badge}</span>
               </p>
               <h3 className={styles.cardHeading}>{teaser.lite.cardHeading}</h3>
+              {/*
+                The checkpoint's own question, quoted, then the four steps that
+                follow it. A `blockquote` because it is a quotation of a surface
+                the reader has not seen yet — the run asks it seventeen times.
+              */}
+              <blockquote className={styles.cardPrompt}>{teaser.lite.prompt}</blockquote>
               <p className={styles.cardBody}>{teaser.lite.body}</p>
               <ul className={styles.chips}>
                 {teaser.lite.chips.map((chip) => (
@@ -322,13 +340,19 @@ export default function DeveloperForwardPage() {
             <LiteCta className={styles.ctaFilled} />
             <StudioCta className={styles.ctaOutlined} />
           </div>
-          <p className={styles.couponClose}>
-            {teaser.coupon.lead}{" "}
-            <Link className={styles.couponClaim} href="/contact">
-              {teaser.coupon.claimLabel}
-            </Link>
-          </p>
-          <p className={styles.couponNote}>{teaser.coupon.claimNote}</p>
+          {/*
+            NO CLAIM LINK ANY MORE. This was the coupon lead followed by "Ask
+            for your coupon" pointing at `/contact`, because nothing here could
+            issue one. Ben's mechanism (2026-09-09) is a hyperlink the learner
+            receives on completion, so the close states the offer and how it
+            arrives, and sends nobody anywhere to ask for it.
+
+            THE SECOND SENTENCE IS A CLAIM THE PRODUCT DOES NOT YET MEET:
+            `EvidenceSummary` renders no coupon link and nothing generates a
+            coupon URL. See `DEVELOPER_FORWARD_TEASER.coupon`.
+          */}
+          <p className={styles.couponClose}>{teaser.coupon.lead}</p>
+          <p className={styles.couponNote}>{teaser.coupon.access}</p>
           <p className={styles.noAi}>
             <strong className={styles.noAiLead}>{teaser.close.noAiLead}</strong> {teaser.close.noAiBody}
           </p>

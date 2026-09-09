@@ -274,12 +274,24 @@
   letter-spacing: -0.01em;
 }
 
-.heroBody {
+/* Three lines, marked. The rule (`--tf-tan`) rather than a disc, matching the
+   two-door card's `.bounded` list and the dash it uses: this page marks a list
+   with the accent, never with a glyph typed into governed copy. */
+.heroPoints {
+  display: grid;
+  gap: 12px;
   margin: 0 0 32px;
+  padding: 0;
   max-width: 540px;
+  list-style: none;
+}
+
+.heroPoint {
+  padding-left: 18px;
+  border-left: 2px solid var(--tf-tan);
   color: var(--tf-cream-80);
-  font-size: clamp(17px, 1.4vw, 20px);
-  line-height: 1.5;
+  font-size: clamp(16px, 1.4vw, 19px);
+  line-height: 1.45;
 }
 
 /* The coupon, said once in the hero so the free door has a reason attached to
@@ -457,6 +469,17 @@
 
 .cardHeadingOnInk {
   color: var(--tf-cream);
+}
+
+/* The quoted checkpoint prompt on the Lite card. Same accent rule as `.coupon`
+   and `.offer` — this page marks a pulled-out line with the accent, never with
+   quotation marks, which a reader would otherwise paste along with the text. */
+.cardPrompt {
+  margin: 0;
+  padding-left: 14px;
+  border-left: 2px solid var(--tf-rust);
+  color: var(--tf-ink);
+  font: 500 italic 17px / 1.4 var(--sans);
 }
 
 .cardBody,
