@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import { Hanken_Grotesk, Instrument_Serif, JetBrains_Mono } from "next/font/google";
 import { FULL_OFFER, LANDING_FAQ, TRUST_FORWARD_TEASER } from "@/content/trust-forward/copy";
 import { ROUTES } from "@/content/trust-forward/stamp/v1-1-0";
 import styles from "./trust-forward.module.css";
@@ -17,15 +16,24 @@ import styles from "./trust-forward.module.css";
  * figure was measured against a product with eleven decisions rather than
  * seventeen checkpoints.
  *
- * NOTHING GLOBAL CHANGED, which was the instruction and is also the reason this
- * page can look nothing like the rest of the site without risk. The brief's
- * palette and its three typefaces exist ONLY as custom properties on the
- * `.page` element in `trust-forward.module.css`; `app/globals.css` is untouched,
- * so no token, no preserved route and no other surface moves. The fonts come
- * through `next/font/google` — the same mechanism `app/layout.tsx` already uses
- * for IBM Plex — rather than through a stylesheet `@import`, so they are
- * self-hosted, preloaded and scoped to this route instead of being fetched by
- * every page on the site.
+ * ITS LAYOUT, THE SITE'S SKIN (second pass). The brief's own palette and its
+ * three typefaces shipped first and read as a different product on a shared
+ * domain. Ben: *"fix the font and colors to match the aesthetic of the rest of
+ * the site, it should still feel definitely like the rest of the site."* Every
+ * colour on this page now resolves to a token `app/globals.css` already owns,
+ * mapped by ROLE rather than by hue, and the structure below is untouched. See
+ * `trust-forward.module.css` for the whole mapping.
+ *
+ * THIS ROUTE NOW LOADS NO FONTS AT ALL. The first build pulled Instrument
+ * Serif, Hanken Grotesk and JetBrains Mono through `next/font` and shipped five
+ * extra woff2 files; all three are gone, and the headings, labels and body take
+ * `--sans` / `--mono`, which `app/layout.tsx` already loads for every page. The
+ * italic hero line survives the swap rather than being dropped — the layout
+ * loads Plex Sans italic, so it is a real italic and not a synthesised oblique.
+ *
+ * NOTHING GLOBAL CHANGED, which was the first instruction and is still true:
+ * `app/globals.css` is untouched, and the `--tf-*` names in the module are a
+ * mapping layer onto the site's tokens rather than a palette of their own.
  *
  * MOBILE-FIRST, AND THE BASE RULES ARE THE PHONE. Every `grid-template-columns`
  * in the brief is a desktop instruction written as `repeat(auto-fit, minmax(…))`;
@@ -69,34 +77,6 @@ import styles from "./trust-forward.module.css";
  * HTML with nothing to expand and no effect to run. This file reads no browser
  * state, fires no telemetry and takes no query, hash or segment.
  */
-
-/*
- * The brief's three typefaces. `display: "swap"` so a slow font never blanks
- * the hero, and a real fallback stack on each so the page is legible if Google
- * Fonts is blocked — which it is, for a non-trivial share of readers.
- */
-const serif = Instrument_Serif({
-  subsets: ["latin"],
-  weight: "400",
-  style: ["normal", "italic"],
-  display: "swap",
-  variable: "--tf-serif",
-  fallback: ["Georgia", "Times New Roman", "serif"]
-});
-
-const sans = Hanken_Grotesk({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--tf-sans",
-  fallback: ["Helvetica Neue", "Helvetica", "Arial", "sans-serif"]
-});
-
-const mono = JetBrains_Mono({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--tf-mono",
-  fallback: ["SFMono-Regular", "Menlo", "Consolas", "monospace"]
-});
 
 export const metadata: Metadata = {
   title: "Trust Forward - BenChanTech",
@@ -153,7 +133,7 @@ function Goal() {
 
 export default function TrustForwardPage() {
   return (
-    <div className={[styles.page, serif.variable, sans.variable, mono.variable].join(" ")}>
+    <div className={styles.page}>
       {/* 1 — Hero */}
       <section className={styles.hero}>
         <div className={styles.heroInner}>

@@ -1,14 +1,55 @@
 /*
- * `/trust-forward` — Ben's 2026-09-08 redesign brief, adapted.
+ * `/trust-forward` — Ben's 2026-09-08 redesign brief, in the site's own type
+ * and palette.
  *
- * NOTHING GLOBAL IS TOUCHED, WHICH WAS THE INSTRUCTION. The brief's palette and
- * its three typefaces are custom properties declared on `.page` and nowhere
- * else, so they cascade into this route and stop at its edge. `app/globals.css`
- * keeps every token it had; no preserved route, no legal page and no course
- * screen moves because of anything in this file. That is also why the names are
- * prefixed `--tf-`: a bare `--ink` here would read as a redefinition of the
- * site token to the next person to open the file, even though a module cannot
- * leak one.
+ * THE BRIEF'S LAYOUT, THE SITE'S SKIN (second pass, 2026-09-08). The first
+ * build took the brief literally: Instrument Serif, Hanken Grotesk and JetBrains
+ * Mono over a #f4f1ea paper with a rust accent. It read as a different product
+ * on a shared domain. Ben: *"fix the font and colors to match the aesthetic of
+ * the rest of the site, it should still feel definitely like the rest of the
+ * site."*
+ *
+ * So the STRUCTURE is untouched — five sections in the brief's order, the ink
+ * hero, the numbered sequence rail, the two doors, the marked method box, the
+ * FAQ, the close — and every colour and every typeface now resolves to a token
+ * `app/globals.css` already defines. The `--tf-*` names survive as a mapping
+ * layer rather than as values: one place to read what this page borrows, and
+ * nothing here can drift from the site's palette because nothing here defines a
+ * colour.
+ *
+ * WHAT EACH BRIEF VALUE BECAME, and why the mapping is by ROLE rather than by
+ * hue. The brief's warm paper and rust have no counterpart in a cool ink-and-
+ * teal system, so matching them by appearance would have invented two new site
+ * colours. Matched by job instead:
+ *
+ *   #f4f1ea paper  -> --white          the page ground
+ *   #faf8f3 card   -> --white          a card on a tint
+ *   #eae5da band   -> --tint-grey      the quiet slab
+ *   #14181f ink    -> --ink            the dark slab, as on the home page
+ *   #3d424b body   -> --body
+ *   #6b6f78 muted  -> --muted
+ *   #ad4318 rust   -> --accent-text-on-tint   the accent, on light
+ *   #e8a77a tan    -> --accent-on-dark        the accent, on ink
+ *
+ * `--accent-on-dark` is restricted by globals.css to "ONLY inside ink slabs",
+ * which is exactly and only where this page uses it.
+ *
+ * TYPE: IBM PLEX, AND NO SERIF. `app/layout.tsx` already loads Plex Sans (with
+ * italic) and Plex Mono for the whole site, so this route now adds NO fonts at
+ * all — the `next/font` calls that shipped three extra typefaces are gone from
+ * `page.tsx` and five preloaded woff2 files went with them. The brief's display
+ * serif has no counterpart here and is not substituted with a lookalike: the
+ * headings take `--sans` at 600 with the site's own tight tracking, which is
+ * how every other headline on this site is set. Its mono eyebrows become the
+ * site's `.eyebrow` idiom — 600 12px, 0.08em, uppercase, accent — because two
+ * ways of writing the same label is the thing that reads as a foreign page.
+ *
+ * GEOMETRY CAME WITH IT, and that is the one thing beyond "font and colors".
+ * The brief squares every corner at 2px; this site rounds blocks at 28-32px and
+ * every action at `--radius-pill`. Two typefaces can be swapped and a page will
+ * still read as a stranger if its corners are square next to a page whose
+ * aren't, so the radii are the site's. Nothing else about the composition
+ * moved.
  *
  * SCOPED, per the §4.1 CSS Modules boundary. `.hero`, `.title`, `.badge`,
  * `.stat` and `.chip` are all names the legacy global layer already owns or
@@ -23,59 +64,52 @@
  * set where a grid child could otherwise refuse to shrink, and the type ramps
  * with `clamp()` from a phone-first floor rather than down from a desktop one.
  *
- * TWO COLOURS IN THE BRIEF DID NOT MEET AA AND WERE MOVED, both by the smallest
- * amount that clears it:
- *
- *   #b8471b on the #eae5da band measured 4.23:1 — the section eyebrows are
- *   11.5px, so 4.5 is the bar. `--tf-rust` ships at #ad4318, which measures
- *   5.18 on paper, 4.65 on the band and 5.51 on the card. One token rather than
- *   two, because an eyebrow that changes colour with its ground is a second
- *   thing to keep in step for no gain.
- *
- *   The sequence rail's step numbers were cream at 45% on ink — 4.13:1 at 11px.
- *   They are gone entirely rather than lightened: an `<ol>` supplies the
- *   numbering, so the brief's hand-typed 01–05 were a second copy of what the
- *   list already says. `::before` draws them from the counter at 55% (5.50:1).
- *
- * Everything else is measured and passing: `--tf-body` 8.95 on paper, 9.52 on
- * the card, 8.04 on the band; `--tf-muted` 4.74 on the card; `--tf-tan` 8.68 on
- * ink; the cream alphas 10.40 / 8.20 / 6.32 / 5.50.
+ * CONTRAST IS INHERITED RATHER THAN RE-MEASURED, which is the point of mapping
+ * onto tokens. The two AA failures the brief's own palette carried are gone
+ * with the palette: every pair on this page is now one of the site's, and all
+ * of them were measured at the 2026-09-08 accessibility pass — `--body` 9.37 on
+ * white and 8.65 on tint-grey, `--muted` 5.47 / 5.05, `--accent-text-on-tint`
+ * 6.12 / 5.65, and on `--ink`: white 16.46, `--body-on-dark` 9.72,
+ * `--muted-on-dark` 5.87, `--accent-on-dark` 8.73. The sequence rail still
+ * draws its numbers from the `<ol>` counter rather than from typed copy, which
+ * was a correctness fix and not a palette one.
  *
  * LIGHT-ONLY, deliberately, like the rest of this repo's world (§4.2). The ink
- * slabs are a compositional device on paper, not a theme.
+ * slabs are a compositional device on white, not a theme.
  */
 
 .page {
-  /* Ground and ink */
-  --tf-paper: #f4f1ea;
-  --tf-card: #faf8f3;
-  --tf-band: #eae5da;
-  --tf-ink: #14181f;
-  --tf-body: #3d424b;
-  --tf-muted: #6b6f78;
-  /* Accents. `--tf-rust` is the AA-corrected #b8471b; see the header. */
-  --tf-rust: #ad4318;
-  --tf-tan: #e8a77a;
-  /* Cream on ink, at the four alphas the brief uses. */
-  --tf-cream: #f4f1ea;
-  --tf-cream-80: rgba(244, 241, 234, 0.8);
-  --tf-cream-70: rgba(244, 241, 234, 0.7);
-  --tf-cream-60: rgba(244, 241, 234, 0.6);
-  --tf-cream-55: rgba(244, 241, 234, 0.55);
-  --tf-hair: rgba(244, 241, 234, 0.18);
-  --tf-hair-ink: rgba(20, 24, 31, 0.16);
-  /* Type */
-  --tf-serif-stack: var(--tf-serif), Georgia, "Times New Roman", serif;
-  --tf-sans-stack: var(--tf-sans), "Helvetica Neue", Helvetica, Arial, sans-serif;
-  --tf-mono-stack: var(--tf-mono), SFMono-Regular, Menlo, Consolas, monospace;
+  /*
+   * A MAPPING LAYER, NOT A PALETTE. Every value on the right is a token
+   * `app/globals.css` owns. Nothing here introduces a colour, so this page
+   * cannot drift from the site — and a reader who wants to know what it
+   * borrows reads one block instead of four hundred lines.
+   */
+  --tf-paper: var(--white);
+  --tf-card: var(--white);
+  --tf-band: var(--tint-grey);
+  --tf-ink: var(--ink);
+  --tf-body: var(--body);
+  --tf-muted: var(--muted);
+  /* The accent, twice: on light, and inside an ink slab. */
+  --tf-rust: var(--accent-text-on-tint);
+  --tf-tan: var(--accent-on-dark);
+  /* On-ink text, at the four weights this page uses. */
+  --tf-cream: var(--white);
+  --tf-cream-80: var(--body-on-dark);
+  --tf-cream-70: var(--body-on-dark);
+  --tf-cream-60: var(--muted-on-dark);
+  --tf-cream-55: var(--muted-on-dark);
+  --tf-hair: rgba(255, 255, 255, 0.18);
+  --tf-hair-ink: var(--border-card);
   /* The measure and the phone gutter. */
   --tf-max: 1140px;
-  --tf-pad: clamp(20px, 5vw, 64px);
+  --tf-pad: var(--gutter);
   --tf-block: clamp(56px, 8vw, 112px);
 
   background: var(--tf-paper);
   color: var(--tf-ink);
-  font-family: var(--tf-sans-stack);
+  font-family: var(--sans);
   text-wrap: pretty;
 }
 
@@ -98,16 +132,16 @@
   text-align: center;
 }
 
-/* The uppercase mono label above each section heading. Letter-spaced because it
-   is set in caps, which is the one case where tracking is legibility and not
-   decoration. */
+/* The site's own eyebrow, not the brief's. `app/globals.css` sets `.eyebrow`
+   and `app/home.module.css` sets `.upworkEyebrow` at 600 12px / 0.08em caps in
+   the accent, and a second way of writing the same label is exactly what makes
+   a page read as a stranger. Tracking is legibility here rather than
+   decoration: it is set in caps. */
 .eyebrow,
 .eyebrowOnInk {
   margin: 0 0 18px;
-  font-family: var(--tf-mono-stack);
-  font-size: 11.5px;
-  letter-spacing: 0.16em;
-  line-height: 1.4;
+  font: 600 12px / 1.3 var(--sans);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -134,11 +168,8 @@
   margin: 0 0 32px;
   max-width: 20ch;
   color: var(--tf-ink);
-  font-family: var(--tf-serif-stack);
-  font-weight: 400;
-  font-size: clamp(30px, 7vw, 54px);
-  line-height: 1.06;
-  letter-spacing: -0.02em;
+  font: 600 clamp(1.875rem, 3.2vw, 2.5rem) / 1.1 var(--sans);
+  letter-spacing: -0.025em;
   text-wrap: balance;
 }
 
@@ -155,11 +186,8 @@
   width: 100%;
   min-height: 48px;
   padding: 16px 26px;
-  border-radius: 2px;
-  font-family: var(--tf-sans-stack);
-  font-weight: 600;
-  font-size: 16px;
-  line-height: 1.2;
+  border-radius: var(--radius-pill);
+  font: 600 16px / 1.2 var(--sans);
   text-align: center;
   text-decoration: none;
 }
@@ -172,7 +200,7 @@
 
 .ctaOutlined {
   background: transparent;
-  border: 1px solid rgba(20, 24, 31, 0.4);
+  border: 1px solid var(--border-pill-strong);
   color: var(--tf-ink);
 }
 
@@ -188,7 +216,7 @@
 .hero .ctaOutlined,
 .cardInk .ctaOutlined,
 .close .ctaOutlined {
-  border-color: rgba(244, 241, 234, 0.4);
+  border-color: rgba(255, 255, 255, 0.4);
   color: var(--tf-cream);
 }
 
@@ -213,7 +241,7 @@
   background: var(--tf-ink);
   background-image: repeating-linear-gradient(
     90deg,
-    rgba(244, 241, 234, 0.04) 0 1px,
+    rgba(255, 255, 255, 0.045) 0 1px,
     transparent 1px 88px
   );
   color: var(--tf-cream);
@@ -233,20 +261,17 @@
 
 .title {
   margin: 0 0 22px;
-  font-family: var(--tf-serif-stack);
-  font-weight: 400;
-  font-size: clamp(46px, 13vw, 92px);
-  line-height: 0.98;
-  letter-spacing: -0.025em;
+  font: 600 clamp(2.375rem, 5.2vw, 4.125rem) / 1.02 var(--sans);
+  letter-spacing: -0.03em;
 }
 
 .prompt {
   margin: 0 0 20px;
   color: var(--tf-cream);
-  font-family: var(--tf-serif-stack);
-  font-style: italic;
-  font-size: clamp(22px, 5.5vw, 32px);
-  line-height: 1.25;
+  /* Plex Sans italic — `app/layout.tsx` loads the italic style, so the brief's
+     italic display line survives the swap instead of becoming a faux oblique. */
+  font: 400 italic clamp(20px, 5vw, 28px) / 1.3 var(--sans);
+  letter-spacing: -0.01em;
 }
 
 .heroBody {
@@ -272,7 +297,8 @@
   flex-direction: column;
   gap: 20px;
   padding: clamp(22px, 3vw, 34px);
-  border: 1px solid rgba(244, 241, 234, 0.22);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  border-radius: var(--radius-block);
 }
 
 /* NUMBERED BY THE LIST, NOT BY HAND. The brief typed 01–05 beside the labels;
@@ -292,7 +318,7 @@
   align-items: baseline;
   gap: 14px;
   padding: 11px 0;
-  border-bottom: 1px solid rgba(244, 241, 234, 0.14);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.14);
   counter-increment: tf-stage;
 }
 
@@ -303,9 +329,9 @@
 .sequenceItem::before {
   content: "0" counter(tf-stage);
   flex: none;
-  color: var(--tf-cream-55);
-  font-family: var(--tf-mono-stack);
-  font-size: 11px;
+  color: var(--tf-cream-60);
+  /* The one place `--mono` earns its keep: a column of aligned ordinals. */
+  font: 400 12px / 1.5 var(--mono);
 }
 
 .sequenceName {
@@ -343,9 +369,8 @@
 }
 
 .statValue {
-  font-family: var(--tf-serif-stack);
-  font-size: 38px;
-  line-height: 1;
+  font: 600 38px / 1 var(--sans);
+  letter-spacing: -0.03em;
 }
 
 .statLabel {
@@ -380,11 +405,13 @@
 
 .cardLight {
   border: 1px solid var(--tf-hair-ink);
+  border-radius: var(--radius-block-lg);
   background: var(--tf-card);
 }
 
 .cardInk {
   border: 1px solid var(--tf-ink);
+  border-radius: var(--radius-block-lg);
   background: var(--tf-ink);
   color: var(--tf-cream);
 }
@@ -396,10 +423,8 @@
   align-items: center;
   gap: 12px;
   margin: 0;
-  font-family: var(--tf-mono-stack);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  line-height: 1.4;
+  font: 600 11px / 1.4 var(--sans);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -412,23 +437,22 @@
 }
 
 .badge {
-  padding: 4px 10px;
-  border: 1px solid rgba(20, 24, 31, 0.22);
+  padding: 5px 12px;
+  border: 1px solid var(--border-pill-strong);
+  border-radius: var(--radius-pill);
 }
 
 .badgeOnInk {
-  padding: 4px 10px;
-  border: 1px solid rgba(232, 167, 122, 0.5);
+  padding: 5px 12px;
+  border: 1px solid rgba(127, 200, 214, 0.5);
+  border-radius: var(--radius-pill);
 }
 
 .cardHeading,
 .cardHeadingOnInk {
   margin: 0;
-  font-family: var(--tf-serif-stack);
-  font-weight: 400;
-  font-size: clamp(26px, 6vw, 36px);
-  line-height: 1.12;
-  letter-spacing: -0.015em;
+  font: 600 clamp(24px, 5vw, 30px) / 1.15 var(--sans);
+  letter-spacing: -0.02em;
 }
 
 .cardHeadingOnInk {
@@ -447,7 +471,7 @@
 }
 
 .cardBodyOnInk {
-  color: rgba(244, 241, 234, 0.78);
+  color: var(--body-on-dark);
 }
 
 .chips {
@@ -460,12 +484,11 @@
 }
 
 .chip {
-  padding: 7px 12px;
+  padding: 8px 14px;
+  border-radius: var(--radius-pill);
   background: var(--tf-ink);
   color: var(--tf-cream);
-  font-family: var(--tf-mono-stack);
-  font-size: 11.5px;
-  line-height: 1.4;
+  font: 500 12.5px / 1.3 var(--sans);
 }
 
 .boundedLead {
@@ -503,16 +526,15 @@
 .coupon {
   padding: 16px 18px;
   border-left: 2px solid var(--tf-rust);
-  background: var(--tf-paper);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  background: var(--tint-teal);
 }
 
 .couponBadge {
   margin: 0 0 8px;
   color: var(--tf-rust);
-  font-family: var(--tf-mono-stack);
-  font-size: 11px;
-  letter-spacing: 0.14em;
-  line-height: 1.4;
+  font: 600 11px / 1.4 var(--sans);
+  letter-spacing: 0.08em;
   text-transform: uppercase;
 }
 
@@ -558,9 +580,9 @@
 
 .passStep {
   color: var(--tf-tan);
-  font-family: var(--tf-mono-stack);
-  font-size: 11px;
+  font: 600 11px / 1.4 var(--sans);
   letter-spacing: 0.08em;
+  text-transform: uppercase;
 }
 
 .passLabel {
@@ -590,8 +612,8 @@
 .method {
   padding: var(--tf-block) var(--tf-pad);
   background: var(--tf-band);
-  border-top: 1px solid rgba(20, 24, 31, 0.12);
-  border-bottom: 1px solid rgba(20, 24, 31, 0.12);
+  border-top: 1px solid var(--border-card);
+  border-bottom: 1px solid var(--border-card);
 }
 
 .innerSplit {
@@ -612,9 +634,8 @@
   margin: 0;
   padding: 0;
   list-style: none;
-  font-family: var(--tf-mono-stack);
-  font-size: 13px;
-  letter-spacing: 0.04em;
+  font: 500 13px / 1.3 var(--sans);
+  letter-spacing: 0.02em;
 }
 
 .grammarItem {
@@ -624,12 +645,14 @@
 }
 
 .stage {
-  padding: 9px 14px;
-  border: 1px solid rgba(20, 24, 31, 0.25);
+  padding: 9px 16px;
+  border: 1px solid var(--border-pill-strong);
+  border-radius: var(--radius-pill);
 }
 
 .stageSolid {
-  padding: 9px 14px;
+  padding: 9px 16px;
+  border-radius: var(--radius-pill);
   background: var(--tf-ink);
   color: var(--tf-cream);
 }
@@ -667,7 +690,8 @@
 .offer {
   padding: 20px 22px;
   border-left: 2px solid var(--tf-rust);
-  background: var(--tf-paper);
+  border-radius: 0 var(--radius-card) var(--radius-card) 0;
+  background: var(--white);
 }
 
 .offerBridge {
@@ -705,11 +729,8 @@
 
 .faqQuestion {
   margin: 0 0 10px;
-  font-family: var(--tf-serif-stack);
-  font-weight: 400;
-  font-size: 24px;
-  line-height: 1.2;
-  letter-spacing: -0.01em;
+  font: 600 20px / 1.25 var(--sans);
+  letter-spacing: -0.015em;
 }
 
 .faqAnswer {
@@ -731,18 +752,15 @@
 
 .closeHeading {
   margin: 0 0 20px;
-  font-family: var(--tf-serif-stack);
-  font-weight: 400;
-  font-size: clamp(34px, 9vw, 64px);
-  line-height: 1.04;
-  letter-spacing: -0.02em;
+  font: 600 clamp(2rem, 4.4vw, 3.25rem) / 1.06 var(--sans);
+  letter-spacing: -0.03em;
   text-wrap: balance;
 }
 
 .closeBody {
   margin: 0 auto 32px;
   max-width: 600px;
-  color: rgba(244, 241, 234, 0.78);
+  color: var(--body-on-dark);
   font-size: clamp(17px, 1.4vw, 20px);
   line-height: 1.5;
 }
@@ -755,7 +773,15 @@
 }
 
 /* Underlined, not a pill: it is a claim path inside a sentence, and a third
-   button here would compete with the two that just made the offer. */
+   button here would compete with the two that just made the offer.
+
+   MEASURED AT 20px TALL AT 375px, AND THAT IS ALLOWED — noted so a later
+   accessibility pass does not re-flag it. WCAG 2.5.8 exempts a target "in a
+   sentence or its size is otherwise constrained by the line-height of
+   non-target text", which is exactly this, and the sentence /accessibility
+   publishes is about "buttons, links in navigation and course controls" — the
+   inline links on /privacy, /cookies and /ai-disclosure are set the same way.
+   Padding it to 44px would break the line it sits in. */
 .couponClaim {
   color: var(--tf-cream);
   font-weight: 600;
@@ -781,7 +807,7 @@
 }
 
 .noAiLead {
-  color: rgba(244, 241, 234, 0.85);
+  color: var(--white);
   font-weight: 600;
 }
 
