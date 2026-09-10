@@ -4,6 +4,7 @@ import { execFileSync } from "node:child_process";
 import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
+import { DEVELOPER_FORWARD_LITE_CURRENT_STATUS } from "@/content/developer-forward/current-status";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string): string => readFileSync(path.join(repoRoot, relative), "utf8");
@@ -11,14 +12,11 @@ const read = (relative: string): string => readFileSync(path.join(repoRoot, rela
 /**
  * Preservation after ADR 0010.
  *
- * The old version of this test froze the 2026-09-04 homepage composition and
- * the former Studio destination. ADR 0010 intentionally changes both while
- * keeping the load-bearing URLs, evidence, legal surfaces, ecosystem links,
- * machine surfaces, and reversible historical source intact. This test guards
- * that current preservation boundary rather than forcing the retired homepage
- * to remain the product architecture forever.
+ * The old version froze the 2026-09-04 homepage composition and former Studio
+ * destination. ADR 0010 intentionally changes both while preserving the
+ * load-bearing URLs, evidence, legal surfaces, ecosystem links, machine
+ * surfaces, and reversible historical source.
  */
-
 const REQUIRED_PAGE_FILES = [
   "app/page.tsx",
   "app/developer-forward/page.tsx",
@@ -89,17 +87,13 @@ test("the current public Developer Forward path contains no active Studio checko
   const stamp = read("content/developer-forward/stamp/v1-1-0.ts");
   assert.equal(full.includes("StudioCta"), false);
   assert.equal(full.includes("couponTarget"), false);
-  assert.ok(lite.includes("no paid upgrade is currently offered"));
+  assert.ok(lite.includes("DEVELOPER_FORWARD_LITE_CURRENT_STATUS"));
+  assert.match(DEVELOPER_FORWARD_LITE_CURRENT_STATUS.metadataDescription, /no paid upgrade/i);
   assert.equal(stamp.includes("studio.com/benchanviolin"), false);
 });
 
 test("the major ecosystem authority links remain in source", () => {
-  const files = [
-    read("content/site-config.ts"),
-    read("content/nav.ts"),
-    read("app/page.tsx"),
-    read("next.config.ts")
-  ].join("\n");
+  const files = [read("content/site-config.ts"), read("content/nav.ts"), read("app/page.tsx"), read("next.config.ts")].join("\n");
   for (const href of [
     "https://yymethod.com",
     "https://yymethod.com/doctrine",
