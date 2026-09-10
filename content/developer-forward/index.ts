@@ -22,6 +22,7 @@ import { SIGNALS_PROVENANCE, OPTION_LABELS_PROVENANCE } from "./signals";
 import { SURFACE_PROVENANCE } from "./surfaces";
 import { VARIANT_PROVENANCE } from "./variants";
 import { DEVELOPER_FORWARD_DIGESTS } from "./digests";
+import { ANSWER_SURFACES_PROVENANCE } from "./answer-surfaces";
 
 /**
  * The six authority levels from `TRUST_FORWARD_PROVENANCE.md`.
@@ -71,6 +72,10 @@ export interface DeveloperForwardRegistryGroup {
  * the one entry that makes the others checkable.
  */
 export const developerForwardRegistry: readonly DeveloperForwardRegistryGroup[] = [
+  {
+    module: "content/developer-forward/answer-surfaces.ts",
+    provenance: ANSWER_SURFACES_PROVENANCE
+  },
   { module: "content/developer-forward/cases.ts", provenance: CASES_PROVENANCE },
   { module: "content/developer-forward/cases.ts (authoring notes)", provenance: AUTHORING_NOTES_PROVENANCE },
   { module: "content/developer-forward/copy.ts", provenance: COPY_PROVENANCE },

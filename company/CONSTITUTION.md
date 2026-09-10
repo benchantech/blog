@@ -44,4 +44,6 @@ Every indexed answer surface should stand alone as useful to a human reader and 
 
 No indexed page should exist merely because AI can generate a variation. A page earns publication by answering a materially distinct question with identifiable evidence.
 
+Every new public canonical page must be registered in `content/canonical-surfaces.ts` in the same change that creates the page. The sitemap and `llms.txt` are generated from that registry, so publication is incomplete until the new page is present there. Redirects, retired pages, historical alternatives, and machine mirrors must not be added to the human sitemap merely to increase surface area.
+
 History is append-only. Current interpretations may change; the record of what happened may not be silently rewritten.

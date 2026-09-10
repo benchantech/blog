@@ -37,6 +37,7 @@ import * as surfacesModule from "@/content/developer-forward/surfaces";
 import * as variantsModule from "@/content/developer-forward/variants";
 import * as stampModule from "@/content/developer-forward/stamp/v1-1-0";
 import * as currentStatusModule from "@/content/developer-forward/current-status";
+import * as answerSurfacesModule from "@/content/developer-forward/answer-surfaces";
 
 /**
  * Developer Forward Lite — the content governance gate (plan §7; REV4 test table).
@@ -105,6 +106,7 @@ function contentModulePaths(dir: string, out: string[] = []): string[] {
  * and §1 fails until it has one.
  */
 const MODULE_NAMESPACES: Readonly<Record<string, Record<string, unknown>>> = {
+  "content/developer-forward/answer-surfaces.ts": answerSurfacesModule,
   "content/developer-forward/cases.ts": casesModule,
   "content/developer-forward/copy.ts": copyModule,
   "content/developer-forward/digests.ts": digestsModule,

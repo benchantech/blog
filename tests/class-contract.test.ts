@@ -445,7 +445,9 @@ test("mode 2: every styles.<key> resolves to a class in its sibling .module.css"
   // adds one, never to make a red test green.
   // The GPT usage meter adds one component-owned CSS Module, taking the
   // deliberately measured total from 76 to 77.
-  assert.equal(modulesChecked, 77, "CSS Module imports across app/ and components/ — update deliberately");
+  // The experiment and answer-surface renderers add two more shared module
+  // imports, taking the deliberately measured total from 77 to 79.
+  assert.equal(modulesChecked, 79, "CSS Module imports across app/ and components/ — update deliberately");
 });
 
 /* -------------------------------------------------------------------------- */
