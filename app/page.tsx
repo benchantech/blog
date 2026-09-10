@@ -7,6 +7,7 @@ const evidenceLinks = [
   { href: "/developer-forward", label: "Developer judgment", title: "Developer Forward" },
   { href: "/developer-forward-lite", label: "Free deterministic experience", title: "Developer Forward Lite" },
   { href: "/neon", label: "Technical case study", title: "Neon / retrieval architecture" },
+  { href: "/upwork", label: "Professional evidence", title: "Freelancer to CTO record" },
   { href: "https://yymethod.com", label: "Canonical method", title: "YY Method™", external: true },
   { href: "https://yyandme.benchantech.com", label: "Narrative record", title: "YY & Me", external: true },
   { href: "https://benchanviolin.substack.com", label: "Essays and field notes", title: "Resonant Patterns", external: true }
@@ -26,9 +27,7 @@ export default function Home() {
       </section>
 
       <section className={`${styles.section} ${styles.rule}`}>
-        <div>
-          <div className={styles.cost}>{experiment.costRule.label}</div>
-        </div>
+        <div><div className={styles.cost}>{experiment.costRule.label}</div></div>
         <div>
           <p className={styles.eyebrow}>The operating constraint</p>
           <h2 className={styles.heading}>{experiment.costRule.heading}</h2>
@@ -42,9 +41,7 @@ export default function Home() {
           <h2 className={styles.heading}>{experiment.experiment.heading}</h2>
           <p className={styles.body}>{experiment.experiment.body}</p>
           <ul className={styles.measureGrid}>
-            {experiment.experiment.measures.map((measure) => (
-              <li className={styles.measure} key={measure}>{measure}</li>
-            ))}
+            {experiment.experiment.measures.map((measure) => <li className={styles.measure} key={measure}>{measure}</li>)}
           </ul>
         </div>
       </section>
@@ -102,16 +99,15 @@ export default function Home() {
           <p className={styles.eyebrow}>Questions the company is trying to answer</p>
           <h2 className={styles.heading}>{experiment.questions.heading}</h2>
           <ul className={styles.measureGrid}>
-            {experiment.questions.items.map((question) => (
-              <li className={styles.measure} key={question}>{question}</li>
-            ))}
+            {experiment.questions.items.map((question) => <li className={styles.measure} key={question}>{question}</li>)}
           </ul>
         </div>
       </section>
 
-      <section className={styles.section}>
+      <section className={styles.section} aria-labelledby="stakeholder-heading">
         <div className={styles.inner}>
-          <p className={styles.eyebrow}>Existing review surfaces</p>
+          <p className={styles.eyebrow}>Review routes</p>
+          <h2 className={styles.heading} id="stakeholder-heading">Two rooms are built for current reviewers.</h2>
           <div className={styles.linkGrid}>
             {stakeholderRoutes.map((route) => (
               <Link className={styles.linkCard} href={route.url} key={route.id}>
