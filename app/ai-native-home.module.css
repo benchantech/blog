@@ -1,0 +1,263 @@
+/*
+ * `/` — the AI-native company experiment, in the site's own type and palette.
+ *
+ * THE LAYOUT IS THE BRANCH'S; THE SKIN IS THE SITE'S. Ben: "fix the aesthetics
+ * to match what it used to be on main so it's still visually aligned." Every
+ * section, its order, its grid and its breakpoints-worth of structure are
+ * unchanged. What changed is that no value below is invented: each colour, type
+ * step and radius resolves to a token `app/globals.css` already owns, so this
+ * page sits beside the header, the disclosure strip and the footer instead of
+ * reading as a different site pasted between them.
+ *
+ * WHAT WAS WRONG, ITEM BY ITEM, because "it looked off" is not a thing anyone
+ * can check later:
+ *
+ *   1. FALLBACKS THAT WERE NOT THE SITE'S COLOURS. `var(--paper, #f5f2ea)` and
+ *      `var(--ink, #151515)` named a warm paper and a near-black. Both tokens
+ *      exist, so the fallbacks never rendered — but they describe a palette
+ *      this site does not have, and the day a token is renamed the page would
+ *      quietly become a different design. Removed, not corrected: a fallback
+ *      for a token that is defined in `:root` is a second source of truth.
+ *   2. OPACITY USED AS A COLOUR. `.eyebrow` at .72, `.linkLabel` at .66,
+ *      `.small` at .78. Opacity cannot be measured against the contrast ratios
+ *      /accessibility publishes — its result depends on whatever is behind it —
+ *      and this site has named tokens for exactly these jobs. `--muted` on
+ *      light, `--muted-on-dark` on ink, both measured.
+ *   3. SQUARE CORNERS. Nothing carried a radius while the site rounds blocks at
+ *      28-32px, cards at 20-22px and every action at `--radius-pill`. This was
+ *      the largest single mismatch: the seam where this page meets the
+ *      disclosure strip was two design languages touching.
+ *   4. A DISPLAY RAMP FROM ANOTHER SYSTEM. The hero ran to 7.8rem at -0.055em
+ *      and weight 500 where the site's page title is
+ *      `600 clamp(2.375rem, 5.2vw, 4.125rem) / 1.02` at -0.03em, and section
+ *      headings ran to 4rem against the site's 2.5rem cap.
+ *   5. MONO WHERE THE SITE USES SANS. The eyebrows and the price were set in
+ *      `--mono`. The site's eyebrow idiom is 600 12px sans caps in the accent
+ *      (`app/globals.css` `.eyebrow`, `app/home.module.css` `.upworkEyebrow`),
+ *      and two ways of writing one label is what reads as a foreign page.
+ *      `--mono` survives in one place it earns: the `$20 / month` figure, where
+ *      a tabular numeral is the point.
+ *   6. A THIRD BREAKPOINT. 760px, where the rest of the site steps at 701px.
+ *
+ * MOBILE-FIRST, unchanged from the branch: one column is the base and the grids
+ * open in a single `min-width: 701px` block.
+ *
+ * LIGHT-ONLY, like the rest of this repo. The ink slabs are a compositional
+ * device on white, not a theme.
+ */
+
+.page {
+  background: var(--paper);
+  color: var(--ink);
+}
+
+.section {
+  padding: clamp(56px, 8vw, 112px) var(--gutter);
+}
+
+.inner {
+  width: min(1120px, 100%);
+  margin: 0 auto;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Hero                                                                       */
+/* -------------------------------------------------------------------------- */
+
+.hero {
+  background: var(--ink);
+  color: var(--white);
+  min-height: min(780px, 88vh);
+  display: flex;
+  align-items: center;
+}
+
+/* The site's eyebrow, not a mono one: 600 12px caps in the accent. Tracking is
+   legibility here rather than decoration — it is set in capitals. */
+.eyebrow {
+  margin: 0 0 20px;
+  color: var(--accent-text-on-tint);
+  font: 600 12px / 1.3 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+/* Inside an ink slab the accent changes, which globals.css restricts to exactly
+   this case: "--accent-on-dark appears ONLY inside ink slabs." */
+.hero .eyebrow,
+.inkSection .eyebrow {
+  color: var(--accent-on-dark);
+}
+
+.title {
+  margin: 0;
+  max-width: 20ch;
+  font: 600 clamp(2.375rem, 5.2vw, 4.125rem) / 1.02 var(--sans);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+.lede {
+  margin: 28px 0 0;
+  max-width: 40em;
+  color: var(--body-on-dark);
+  font: 400 clamp(1.0625rem, 1.5vw, 1.3125rem) / 1.5 var(--sans);
+  text-wrap: pretty;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The cost rule                                                              */
+/* -------------------------------------------------------------------------- */
+
+.rule {
+  display: grid;
+  gap: 24px;
+  grid-template-columns: 1fr;
+  border-top: 1px solid var(--border-card);
+  border-bottom: 1px solid var(--border-card);
+}
+
+/* THE ONE PLACE `--mono` EARNS ITS KEEP on this page: a price, where a tabular
+   numeral is the point. Everything else moved to `--sans` with the site's
+   tracking. */
+.cost {
+  color: var(--ink);
+  font: 500 clamp(2.25rem, 5.5vw, 3.75rem) / 1 var(--mono);
+  letter-spacing: -0.04em;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Section type                                                               */
+/* -------------------------------------------------------------------------- */
+
+.heading {
+  margin: 0;
+  max-width: 24ch;
+  font: 600 clamp(1.875rem, 3.2vw, 2.5rem) / 1.1 var(--sans);
+  letter-spacing: -0.025em;
+  text-wrap: balance;
+}
+
+.body {
+  margin: 18px 0 0;
+  max-width: 40em;
+  color: var(--body);
+  font: 400 17px / 1.6 var(--sans);
+  text-wrap: pretty;
+}
+
+.inkSection .body,
+.hero .body {
+  color: var(--body-on-dark);
+}
+
+.small {
+  margin: 16px 0 0;
+  max-width: 40em;
+  color: var(--muted);
+  font: 400 15px / 1.6 var(--sans);
+  text-wrap: pretty;
+}
+
+.inkSection .small {
+  color: var(--muted-on-dark);
+}
+
+/* -------------------------------------------------------------------------- */
+/* Cards                                                                      */
+/* -------------------------------------------------------------------------- */
+
+.measureGrid,
+.linkGrid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 16px;
+  margin-top: 32px;
+  padding: 0;
+  list-style: none;
+}
+
+/* The site's card: a tint fill and a rounded block, not a hairline box on a
+   translucent white. `--radius-card-lg` is what `CardShell` uses. */
+.measure,
+.linkCard {
+  padding: 22px;
+  border: 1px solid var(--border-card);
+  border-radius: var(--radius-card-lg);
+  background: var(--tint-grey);
+}
+
+.measure {
+  color: var(--body);
+  font: 400 16px / 1.55 var(--sans);
+}
+
+.linkCard {
+  display: block;
+  color: inherit;
+  text-decoration: none;
+  transition: transform 120ms ease, border-color 120ms ease, background-color 120ms ease;
+}
+
+/* `prefers-reduced-motion` is honoured globally — globals.css clamps every
+   transition to 0.01ms — so the lift still lands, it just lands instantly. */
+.linkCard:hover,
+.linkCard:focus-visible {
+  transform: translateY(-2px);
+  border-color: var(--border-pill-strong);
+  background: var(--white);
+}
+
+.linkLabel {
+  display: block;
+  color: var(--accent-text-on-tint);
+  font: 600 11px / 1.3 var(--sans);
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.linkTitle {
+  display: block;
+  margin-top: 8px;
+  color: var(--ink);
+  font: 600 19px / 1.3 var(--sans);
+  letter-spacing: -0.015em;
+}
+
+/* -------------------------------------------------------------------------- */
+/* The closing ink slab                                                       */
+/* -------------------------------------------------------------------------- */
+
+.inkSection {
+  background: var(--ink);
+  color: var(--white);
+}
+
+.principle {
+  margin: 0;
+  max-width: 22ch;
+  font: 600 clamp(1.75rem, 4vw, 3rem) / 1.1 var(--sans);
+  letter-spacing: -0.03em;
+  text-wrap: balance;
+}
+
+/* -------------------------------------------------------------------------- */
+/* Desktop: the site's breakpoint, not a third one                            */
+/* -------------------------------------------------------------------------- */
+/* 701px is where globals.css steps --gutter and where every other module in
+   this repo opens. */
+@media (min-width: 701px) {
+  .rule {
+    grid-template-columns: minmax(240px, 0.7fr) 1.3fr;
+    align-items: start;
+    gap: 40px;
+  }
+
+  .measureGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .linkGrid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+}
