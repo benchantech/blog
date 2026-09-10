@@ -11,7 +11,7 @@ export interface UsageObservation {
   remainingPercent: number;
   resetAt: string;
   planCostMonthlyUsd: 20;
-  source: "manually observed in ChatGPT usage UI";
+  source: "automatically read from Codex CLI usage status";
 }
 
 export function validateInput(remaining: number, resetAt: string): void;

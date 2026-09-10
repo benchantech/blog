@@ -2,7 +2,7 @@ import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
 import { fileURLToPath, pathToFileURL } from "node:url";
 
-const SOURCE = "manually observed in ChatGPT usage UI";
+const SOURCE = "automatically read from Codex CLI usage status";
 const PLAN_COST_MONTHLY_USD = 20;
 const scriptDirectory = path.dirname(fileURLToPath(import.meta.url));
 const repoRoot = path.resolve(scriptDirectory, "..");

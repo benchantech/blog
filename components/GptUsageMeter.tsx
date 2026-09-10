@@ -55,7 +55,7 @@ export function GptUsageMeter({ observation = usage }: { observation?: GptUsageO
       </dl>
 
       <p className={styles.disclosure}>
-        Manually observed in ChatGPT—not via private API or account scraping.
+        Read through the installed Codex CLI—not via browser or account scraping.
       </p>
     </aside>
   );

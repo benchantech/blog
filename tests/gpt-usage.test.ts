@@ -61,5 +61,6 @@ test("the homepage meter renders its operating-cost and observation contract", (
   assert.equal(usage.resetAt, "2026-09-14T15:12:00-04:00");
   assert.equal(usage.observedAt, "2026-09-10T15:20:00-04:00");
   assert.match(component, /\$20 Operating Meter/);
-  assert.match(component, /not via private API or account scraping/i);
+  assert.match(component, /installed Codex CLI/i);
+  assert.match(component, /not via browser or account scraping/i);
 });
