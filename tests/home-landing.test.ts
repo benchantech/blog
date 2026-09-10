@@ -23,7 +23,23 @@ test("the homepage is driven by the canonical AI-native company content record",
   assert.ok(homePage.includes('from "@/content/ai-native-company"'));
   assert.ok(homePage.includes("AI_NATIVE_COMPANY"));
   assert.ok(AI_NATIVE_COMPANY.heading.includes("$20"));
-  assert.ok(AI_NATIVE_COMPANY.costRule.body.includes("only required AI operating expense"));
+  /*
+   * THE CLAIM, WHEREVER THE RECORD MAKES IT (2026-09-10). This named
+   * `costRule.body`, which does not contain the phrase and never did — the
+   * "only required AI operating expense" sentence is in the `lede`, and
+   * `costRule.body` says the same thing in its own words ("one ChatGPT Plus
+   * subscription", "none may become required infrastructure"). The test was
+   * asserting a location rather than the claim, so it failed while the claim
+   * was being made correctly two fields away.
+   */
+  assert.ok(
+    AI_NATIVE_COMPANY.lede.includes("only required AI operating expense"),
+    "the home page no longer states the one-required-expense claim"
+  );
+  assert.ok(
+    AI_NATIVE_COMPANY.costRule.body.includes("one ChatGPT Plus subscription"),
+    "the cost rule no longer names the single subscription it is a rule about"
+  );
 });
 
 /*

@@ -438,7 +438,45 @@ test("the one sanctioned use of \"AI you can trust\" is still struck through, an
     if (source.includes("AI you can trust")) owners.push(path.relative(repoRoot, file).split(path.sep).join("/"));
   }
   assert.deepEqual(owners, ["content/watch-your-step/landing.ts"]);
-  assert.ok(read("app/page.tsx").includes("StruckPill"), "the anti-feature pills are no longer struck through");
+
+  /*
+   * THE PHRASE IS NO LONGER RENDERED AT ALL, WHICH IS SAFER THAN STRUCK
+   * THROUGH — and saying so is better than asserting a location that moved.
+   *
+   * This required `app/page.tsx` to import `StruckPill`, which was true while
+   * the old home page carried the anti-feature list. The AI-native rewrite
+   * removed that section on 2026-09-10. The phrase now survives in exactly one
+   * place: `landingAntiFeatures`, the DESKTOP list, which is rendered only by
+   * `/watch-your-step` — a route that has been retired behind a redirect since
+   * the course retirement. The mobile list that page still uses does not
+   * contain it.
+   *
+   * So the forbidden claim is not being made anywhere a reader can reach, and
+   * the check is now the pair that keeps that true: nothing outside `content/`
+   * types the phrase, and any surface that renders the list containing it must
+   * do so through `StruckPill`. If the list is ever rendered plainly, this
+   * fails.
+   */
+  const renderers: string[] = [];
+  for (const dir of ["app", "components"]) {
+    for (const file of walk(path.join(repoRoot, dir), [".tsx"])) {
+      const source = withoutComments(readFileSync(file, "utf8"));
+      const rel = path.relative(repoRoot, file).split(path.sep).join("/");
+      assert.equal(
+        source.includes("AI you can trust"),
+        false,
+        `${rel} types the forbidden claim directly instead of importing the struck list`
+      );
+      if (/\blandingAntiFeatures\b/.test(source)) renderers.push(rel);
+    }
+  }
+  for (const rel of renderers) {
+    const source = withoutComments(read(rel));
+    assert.ok(
+      source.includes("StruckPill"),
+      `${rel} renders the anti-feature list without striking it through`
+    );
+  }
 });
 
 test("no legal record speaks in Ben's first person (R10)", () => {
@@ -682,9 +720,27 @@ test("README.md describes the site the branch actually ships", () => {
   assert.ok(readme.includes("Watch Your Step"), "the course is undocumented");
   assert.ok(readme.includes("scripts/check-no-deletions.sh"), "the deletion gate is undocumented");
   assert.ok(readme.includes("PORT=3999 npm run build"), "the build loop is undocumented");
-  // The analytics section is preserved: it is still accurate and it is the one
-  // place the measurement id is written down.
-  assert.ok(readme.includes("G-25PDJ8VRNT"));
+  /*
+   * THE MEASUREMENT ID MOVED, SO THIS ASSERTION MOVED WITH IT (2026-09-10).
+   *
+   * The README was "the one place the measurement id is written down" while
+   * `components/GoogleAnalytics.tsx` carried it as a literal. It now reads
+   * `process.env.NEXT_PUBLIC_GA_MEASUREMENT_ID`, and the id itself lives in
+   * `docs/legal-analytics.md` — which is where a legal-claims test should be
+   * looking for it anyway, since that document is the one the privacy and
+   * cookies pages are written against.
+   *
+   * Asserted in the doc rather than dropped: an id nobody writes down is an id
+   * nobody can audit a GA4 property against.
+   */
+  assert.ok(
+    read("docs/legal-analytics.md").includes("G-25PDJ8VRNT"),
+    "the GA4 measurement id is written down nowhere; the property cannot be audited against the docs"
+  );
+  assert.ok(
+    readme.includes("NEXT_PUBLIC_GA_MEASUREMENT_ID"),
+    "the README no longer says how analytics are configured"
+  );
 });
 
 test("Ben has a written diff of every final-copy change", () => {
