@@ -1,3 +1,5 @@
+import { LANDING_FAQ } from "@/content/developer-forward/copy";
+
 export type DeveloperForwardAnswer = {
   slug: string;
   question: string;
@@ -9,14 +11,28 @@ export type DeveloperForwardAnswer = {
   currentApplication: string;
   boundary: string;
   related: string[];
-  provenance: string;
+  provenanceNote: string;
 };
+
+export const ANSWER_SURFACES_PROVENANCE =
+  "implementation_authored_under_ben_approved_rule" as const;
+
+export const DEVELOPER_FORWARD_QUESTIONS_INDEX = {
+  metadataTitle: "Developer Judgment Questions | Developer Forward | BenChanTech",
+  metadataDescription:
+    "Evidence-backed answers to practical questions about AI-generated code, verification, delegation, completion, and build-vs-buy judgment.",
+  eyebrow: "Developer Forward",
+  title: "Developer judgment questions",
+  introduction:
+    "Standalone answers grounded in Ben Chan's real professional cases and current AI-era operating experiments.",
+  backLabel: "Developer Forward"
+} as const;
 
 export const DEVELOPER_FORWARD_ANSWERS: readonly DeveloperForwardAnswer[] = [
   {
     slug: "can-you-trust-ai-generated-code",
-    question: "Can you trust AI-generated code?",
-    title: "Can You Trust AI-Generated Code?",
+    question: LANDING_FAQ[0].question,
+    title: LANDING_FAQ[0].question,
     description: "A consequence-based answer to when AI-generated code deserves trust, grounded in Ben Chan's real engineering cases.",
     answer:
       "Trust should follow evidence, not the fact that AI produced the code or the fact that the code looks polished. The amount of evidence you require should scale with the consequence, recoverability, detectability, exposure, and likelihood of failure.",
@@ -31,12 +47,12 @@ export const DEVELOPER_FORWARD_ANSWERS: readonly DeveloperForwardAnswer[] = [
     boundary:
       "This is not a rule to maximize testing everywhere. Low-consequence, reversible work can justify much lighter verification. The point is proportionality, not blanket distrust of AI-generated code.",
     related: ["how-to-verify-ai-generated-code", "when-is-ai-generated-work-complete", "how-much-work-can-ai-safely-own"],
-    provenance:
+    provenanceNote:
       "Grounded in Ben Chan's canonical Case 33 historical record. The answer and AI-era application are a current synthesis of that evidence, not a claim that the historical case involved generative AI."
   },
   {
     slug: "how-to-verify-ai-generated-code",
-    question: "How do you verify AI-generated code?",
+    question: LANDING_FAQ[1].question,
     title: "How to Verify AI-Generated Code",
     description: "Verify AI-generated code by proving the behavior that matters, scaling checks to consequence, and separating mechanical completion from human judgment.",
     answer:
@@ -52,13 +68,13 @@ export const DEVELOPER_FORWARD_ANSWERS: readonly DeveloperForwardAnswer[] = [
     boundary:
       "Mechanical validation does not prove good judgment. A perfectly conformant artifact can still embody a bad decision. Verification should remove avoidable checking from human attention so that human review can concentrate on substance and consequence.",
     related: ["can-you-trust-ai-generated-code", "when-is-ai-generated-work-complete", "how-much-work-can-ai-safely-own"],
-    provenance:
+    provenanceNote:
       "Grounded in Ben Chan's canonical Cases 33 and 39. Case 39 is live human/AI workflow evidence from September 2026; hidden model causes remain unknown."
   },
   {
     slug: "how-much-work-can-ai-safely-own",
-    question: "How much work can AI safely own?",
-    title: "How Much Work Can AI Safely Own?",
+    question: LANDING_FAQ[2].question,
+    title: LANDING_FAQ[2].question,
     description: "Delegate AI execution according to bounded authority, consequence, verification, and recoverability rather than a fixed percentage of work.",
     answer:
       "There is no useful universal percentage. AI can carry more work when the desired outcome is explicit, authority is bounded, failure is recoverable, and the result can be independently checked. Human ownership becomes more important as consequences rise, ambiguity changes the goal, or the system would otherwise be allowed to redefine its own authority.",
@@ -73,7 +89,7 @@ export const DEVELOPER_FORWARD_ANSWERS: readonly DeveloperForwardAnswer[] = [
     boundary:
       "This does not require a human to inspect every token or approve every routine decision. If human review becomes the mechanical validator for everything, delegation has failed. The boundary should preserve judgment, not recreate manual execution under a new name.",
     related: ["can-you-trust-ai-generated-code", "how-to-verify-ai-generated-code", "when-is-ai-generated-work-complete"],
-    provenance:
+    provenanceNote:
       "The historical evidence comes from Ben Chan's canonical case corpus. The company-operating application is current Ben Chan Tech practice and is presented as such, not retroactively inserted into the older cases."
   },
   {
@@ -94,7 +110,7 @@ export const DEVELOPER_FORWARD_ANSWERS: readonly DeveloperForwardAnswer[] = [
     boundary:
       "Not every creative or exploratory task needs rigid conformance. Exactness becomes important when structure controls downstream automation, provenance, approval state, contractual meaning, routing, or consequential action.",
     related: ["how-to-verify-ai-generated-code", "can-you-trust-ai-generated-code", "how-much-work-can-ai-safely-own"],
-    provenance:
+    provenanceNote:
       "Grounded in the canonical live-workflow meta-case Probably Complete Is Not Complete. The observed omissions are historical evidence; explanations for why the model produced them are intentionally not asserted."
   },
   {
@@ -115,7 +131,7 @@ export const DEVELOPER_FORWARD_ANSWERS: readonly DeveloperForwardAnswer[] = [
     boundary:
       "This is not an argument to always buy. Custom differentiation, unavailable vendors, unacceptable data exposure, or unusually strong internal operating capability can reverse the decision. The AI-era mistake is assuming that cheaper construction settles the ownership question by itself.",
     related: ["how-much-work-can-ai-safely-own", "can-you-trust-ai-generated-code", "how-to-verify-ai-generated-code"],
-    provenance:
+    provenanceNote:
       "Grounded in Ben Chan's canonical Cases 17 and 18. Client, vendor, pricing, NDA, and implementation details that are not established in the corpus remain intentionally unspecified."
   }
 ] as const;

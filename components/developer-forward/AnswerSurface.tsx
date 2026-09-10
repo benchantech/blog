@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { cx } from "@/components/provenance/cx";
 import type { DeveloperForwardAnswer } from "@/content/developer-forward/answer-surfaces";
 import { developerForwardAnswer } from "@/content/developer-forward/answer-surfaces";
 import styles from "./answer-surface.module.css";
@@ -24,7 +25,7 @@ export function AnswerSurface({ answer }: { answer: DeveloperForwardAnswer }) {
         </div>
       </section>
 
-      <section className={`${styles.section} ${styles.tint}`}>
+      <section className={cx(styles.section, styles.tint)}>
         <div className={styles.inner}>
           <p className={styles.eyebrow}>What changes now</p>
           <p className={styles.body}>{answer.currentApplication}</p>
@@ -35,11 +36,11 @@ export function AnswerSurface({ answer }: { answer: DeveloperForwardAnswer }) {
         <div className={styles.inner}>
           <p className={styles.eyebrow}>Boundary</p>
           <p className={styles.body}>{answer.boundary}</p>
-          <p className={styles.provenance}>{answer.provenance}</p>
+          <p className={styles.provenance}>{answer.provenanceNote}</p>
         </div>
       </section>
 
-      <section className={`${styles.section} ${styles.ink}`}>
+      <section className={cx(styles.section, styles.ink)}>
         <div className={styles.inner}>
           <p className={styles.eyebrow}>Related questions</p>
           <div className={styles.linkGrid}>

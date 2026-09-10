@@ -13,6 +13,21 @@ export type ShippedOutcome = {
 export const USEFUL_SHIPPED_OUTCOME_DEFINITION =
   "A user-visible, operational, research, or governance change that reaches its intended durable destination and would still have value if no further work were done on it.";
 
+export const OPERATING_METRICS_COPY = {
+  metadataTitle: "Operating Metrics | BenChanTech",
+  metadataDescription:
+    "How Ben Chan Tech measures Captain effort against useful AI-assisted shipped outcomes.",
+  eyebrow: "$20 company · measurement",
+  title: "Operating metrics",
+  logLabel: "Current outcome log",
+  destinationLabel: "Destination",
+  captainMinutesLabel: "Captain minutes",
+  unknownLabel: "unknown",
+  interventionNote:
+    "Interventions are classified as judgment, authority, missing context, execution failure, or tooling. Unknown historical values remain unknown rather than being reconstructed from memory.",
+  backLabel: "All experiments"
+} as const;
+
 export const SHIPPED_OUTCOMES: readonly ShippedOutcome[] = [
   {
     id: "ai-native-company-migration",

@@ -6,6 +6,7 @@ import os from "node:os";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import usage from "@/content/company/gpt-usage.json";
+import usageHistory from "@/content/company/gpt-usage-history.json";
 import { parseArguments, updateUsage, validateInput } from "../scripts/update-gpt-usage.mjs";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -56,10 +57,12 @@ test("the homepage meter renders its operating-cost and observation contract", (
   const homepage = readFileSync(path.join(repoRoot, "app/page.tsx"), "utf8");
   assert.ok(homepage.includes("<GptUsageMeter />"), "the homepage no longer renders the usage meter");
   assert.ok(component.includes('from "@/content/company/gpt-usage.json"'));
-  assert.equal(usage.remainingPercent, 68);
+  assert.ok(Number.isInteger(usage.remainingPercent));
+  assert.ok(usage.remainingPercent >= 0 && usage.remainingPercent <= 100);
   assert.equal(usage.planCostMonthlyUsd, 20);
-  assert.equal(usage.resetAt, "2026-09-14T15:12:00-04:00");
-  assert.equal(usage.observedAt, "2026-09-10T15:20:00-04:00");
+  assert.ok(!Number.isNaN(Date.parse(usage.resetAt)));
+  assert.ok(!Number.isNaN(Date.parse(usage.observedAt)));
+  assert.deepEqual(usageHistory.at(-1), usage, "current usage must match the latest history record");
   assert.match(component, /\$20 Operating Meter/);
   assert.match(component, /installed Codex CLI/i);
   assert.match(component, /not via browser or account scraping/i);

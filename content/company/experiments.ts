@@ -10,6 +10,17 @@ export type CompanyExperiment = {
   unresolvedBoundary: string;
 };
 
+export const EXPERIMENTS_INDEX_COPY = {
+  metadataTitle: "Experiments | BenChanTech",
+  metadataDescription:
+    "The public operating record of Ben Chan Tech's $20 AI-native company experiment.",
+  eyebrow: "Ben Chan Tech",
+  title: "Experiments",
+  introduction:
+    "Observed work, current conclusions, and unresolved boundaries from operating a real company with AI execution under human judgment.",
+  metricsLabel: "Operating metrics"
+} as const;
+
 export const COMPANY_EXPERIMENTS: readonly CompanyExperiment[] = [
   {
     slug: "20-dollar-company",
