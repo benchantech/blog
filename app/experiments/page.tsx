@@ -1,0 +1,6 @@
+import type { Metadata } from "next";
+import Link from "next/link";
+import { COMPANY_EXPERIMENTS } from "@/content/company/experiments";
+import styles from "@/components/company/experiment.module.css";
+export const metadata: Metadata = { title: "Experiments | BenChanTech", description: "The public operating record of Ben Chan Tech's $20 AI-native company experiment.", alternates: { canonical: "/experiments" } };
+export default function Page(){return <article className={styles.page}><header className={styles.hero}><div className={styles.inner}><p className={styles.eyebrow}>Ben Chan Tech</p><h1 className={styles.title}>Experiments</h1><p className={styles.question}>Observed work, current conclusions, and unresolved boundaries from operating a real company with AI execution under human judgment.</p></div></header><section className={styles.section}><div className={styles.inner}><ul className={styles.list}>{COMPANY_EXPERIMENTS.map((experiment)=><li key={experiment.slug}><Link href={`/experiments/${experiment.slug}`}>{experiment.title}</Link> · {experiment.status}</li>)}</ul><p><Link className={styles.back} href="/experiments/operating-metrics">Operating metrics</Link></p></div></section></article>}
