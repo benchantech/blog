@@ -10,11 +10,9 @@ export interface AgentBootstrap {
 
 /**
  * Current repository bootstrap after the 2026-09-10 AI-native company pivot.
- *
  * The Company Constitution and Current State are now the first authority an
- * agent reads. The preserved Author Ship records remain part of the historical
- * and governance substrate, but they no longer define the company's current
- * mission by themselves.
+ * agent reads. Preserved Author Ship records remain historical/governance
+ * substrate rather than the company's sole current mission.
  */
 export const agentBootstrap = {
   id: "agent-bootstrap",
@@ -27,7 +25,7 @@ export const agentBootstrap = {
     "Do not reconstruct superseded decisions from older material when a newer captain-approved state exists.",
     "Operate inside delegated authority and keep the $20 AI operating constraint in force."
   ],
-  sourceIds: ["company-constitution", "company-current-state"]
+  sourceIds: []
 } as const satisfies AgentBootstrap;
 
 export function agentBootstrapText(): string {
