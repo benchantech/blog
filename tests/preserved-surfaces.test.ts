@@ -1,7 +1,7 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync } from "node:fs";
+import { existsSync, readFileSync, readdirSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DEVELOPER_FORWARD_LITE_CURRENT_STATUS } from "@/content/developer-forward/current-status";
@@ -92,15 +92,64 @@ test("Developer Forward and Lite remain canonical public surfaces", () => {
   assert.ok(full.includes("LANDING_FAQ"), "Developer Forward lost its answer-first FAQ evidence");
 });
 
+/*
+ * THIS CHECKED TWO PAGE FILES AND MISSED THE SCREEN THE OFFER WAS ACTUALLY ON.
+ *
+ * It read `app/developer-forward/page.tsx` and `app/developer-forward-lite/
+ * page.tsx` — and the Lite route file is four lines that mount `<YYSandbox>`.
+ * The coupon lived in the sandbox, so for a day after the pivot a learner who
+ * finished five cases was told "You earned your coupon … on Studio", handed a
+ * link, and delivered to a page saying there is "no checkout, coupon, waitlist,
+ * or upgrade path". Every assertion here passed throughout.
+ *
+ * A route file is not a surface. The scan now covers every component the run
+ * actually renders, and the superseded offer records are asserted unrendered
+ * rather than merely unmentioned — they are live-sounding offers one import
+ * away from a screen. See docs/adr/0011.
+ */
 test("the current public Developer Forward path contains no active Studio checkout or coupon", () => {
-  const full = read("app/developer-forward/page.tsx");
-  const lite = read("app/developer-forward-lite/page.tsx");
-  const stamp = read("content/developer-forward/stamp/v1-1-0.ts");
-  assert.equal(full.includes("StudioCta"), false);
-  assert.equal(full.includes("couponTarget"), false);
-  assert.ok(lite.includes("DEVELOPER_FORWARD_LITE_CURRENT_STATUS"));
-  assert.match(DEVELOPER_FORWARD_LITE_CURRENT_STATUS.metadataDescription, /no paid upgrade/i);
+  // Comments stripped: the stamp explains the removal in prose, and a raw scan
+  // would fail a correct file for documenting itself.
+  const stamp = read("content/developer-forward/stamp/v1-1-0.ts")
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/^\s*\/\/.*$/gm, " ");
   assert.equal(stamp.includes("studio.com/benchanviolin"), false);
+  assert.equal(stamp.includes("couponTarget"), false, "the coupon route key is back");
+  assert.match(DEVELOPER_FORWARD_LITE_CURRENT_STATUS.metadataDescription, /no paid upgrade/i);
+  assert.ok(read("app/developer-forward-lite/page.tsx").includes("DEVELOPER_FORWARD_LITE_CURRENT_STATUS"));
+
+  const surfaces: string[] = [];
+  const collect = (dir: string) => {
+    for (const entry of readdirSync(path.join(repoRoot, dir), { withFileTypes: true })) {
+      const next = `${dir}/${entry.name}`;
+      if (entry.isDirectory()) collect(next);
+      else if (entry.name.endsWith(".tsx")) surfaces.push(next);
+    }
+  };
+  collect("app");
+  collect("components");
+
+  const offences: string[] = [];
+  for (const file of surfaces) {
+    const source = read(file).replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+    // The superseded offer records, and the Studio destination they pointed at.
+    for (const banned of [
+      "FULL_OFFER",
+      "LANDING_INCOMPLETE",
+      "LANDING_COMPLETE",
+      "DEVELOPER_FORWARD_TEASER",
+      "couponTarget",
+      "StudioCta",
+      "studio.com/benchanviolin"
+    ]) {
+      if (source.includes(banned)) offences.push(`${file}: ${banned}`);
+    }
+  }
+  assert.deepEqual(
+    offences,
+    [],
+    "a surface renders a superseded paid offer; the current record says there is no checkout, coupon or upgrade path"
+  );
 });
 
 test("the major ecosystem authority links remain in source", () => {

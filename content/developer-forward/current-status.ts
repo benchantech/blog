@@ -25,5 +25,28 @@ export const DEVELOPER_FORWARD_LITE_CURRENT_STATUS = {
   metadataTitle: "Developer Forward Lite — Free Developer Judgment Practice | BenChanTech",
   metadataDescription:
     "A free, deterministic five-case developer-judgment experience. No account, no runtime AI, and no paid upgrade is currently offered.",
-  noUpgradeStatement: "No paid upgrade is currently offered."
+  noUpgradeStatement: "No paid upgrade is currently offered.",
+
+  /*
+   * WHAT THE COMPLETION SCREEN SAYS NOW, replacing a coupon (2026-09-10).
+   *
+   * Until this commit a learner who finished all five cases was told "You
+   * earned your coupon", "It applies to Developer Forward on Studio", and given
+   * an "Open your coupon →" link — which, after the AI-native pivot repointed
+   * `couponTarget`, landed them on `/developer-forward`, a page that says in
+   * its own words that there is "no checkout, coupon, waitlist, or upgrade
+   * path". Two falsehoods in one block: there is no coupon, and Studio is no
+   * longer the destination at all.
+   *
+   * This is the honest close for the same moment. It says what the learner
+   * actually has — their own committed record — and where the work continues,
+   * and it makes no offer, because there is none to make. `noUpgradeStatement`
+   * above is reused rather than restated so the two cannot drift.
+   */
+  completion: {
+    heading: "That is the five-case sample.",
+    body:
+      "What you committed is yours and stays in this browser. Developer Forward continues as a public evidence surface for developer judgment in the AI era, and it is where this work is written up.",
+    cta: "See where the work continues →"
+  }
 } as const;

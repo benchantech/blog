@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { GptUsageMeter } from "@/components/GptUsageMeter";
 import { cx } from "@/components/provenance/cx";
 import { AI_NATIVE_COMPANY, EVIDENCE_LINKS } from "@/content/ai-native-company";
 import { stakeholderRoutes } from "@/content/site-config";
@@ -33,6 +34,10 @@ export default function Home() {
           <h2 className={styles.heading}>{experiment.costRule.heading}</h2>
           <p className={styles.body}>{experiment.costRule.body}</p>
         </div>
+      </section>
+
+      <section className={styles.section} aria-label="Current ChatGPT Plus usage">
+        <GptUsageMeter />
       </section>
 
       <section className={styles.section}>

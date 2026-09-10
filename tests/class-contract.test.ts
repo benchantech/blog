@@ -443,7 +443,9 @@ test("mode 2: every styles.<key> resolves to a class in its sibling .module.css"
   // sandbox shell and the case/reveal component sets. The number is pinned so
   // a new stylesheet cannot arrive unnoticed — bump it in the same commit that
   // adds one, never to make a red test green.
-  assert.equal(modulesChecked, 76, "CSS Module imports across app/ and components/ — update deliberately");
+  // The GPT usage meter adds one component-owned CSS Module, taking the
+  // deliberately measured total from 76 to 77.
+  assert.equal(modulesChecked, 77, "CSS Module imports across app/ and components/ — update deliberately");
 });
 
 /* -------------------------------------------------------------------------- */

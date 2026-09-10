@@ -378,6 +378,33 @@ export const RESULT = {
   destructiveCta: "Start over"
 } as const;
 
+/* ==========================================================================
+   SUPERSEDED BY THE AI-NATIVE PIVOT, 2026-09-10 — RENDERED BY NOTHING.
+   ==========================================================================
+
+   `FULL_OFFER`, `LANDING_INCOMPLETE`, `LANDING_COMPLETE`, `TRUST_STRIP` and
+   `DEVELOPER_FORWARD_TEASER` below describe a PAID 90-day curriculum with a
+   Studio destination, a coupon, and an upgrade path. None of that exists any
+   more: `content/ai-native-company.ts` and
+   `content/developer-forward/current-status.ts` are the current record, and
+   they say the full offering is discontinued with "no checkout, coupon,
+   waitlist, or upgrade path".
+
+   NOT DELETED, AND THE REASON IS NARROW. The deletion contract preserves the
+   files, and these records are the evidence of what was offered and when —
+   `tests/developer-forward-content.test.ts` still walks them for forbidden
+   public claims, so they cannot rot into something worse while they sit here.
+
+   BUT NOTHING MAY RENDER THEM AGAIN WITHOUT A NEW RULING. Every one of these
+   is a live-sounding offer sitting one import away from a screen, and the last
+   one that stayed wired — the coupon block on the Lite completion screen —
+   spent a day telling learners they had earned something that the page it
+   linked to said did not exist. That is the failure mode this banner exists to
+   prevent, and `tests/preserved-surfaces.test.ts` asserts the absence.
+
+   See docs/adr/0011.
+   ========================================================================== */
+
 /* -------------------------------------------------------------------------- */
 /* 7. The full Developer Forward offer                                            */
 /*    (07_…/public-copy-and-full-bridge.BEN_APPROVED.json)                    */
