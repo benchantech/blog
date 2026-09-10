@@ -20,9 +20,8 @@ function faqStructuredData(): string {
 }
 
 export const metadata: Metadata = {
-  title: "Developer Forward — Developer Judgment in the AI Era | BenChanTech",
-  description:
-    "Developer Forward is Ben Chan Tech's evidence surface for developer judgment in AI-assisted engineering: what to trust, verify, delegate, promise, and take back.",
+  title: DEVELOPER_FORWARD_CURRENT_STATUS.metadataTitle,
+  description: DEVELOPER_FORWARD_CURRENT_STATUS.metadataDescription,
   alternates: { canonical: "/developer-forward" }
 };
 
