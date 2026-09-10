@@ -5,6 +5,8 @@ import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 import { DEVELOPER_FORWARD_LITE_CURRENT_STATUS } from "@/content/developer-forward/current-status";
+import { AI_NATIVE_COMPANY, EVIDENCE_LINKS } from "@/content/ai-native-company";
+import { canonicalSurfacePaths } from "@/content/canonical-surfaces";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const read = (relative: string): string => readFileSync(path.join(repoRoot, relative), "utf8");
@@ -69,10 +71,19 @@ test("current redirects preserve useful entry points without a discontinued Stud
   assert.equal(config.includes("permanent: true"), false);
 });
 
+/*
+ * CHECKS THE ROSTER, NOT THE SOURCE TEXT (2026-09-10). This grepped
+ * `content/canonical-surfaces.ts` for the literal `path: "/developer-forward"`,
+ * which the file has not contained since the entry was built from
+ * `developerForwardNav.href` instead of a hard-coded string. The route was in
+ * the roster and in the served sitemap the whole time; only the grep was
+ * stale. Reading the exported roster asks the question the test means — is this
+ * surface canonical — and survives the next refactor of how the row is built.
+ */
 test("Developer Forward and Lite remain canonical public surfaces", () => {
-  const canonical = read("content/canonical-surfaces.ts");
-  assert.ok(canonical.includes('path: "/developer-forward"'));
-  assert.ok(canonical.includes('path: "/developer-forward-lite"'));
+  const roster = new Set(canonicalSurfacePaths());
+  assert.ok(roster.has("/developer-forward"), "/developer-forward left the canonical roster");
+  assert.ok(roster.has("/developer-forward-lite"), "/developer-forward-lite left the canonical roster");
 
   const full = read("app/developer-forward/page.tsx");
   const lite = read("app/developer-forward-lite/page.tsx");
@@ -123,11 +134,23 @@ test("machine discovery surfaces remain generated from canonical state", () => {
   assert.ok(llms.includes("AI_NATIVE_COMPANY"));
 });
 
+/*
+ * CHECKS THE LINKS, NOT THE FILE THEY USED TO BE TYPED IN (2026-09-10). The
+ * hrefs moved to `content/ai-native-company.ts` when the home page's copy was
+ * brought under the provenance spine, so grepping the renderer reported a loss
+ * where there was none — every destination was linked and serving. The
+ * requirement is unchanged: these surfaces stay reachable from `/`.
+ */
 test("the new homepage keeps professional evidence and reviewer routes reachable", () => {
   const home = read("app/page.tsx");
-  assert.ok(home.includes('href="/upwork"'));
-  assert.ok(home.includes('href="/developer-forward"'));
-  assert.ok(home.includes('href="/developer-forward-lite"'));
+  const linked = new Set([
+    ...EVIDENCE_LINKS.map((item) => item.href),
+    ...AI_NATIVE_COMPANY.developerForwardLinks.map((item) => item.href)
+  ]);
+  for (const href of ["/upwork", "/developer-forward", "/developer-forward-lite"]) {
+    assert.ok(linked.has(href), `the home page no longer links ${href}`);
+  }
+  // The reviewer block is still rendered, and still named for its heading.
   assert.ok(home.includes('id="stakeholder-heading"'));
   assert.ok(home.includes("stakeholderRoutes"));
 });
