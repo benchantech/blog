@@ -1,15 +1,8 @@
 # Agent Instructions
 
-## Read this first
+## Canonical bootstrap
 
-Before acting in this repository, read:
-
-1. `company/CONSTITUTION.md`
-2. `company/CURRENT_STATE.md`
-3. `docs/adr/README.md`
-4. every ADR whose Status is `ACCEPTED`, checking its `Stale when` condition before relying on it
-
-Then read the current Author Ship state, Standing Orders, and relevant Ship's Log entries when the task touches preserved governance/history surfaces. Do not reconstruct superseded decisions from older material when a newer captain-approved state exists.
+Read company/CONSTITUTION.md and company/CURRENT_STATE.md first. Read docs/adr/README.md and every ADR whose Status is ACCEPTED; check each one's Stale-when condition before relying on it. When preserved Author Ship surfaces are relevant, read the current Author Ship state, Standing Orders, and the most recent Ship's Log entries for the task. Do not reconstruct superseded decisions from older material when a newer captain-approved state exists. Operate inside delegated authority and keep the $20 AI operating constraint in force.
 
 ## Core operating rule
 
@@ -43,20 +36,20 @@ Synthetic simulations must be labeled as simulations and must never be passed of
 
 History is append-only. Current interpretations may change; the historical record should not be silently rewritten.
 
-## Secret Handling
+## Secret handling
 
 - Never print raw environment variables, dotenv files, API tokens, private keys, cookies, credentials, or authorization headers into chat or logs.
 - When checking whether a credential exists, report only presence, source, length, prefix/suffix fingerprints, or validation status.
 - Do not run broad secret-dumping commands.
 - If a secret is exposed, say so immediately, stop using it, and recommend rotation.
 
-## Git Hooks and verification
+## Git hooks and verification
 
 - Keep hooks lightweight and deterministic.
 - Run `scripts/check-secrets.sh` before committing changes that touch environment, config, or deployment files.
 - Follow accepted ADRs governing verification, parser independence, scripted edits, and concurrent file ownership.
 
-## Preserved Author Ship bootstrap locations
+## Preserved Author Ship locations
 
 - Author Ship state — `/author-ship/state.json`, built from `lib/author-ship-state.ts`.
 - Standing Orders — `/standing-orders`, defined in `content/ship/standing-orders.ts`.
