@@ -5,6 +5,7 @@ PATH="/opt/homebrew/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin"
 export PATH
 
 repository_url="https://github.com/benchantech/blog.git"
+vercel_project_file="/Users/benchan/yy/benchantech/.vercel/project.json"
 temporary_parent="${TMPDIR:-/tmp}"
 work_directory=$(mktemp -d "${temporary_parent%/}/benchantech-gpt-usage.XXXXXX")
 
@@ -49,4 +50,14 @@ fi
 
 git commit --quiet -m "Update Codex usage observation"
 git push --quiet origin HEAD:main
+
+if [ ! -f "$vercel_project_file" ]; then
+  printf '%s\n' "Missing linked Vercel project configuration: $vercel_project_file" >&2
+  exit 1
+fi
+mkdir -p .vercel
+cp "$vercel_project_file" .vercel/project.json
+deployment_url=$(vercel deploy --prod --yes 2>/dev/null | tail -n 1)
+
 printf '%s\n' "Published Codex usage observation: ${remaining}% remaining, reset ${reset_at}"
+printf '%s\n' "Production deployment: ${deployment_url}"
