@@ -1,12 +1,12 @@
 import type { Metadata } from "next";
 import { INFO_MARKERS, LITE_INTRO } from "@/content/developer-forward/copy";
+import { DEVELOPER_FORWARD_LITE_CURRENT_STATUS } from "@/content/developer-forward/current-status";
 import { YYSandbox } from "@/components/developer-forward/yy/YYSandbox";
 import styles from "@/components/developer-forward/yy/yy.module.css";
 
 export const metadata: Metadata = {
-  title: "Developer Forward Lite — Free Developer Judgment Practice | BenChanTech",
-  description:
-    "A free, deterministic five-case developer-judgment experience. No account, no runtime AI, and no paid upgrade is currently offered.",
+  title: DEVELOPER_FORWARD_LITE_CURRENT_STATUS.metadataTitle,
+  description: DEVELOPER_FORWARD_LITE_CURRENT_STATUS.metadataDescription,
   alternates: { canonical: "/developer-forward-lite" }
 };
 
