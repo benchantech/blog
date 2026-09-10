@@ -5,6 +5,7 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { case1 } from "@/content/developer-forward/yy/case-1";
+import { DEVELOPER_FORWARD_LITE_CURRENT_STATUS } from "@/content/developer-forward/current-status";
 import { isRevealUnlocked } from "@/lib/developer-forward/yy/records";
 
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
@@ -99,7 +100,8 @@ test("a new step scrolls to the top once and inherits reduced-motion behavior", 
 test("the current public Lite route does not expose a paid upgrade or coupon", () => {
   const page = readFileSync(path.join(repoRoot, "app", "developer-forward-lite", "page.tsx"), "utf8");
   const stamp = readFileSync(path.join(repoRoot, "content", "developer-forward", "stamp", "v1-1-0.ts"), "utf8");
-  assert.ok(page.includes("no paid upgrade is currently offered"));
+  assert.ok(page.includes("DEVELOPER_FORWARD_LITE_CURRENT_STATUS"));
+  assert.match(DEVELOPER_FORWARD_LITE_CURRENT_STATUS.metadataDescription, /no paid upgrade/i);
   assert.ok(page.includes('[class*="coupon"]'));
   assert.ok(stamp.includes('fullTarget: "/developer-forward"'));
   assert.ok(stamp.includes('couponTarget: "/developer-forward"'));
