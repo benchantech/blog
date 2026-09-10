@@ -1,4 +1,7 @@
 export const DEVELOPER_FORWARD_CURRENT_STATUS = {
+  metadataTitle: "Developer Forward — Developer Judgment in the AI Era | BenChanTech",
+  metadataDescription:
+    "Developer Forward is Ben Chan Tech's evidence surface for developer judgment in AI-assisted engineering: what to trust, verify, delegate, promise, and take back.",
   eyebrow: "Developer Forward · current status",
   heading: "Developer Forward is becoming a public developer-judgment evidence surface.",
   body:
@@ -16,4 +19,11 @@ export const DEVELOPER_FORWARD_CURRENT_STATUS = {
   closeHeading: "Start with the five-case Lite experience.",
   closeBody:
     "Lite is the working public sample today. The larger Developer Forward body of work remains here as an indexed research and evidence surface while the eventual course format is still undecided."
+} as const;
+
+export const DEVELOPER_FORWARD_LITE_CURRENT_STATUS = {
+  metadataTitle: "Developer Forward Lite — Free Developer Judgment Practice | BenChanTech",
+  metadataDescription:
+    "A free, deterministic five-case developer-judgment experience. No account, no runtime AI, and no paid upgrade is currently offered.",
+  noUpgradeStatement: "No paid upgrade is currently offered."
 } as const;
