@@ -64,7 +64,14 @@ export const ROUTES = {
   publicAlternate: "/developer-forward-lite",
   redirect: "/df",
   fullTarget: "/developer-forward",
-  couponTarget: "/developer-forward",
+  /*
+   * `couponTarget` WAS REMOVED 2026-09-10. It named a Studio coupon; the
+   * AI-native pivot discontinued the paid offering, and the key survived only
+   * by being repointed at `/developer-forward` — where it delivered learners to
+   * a page stating there is no coupon. A route key whose NAME asserts an offer
+   * that does not exist is a trap for the next person wiring a screen, so it is
+   * gone rather than aliased. The end of Lite now links `ROUTES.canonical`.
+   */
   learnerStateInUrl: false
 } as const;
 

@@ -1,0 +1,23 @@
+[
+  {
+    "observedAt": "2026-09-10T15:20:00-04:00",
+    "remainingPercent": 68,
+    "resetAt": "2026-09-14T15:12:00-04:00",
+    "planCostMonthlyUsd": 20,
+    "source": "manually observed in ChatGPT usage UI"
+  },
+  {
+    "observedAt": "2026-09-10T15:44:29-04:00",
+    "remainingPercent": 81,
+    "resetAt": "2026-09-16T09:05:50-04:00",
+    "planCostMonthlyUsd": 20,
+    "source": "automatically read from Codex CLI usage status"
+  },
+  {
+    "observedAt": "2026-09-10T15:46:54-04:00",
+    "remainingPercent": 80,
+    "resetAt": "2026-09-16T09:05:50-04:00",
+    "planCostMonthlyUsd": 20,
+    "source": "automatically read from Codex CLI usage status"
+  }
+]

@@ -36,6 +36,7 @@ import * as signalsModule from "@/content/developer-forward/signals";
 import * as surfacesModule from "@/content/developer-forward/surfaces";
 import * as variantsModule from "@/content/developer-forward/variants";
 import * as stampModule from "@/content/developer-forward/stamp/v1-1-0";
+import * as currentStatusModule from "@/content/developer-forward/current-status";
 
 /**
  * Developer Forward Lite — the content governance gate (plan §7; REV4 test table).
@@ -114,7 +115,18 @@ const MODULE_NAMESPACES: Readonly<Record<string, Record<string, unknown>>> = {
   "content/developer-forward/signals.ts": signalsModule,
   "content/developer-forward/surfaces.ts": surfacesModule,
   "content/developer-forward/variants.ts": variantsModule,
-  "content/developer-forward/stamp/v1-1-0.ts": stampModule
+  "content/developer-forward/stamp/v1-1-0.ts": stampModule,
+  /*
+   * Added 2026-09-10 with the AI-native pivot. Being on
+   * `DEVELOPER_FORWARD_RECORD_FREE_MODULES` is not enough on its own: the
+   * registry test also requires the module be reachable HERE, so the
+   * value-level guards in this file — the forbidden public claims, the
+   * `ben_canonical` gate, the identity-predicate ban — actually walk its
+   * strings. A module declared record-free but invisible to those checks would
+   * be exempt from every one of them by omission, which is the loophole the
+   * two-list rule exists to close.
+   */
+  "content/developer-forward/current-status.ts": currentStatusModule
 };
 
 interface ContentString {

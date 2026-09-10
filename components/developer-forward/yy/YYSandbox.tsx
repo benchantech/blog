@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useId, useMemo, useRef, useState } from "react";
 import type { ReactNode } from "react";
 
@@ -42,7 +43,7 @@ import { CommitBar } from "@/components/developer-forward/yy/CommitBar";
 import type { CommitBarCopy } from "@/components/developer-forward/yy/CommitBar";
 import { EvidenceSummary } from "@/components/developer-forward/yy/EvidenceSummary";
 import { caseArtFor } from "@/content/developer-forward/yy/case-art";
-import { DEVELOPER_FORWARD_TEASER } from "@/content/developer-forward/copy";
+import { DEVELOPER_FORWARD_LITE_CURRENT_STATUS as LITE_STATUS } from "@/content/developer-forward/current-status";
 import { ROUTES } from "@/content/developer-forward/stamp/v1-1-0";
 import { ReflectBox } from "@/components/developer-forward/yy/ReflectBox";
 import { RevealPanel } from "@/components/developer-forward/yy/RevealPanel";
@@ -1089,27 +1090,34 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
    * how a case went, and nothing is ordered by anything a learner did.
    */
   /**
-   * The coupon, handed over on the screen that proves it was earned.
+   * What the run closes on, and what it stopped closing on.
    *
-   * `/developer-forward` says "Access your coupon immediately upon completion
-   * via hyperlink"; this is the hyperlink, and until 2026-09-09 it did not
-   * exist — the sentence shipped ahead of the mechanism and was reported as a
-   * claim the product could not keep. It is rendered UNCONDITIONALLY on the
-   * summary, not gated on a completion count, because the summary is only
-   * reachable by walking the five cases and a gate would be a second, weaker
-   * definition of "finished" beside the one `isRevealUnlocked` already owns.
+   * THIS WAS A COUPON UNTIL 2026-09-10, AND THE COUPON HAD BECOME A LIE. It
+   * read "You earned your coupon" / "It applies to Developer Forward on Studio"
+   * over an "Open your coupon →" link. The AI-native pivot discontinued the
+   * paid offering and repointed `couponTarget` away from Studio, so the link
+   * delivered a learner to `/developer-forward` — a page that says there is
+   * "no checkout, coupon, waitlist, or upgrade path". A learner finished five
+   * cases, was told they had earned something, clicked, and was told it did not
+   * exist.
    *
-   * An anchor, not a button: it leaves the site, and it carries no learner
-   * state — the code is one shared marketing value in `ROUTES`, and this site
-   * has no account to attach a per-learner one to. See `ROUTES.couponTarget`.
+   * The block stays because the MOMENT is real: someone has just committed
+   * seventeen judgments and should be told where the work goes next. What it
+   * may not do is make an offer, and this one makes none.
+   *
+   * STILL UNCONDITIONAL ON THE SUMMARY, for the reason it always was: the
+   * summary is only reachable by walking the five cases, and gating it on a
+   * count would be a second, weaker definition of "finished" beside the one
+   * `isRevealUnlocked` already owns.
    */
-  const renderCoupon = () => (
-    <section className={styles.coupon}>
-      <p className={styles.couponHeading}>{DEVELOPER_FORWARD_TEASER.coupon.earnedHeading}</p>
-      <p className={styles.couponBody}>{DEVELOPER_FORWARD_TEASER.coupon.earnedBody}</p>
-      <a className={styles.couponLink} href={ROUTES.couponTarget}>
-        {DEVELOPER_FORWARD_TEASER.coupon.earnedCta}
-      </a>
+  const renderClose = () => (
+    <section className={styles.close}>
+      <p className={styles.closeHeading}>{LITE_STATUS.completion.heading}</p>
+      <p className={styles.closeBody}>{LITE_STATUS.completion.body}</p>
+      <Link className={styles.closeLink} href={ROUTES.canonical}>
+        {LITE_STATUS.completion.cta}
+      </Link>
+      <p className={styles.closeNote}>{LITE_STATUS.noUpgradeStatement}</p>
     </section>
   );
 
@@ -1124,7 +1132,7 @@ export function YYSandbox({ children }: { children?: ReactNode }) {
         records={records}
         cases={CASES}
       />
-      {renderCoupon()}
+      {renderClose()}
       <section className={styles.replay}>
         <p className={styles.replayLabel}>{SHELL_LABELS.replayHeading}</p>
         <ul className={styles.replayList}>

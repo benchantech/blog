@@ -1,24 +1,25 @@
 import Link from "next/link";
-import { AI_NATIVE_COMPANY } from "@/content/ai-native-company";
+import { GptUsageMeter } from "@/components/GptUsageMeter";
+import { cx } from "@/components/provenance/cx";
+import { AI_NATIVE_COMPANY, EVIDENCE_LINKS } from "@/content/ai-native-company";
 import { stakeholderRoutes } from "@/content/site-config";
 import styles from "./ai-native-home.module.css";
 
-const evidenceLinks = [
-  { href: "/developer-forward", label: "Developer judgment", title: "Developer Forward" },
-  { href: "/developer-forward-lite", label: "Free deterministic experience", title: "Developer Forward Lite" },
-  { href: "/neon", label: "Technical case study", title: "Neon / retrieval architecture" },
-  { href: "/upwork", label: "Professional evidence", title: "Freelancer to CTO record" },
-  { href: "https://yymethod.com", label: "Canonical method", title: "YY Method™", external: true },
-  { href: "https://yyandme.benchantech.com", label: "Narrative record", title: "YY & Me", external: true },
-  { href: "https://benchanviolin.substack.com", label: "Essays and field notes", title: "Resonant Patterns", external: true }
-] as const;
+/*
+ * The evidence cards moved to `content/ai-native-company.ts` on 2026-09-10,
+ * with the section eyebrows and the two Developer Forward cards. Declared here
+ * as an `as const` array, they typed as a union in which four members had no
+ * `external` property — so `item.external` below failed the production
+ * typecheck while `next dev` served the page correctly. `EvidenceLink` names
+ * the optional flag once.
+ */
 
 export default function Home() {
   const experiment = AI_NATIVE_COMPANY;
 
   return (
     <article className={styles.page}>
-      <section className={`${styles.section} ${styles.hero}`}>
+      <section className={cx(styles.section, styles.hero)}>
         <div className={styles.inner}>
           <p className={styles.eyebrow}>{experiment.eyebrow}</p>
           <h1 className={styles.title}>{experiment.heading}</h1>
@@ -26,18 +27,22 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={`${styles.section} ${styles.rule}`}>
+      <section className={cx(styles.section, styles.rule)}>
         <div><div className={styles.cost}>{experiment.costRule.label}</div></div>
         <div>
-          <p className={styles.eyebrow}>The operating constraint</p>
+          <p className={styles.eyebrow}>{experiment.eyebrows.costRule}</p>
           <h2 className={styles.heading}>{experiment.costRule.heading}</h2>
           <p className={styles.body}>{experiment.costRule.body}</p>
         </div>
       </section>
 
+      <section className={styles.section} aria-label="Current ChatGPT Plus usage">
+        <GptUsageMeter />
+      </section>
+
       <section className={styles.section}>
         <div className={styles.inner}>
-          <p className={styles.eyebrow}>The live experiment</p>
+          <p className={styles.eyebrow}>{experiment.eyebrows.experiment}</p>
           <h2 className={styles.heading}>{experiment.experiment.heading}</h2>
           <p className={styles.body}>{experiment.experiment.body}</p>
           <ul className={styles.measureGrid}>
@@ -46,9 +51,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={`${styles.section} ${styles.inkSection}`}>
+      <section className={cx(styles.section, styles.inkSection)}>
         <div className={styles.inner}>
-          <p className={styles.eyebrow}>Operating model</p>
+          <p className={styles.eyebrow}>{experiment.eyebrows.operatingModel}</p>
           <h2 className={styles.heading}>{experiment.operatingModel.heading}</h2>
           <p className={styles.body}>{experiment.operatingModel.body}</p>
           <p className={styles.small}>{experiment.operatingModel.rule}</p>
@@ -57,16 +62,32 @@ export default function Home() {
 
       <section className={styles.section}>
         <div className={styles.inner}>
-          <p className={styles.eyebrow}>Evidence, not synthetic authority</p>
+          <p className={styles.eyebrow}>{experiment.eyebrows.evidence}</p>
           <h2 className={styles.heading}>{experiment.evidence.heading}</h2>
           <p className={styles.body}>{experiment.evidence.body}</p>
           <div className={styles.linkGrid}>
-            {evidenceLinks.map((item) => item.external ? (
+            {EVIDENCE_LINKS.map((item) => (item.external ? (
               <a className={styles.linkCard} href={item.href} key={item.href} target="_blank" rel="noopener noreferrer">
                 <span className={styles.linkLabel}>{item.label}</span>
                 <span className={styles.linkTitle}>{item.title}</span>
               </a>
             ) : (
+              <Link className={styles.linkCard} href={item.href} key={item.href}>
+                <span className={styles.linkLabel}>{item.label}</span>
+                <span className={styles.linkTitle}>{item.title}</span>
+              </Link>
+            )))}
+          </div>
+        </div>
+      </section>
+
+      <section className={styles.section}>
+        <div className={styles.inner}>
+          <p className={styles.eyebrow}>{experiment.eyebrows.developerForward}</p>
+          <h2 className={styles.heading}>{experiment.developerForward.heading}</h2>
+          <p className={styles.body}>{experiment.developerForward.body}</p>
+          <div className={styles.linkGrid}>
+            {experiment.developerForwardLinks.map((item) => (
               <Link className={styles.linkCard} href={item.href} key={item.href}>
                 <span className={styles.linkLabel}>{item.label}</span>
                 <span className={styles.linkTitle}>{item.title}</span>
@@ -78,25 +99,7 @@ export default function Home() {
 
       <section className={styles.section}>
         <div className={styles.inner}>
-          <p className={styles.eyebrow}>Developer Forward</p>
-          <h2 className={styles.heading}>{experiment.developerForward.heading}</h2>
-          <p className={styles.body}>{experiment.developerForward.body}</p>
-          <div className={styles.linkGrid}>
-            <Link className={styles.linkCard} href="/developer-forward">
-              <span className={styles.linkLabel}>Indexed evidence surface</span>
-              <span className={styles.linkTitle}>Explore Developer Forward</span>
-            </Link>
-            <Link className={styles.linkCard} href="/developer-forward-lite">
-              <span className={styles.linkLabel}>Free · no account · deterministic</span>
-              <span className={styles.linkTitle}>Run Developer Forward Lite</span>
-            </Link>
-          </div>
-        </div>
-      </section>
-
-      <section className={styles.section}>
-        <div className={styles.inner}>
-          <p className={styles.eyebrow}>Questions the company is trying to answer</p>
+          <p className={styles.eyebrow}>{experiment.eyebrows.questions}</p>
           <h2 className={styles.heading}>{experiment.questions.heading}</h2>
           <ul className={styles.measureGrid}>
             {experiment.questions.items.map((question) => <li className={styles.measure} key={question}>{question}</li>)}
@@ -106,12 +109,12 @@ export default function Home() {
 
       <section className={styles.section} aria-labelledby="stakeholder-heading">
         <div className={styles.inner}>
-          <p className={styles.eyebrow}>Review routes</p>
-          <h2 className={styles.heading} id="stakeholder-heading">Two rooms are built for current reviewers.</h2>
+          <p className={styles.eyebrow}>{experiment.eyebrows.reviewers}</p>
+          <h2 className={styles.heading} id="stakeholder-heading">{experiment.reviewers.heading}</h2>
           <div className={styles.linkGrid}>
             {stakeholderRoutes.map((route) => (
               <Link className={styles.linkCard} href={route.url} key={route.id}>
-                <span className={styles.linkLabel}>Preserved</span>
+                <span className={styles.linkLabel}>{experiment.reviewers.cardLabel}</span>
                 <span className={styles.linkTitle}>{route.title}</span>
               </Link>
             ))}
@@ -119,9 +122,9 @@ export default function Home() {
         </div>
       </section>
 
-      <section className={`${styles.section} ${styles.inkSection}`}>
+      <section className={cx(styles.section, styles.inkSection)}>
         <div className={styles.inner}>
-          <p className={styles.eyebrow}>Standing principle</p>
+          <p className={styles.eyebrow}>{experiment.eyebrows.principle}</p>
           <p className={styles.principle}>{experiment.principle}</p>
         </div>
       </section>

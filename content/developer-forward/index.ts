@@ -118,6 +118,15 @@ export const DEVELOPER_FORWARD_YY_MODULES: readonly string[] = [
 export const DEVELOPER_FORWARD_RECORD_FREE_MODULES: readonly string[] = [
   "content/developer-forward/index.ts",
   "content/developer-forward/stamp/v1-1-0.ts",
+  /*
+   * Added 2026-09-10 with the AI-native pivot. `current-status.ts` is the page
+   * copy for what Developer Forward IS now — the full offering discontinued,
+   * Lite still free and deterministic, no paid destination promised. It is
+   * declared record-free rather than registered because it carries plain page
+   * strings and no provenance records; the registry test refuses a module that
+   * is in neither list, which is how this was caught.
+   */
+  "content/developer-forward/current-status.ts",
   ...DEVELOPER_FORWARD_YY_MODULES
 ];
 

@@ -55,6 +55,27 @@ Prefer this sequence:
 
 If ChatGPT can produce the final artifact directly, do not add another AI dependency.
 
+## Preserved surfaces
+
+Two bodies of work are still in this repository and still served, and neither is
+part of the current experiment:
+
+- **Watch Your Step** — the developer-judgment course. Its nine routes under
+  `app/watch-your-step/` are retired from public discovery and redirect to `/`
+  with `permanent: false`. The source is preserved, not deleted, and
+  `content/canonical-surfaces.ts` records the retirement in `RETIRED_SURFACES`.
+- **The Author Ship** — `/bridge`, `/standing-orders`, `/ships-log`, `/crew`,
+  `/ben` and `/system`, retired the same way in the 2026-09-09 consolidation.
+
+`scripts/check-no-deletions.sh` is the gate that keeps them: nothing may delete
+a file, and the only rename it permits is the Trust Forward → Developer Forward
+rebrand, matched by shape rather than by a list of paths. Run it before any
+commit that removes markup; `tests/preserved-surfaces.test.ts` runs it too.
+
+Retiring a route means BOTH a redirect and removal from the roster. A page that
+serves but is unlisted, or is unlisted but still serves, is the one state
+`tests/machine-surfaces.test.ts` refuses.
+
 ## Analytics
 
 GA4 uses direct `gtag.js` with Google Consent Mode v2. Set `NEXT_PUBLIC_GA_MEASUREMENT_ID` in Vercel if analytics are desired. The site renders without analytics when it is unset.

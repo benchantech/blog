@@ -102,8 +102,48 @@ test("the current public Lite route does not expose a paid upgrade or coupon", (
   const stamp = readFileSync(path.join(repoRoot, "content", "developer-forward", "stamp", "v1-1-0.ts"), "utf8");
   assert.ok(page.includes("DEVELOPER_FORWARD_LITE_CURRENT_STATUS"));
   assert.match(DEVELOPER_FORWARD_LITE_CURRENT_STATUS.metadataDescription, /no paid upgrade/i);
-  assert.ok(page.includes('[class*="coupon"]'));
-  assert.ok(stamp.includes('fullTarget: "/developer-forward"'));
-  assert.ok(stamp.includes('couponTarget: "/developer-forward"'));
-  assert.equal(stamp.includes("studio.com/benchanviolin"), false);
+  /*
+   * THIS REQUIRED THE HIDE, AND THE HIDE WAS THE BUG (2026-09-10).
+   *
+   * It asserted the Lite page carried `[class*="coupon"] { display: none }` and
+   * that the stamp still held a `couponTarget`. Together those encoded the
+   * offer as PRESENT-BUT-INVISIBLE — shipped in the bundle, hidden by a
+   * substring selector, and pointed at `/developer-forward`, a page that says
+   * there is no coupon. The same file forbids exactly this for `RevealPanel`:
+   * a rendered-then-hidden block is still in the served HTML.
+   *
+   * The offer is gone at the source now, so the check is absence rather than
+   * concealment: no coupon route key, no hiding rule, and nothing on the
+   * completion screen that promises an upgrade.
+   */
+  /*
+   * COMMENTS STRIPPED FIRST. The stamp's own note explains that `couponTarget`
+   * was removed and why — and a raw scan fires on that sentence, failing a
+   * correct file for documenting itself. The same trap is recorded a few tests
+   * below, where `RevealPanel` had to be stripped before scanning for hiding
+   * techniques it says in prose that it does not use.
+   */
+  const stampCode = stamp.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+  assert.ok(stampCode.includes('fullTarget: "/developer-forward"'));
+  assert.equal(stampCode.includes("couponTarget"), false, "the coupon route key is back");
+  assert.equal(stampCode.includes("studio.com/benchanviolin"), false);
+  // Same reason as the stamp above: the page's own comment describes the
+  // `display: none` rule it no longer has.
+  const pageCode = page.replace(/\/\*[\s\S]*?\*\//g, " ").replace(/^\s*\/\/.*$/gm, " ");
+  assert.equal(
+    pageCode.includes("display: none"),
+    false,
+    "the Lite route hides something again; hiding is not removing (see RevealPanel, same file)"
+  );
+
+  const sandbox = readFileSync(path.join(yyDir, "YYSandbox.tsx"), "utf8")
+    .replace(/\/\*[\s\S]*?\*\//g, " ")
+    .replace(/^\s*\/\/.*$/gm, " ");
+  for (const banned of ["coupon", "Coupon", "DEVELOPER_FORWARD_TEASER"]) {
+    assert.equal(
+      sandbox.includes(banned),
+      false,
+      `the run still references "${banned}"; the current record offers no coupon or upgrade`
+    );
+  }
 });

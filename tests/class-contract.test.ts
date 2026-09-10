@@ -85,6 +85,23 @@ const UNRESOLVED_CLASSNAMES: readonly string[] = [];
  * these rules should be deleted and this register should return to empty.
  */
 const ORPHAN_RULES: readonly string[] = [
+  /*
+   * THE AI-NATIVE HOME PAGE REPLACED THE OLD ONE (2026-09-10), and took four
+   * more rules' markup with it. The section it removed was the reviewer block
+   * — `.stakeholder-section`, `.stakeholder-grid`, `.stakeholder-card` and the
+   * `.compact` heading modifier. The reviewer routes themselves did NOT go
+   * anywhere: `app/page.tsx` still renders `stakeholderRoutes`, now in the new
+   * page's own card styles, so what was lost is four global rules and not two
+   * destinations.
+   *
+   * Kept rather than deleted, like the foyer rules below: this register is
+   * self-expiring, and the `stale` assertion fails the moment one of them is
+   * referenced again.
+   */
+  "stakeholder-section",
+  "stakeholder-grid",
+  "stakeholder-card",
+  "compact",
   // The foyer hero: label, headline, copy, signature, and the two buttons.
   "hero",
   "hero-foyer",
@@ -294,11 +311,28 @@ test("mode 1: the extractor actually sees the known tokens", () => {
    * no live consumer. It is kept, not deleted: the check fires on any dynamic
    * class it does not recognise, so it is still load-bearing for the next one.
    */
+  /*
+   * THREE SAMPLES WERE REPOINTED ON 2026-09-10, and the reason is the same one
+   * that has moved this list before: they named markup a rewrite removed.
+   * "section-heading", "compact" and "stakeholder-card" all belonged to the old
+   * home page, which the AI-native rewrite replaced — so a scanner that had
+   * stopped working entirely would now pass on them.
+   *
+   * The replacements keep the same three extractor features under test: a
+   * MULTI-TOKEN attribute (`className="detail-page legal-page"` on the seven
+   * legal routes — one attribute, two tokens), a CONDITIONAL (IntentRouter's
+   * "active" / "complete" ternary), and tokens from the chrome, which no home
+   * page rewrite can take away.
+   *
+   * "hero" and "hero-foyer" are NOT usable as samples any more: they are in
+   * `ORPHAN_RULES` above, because the AI-native rewrite removed the markup that
+   * carried them. A sample has to be a token something still renders.
+   */
   const tokens = new Set(allClassUses.map((use) => use.token));
   for (const expected of [
+    "detail-page",
     "section-heading",
-    "compact",
-    "stakeholder-card",
+    "footer-group-label",
     "external-arrow",
     "active",
     "complete",
@@ -409,7 +443,9 @@ test("mode 2: every styles.<key> resolves to a class in its sibling .module.css"
   // sandbox shell and the case/reveal component sets. The number is pinned so
   // a new stylesheet cannot arrive unnoticed — bump it in the same commit that
   // adds one, never to make a red test green.
-  assert.equal(modulesChecked, 76, "CSS Module imports across app/ and components/ — update deliberately");
+  // The GPT usage meter adds one component-owned CSS Module, taking the
+  // deliberately measured total from 76 to 77.
+  assert.equal(modulesChecked, 77, "CSS Module imports across app/ and components/ — update deliberately");
 });
 
 /* -------------------------------------------------------------------------- */

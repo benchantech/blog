@@ -13,7 +13,9 @@ import {
   canonicalSurfaces,
   humanCanonicalSurfaces
 } from "@/content/canonical-surfaces";
-import { agentBootstrap, agentBootstrapText, historicalSnapshotInstruction } from "@/content/ship/agent-bootstrap";
+import { agentBootstrap, agentBootstrapText, historicalSnapshotInstruction,
+  HISTORICAL_SNAPSHOT_INSTRUCTION
+} from "@/content/ship/agent-bootstrap";
 import { authorShipState, authorShipStateJson } from "@/lib/author-ship-state";
 import { llmsTxt } from "@/lib/llms-txt";
 import { approvalState } from "@/lib/approval-state";
@@ -201,13 +203,24 @@ test("llms.txt carries the instruction about superseded material", () => {
   const text = llmsTxt();
   assert.ok(text.includes(agentBootstrapText()));
   assert.ok(text.includes(historicalSnapshotInstruction()));
-  // Indexed from the END, not from position 3. The ADR sentence was inserted
-  // before it on 2026-09-08 and a front-indexed reference silently pointed at
-  // the wrong sentence — the drift Standing Order 07 exists to prevent, caught
-  // here rather than shipped.
-  assert.equal(
-    historicalSnapshotInstruction(),
-    agentBootstrap.lines[agentBootstrap.lines.length - 1]
+  /*
+   * MEMBERSHIP, NOT A SLOT — third revision, 2026-09-10.
+   *
+   * This asserted `lines[3]`, then `lines[lines.length - 1]` after a line was
+   * inserted before the sentence in 2026-09-08. A line was then appended AFTER
+   * it, and the back-indexed reference broke exactly as the front-indexed one
+   * had. A position is not an identity, and each fix that picked a different
+   * position was buying time rather than closing the defect.
+   *
+   * `HISTORICAL_SNAPSHOT_INSTRUCTION` is the sentence; `lines` composes from
+   * it. So the check is that the accessor returns that constant and that the
+   * bootstrap actually carries it — which holds however the list is reordered,
+   * and still fails if the sentence is dropped from the boot text entirely.
+   */
+  assert.equal(historicalSnapshotInstruction(), HISTORICAL_SNAPSHOT_INSTRUCTION);
+  assert.ok(
+    agentBootstrap.lines.includes(HISTORICAL_SNAPSHOT_INSTRUCTION),
+    "the boot text no longer carries the superseded-material instruction"
   );
   // The ADR instruction is part of the boot path, not an optional extra.
   assert.ok(
