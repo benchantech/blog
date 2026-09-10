@@ -33,11 +33,12 @@ Priority preservation includes:
 - `/developer-forward`
 - `/developer-forward-lite`
 - `/neon`
+- `/studio` while harmless and useful as historical/reviewer surface
 - legal/disclosure routes
 - sitemap and robots
 - `llms.txt`
 - canonical-surface registry
-- Ben Chan / Ben Chan Tech identity evidence
+- Ben Chan / Ben Chan Tech professional evidence, including the controlled `/upwork` route
 - links to YY Method, BenChanViolin, YY & Me, and Resonant Patterns
 - historical source and governance artifacts in the repository
 
@@ -53,10 +54,17 @@ Priority preservation includes:
 ## Current implementation status on this branch
 
 - New AI-native mission content added.
-- New homepage framing added.
-- Site metadata updated.
-- Developer Forward page changed from active offer to evidence hub.
-- Developer Forward Lite marked as standalone with no current paid upgrade.
-- `/df` no longer points to Studio.
-- Legacy Studio/coupon route fields now resolve internally to `/developer-forward` for compatibility only.
-- Company constitution added.
+- New homepage framing added while keeping Developer Forward, Lite, Neon, Upwork/professional evidence, YY Method, YY & Me, Resonant Patterns, and reviewer routes reachable.
+- Root metadata updated for the AI-native company experiment.
+- Developer Forward changed from an active full-product sales surface to an indexed evidence hub with its existing answer-first FAQ retained.
+- Developer Forward Lite remains the working deterministic experience and no longer exposes a paid upgrade/coupon surface.
+- `/df` no longer points to Studio; it resolves to `/developer-forward` until a real future course destination exists.
+- Legacy full/coupon route fields resolve internally to `/developer-forward` for compatibility with archived code rather than an external checkout.
+- Company constitution and ADR 0010 added.
+- Agent bootstrap now reads the company constitution/current state before product-era governance.
+- `/llms.txt` now states the current company mission, $20 constraint, and canonical homepage before listing the preserved surface map.
+- Preservation tests were rebased from the superseded 2026-09-04 homepage/Studio-offer assumptions to the current load-bearing surface rules.
+
+## Verification boundary
+
+The GitHub connector can inspect and mutate the repository but does not execute the Next.js runtime. A real `npm test`, TypeScript/build run, and browser render remain required before merge or production deployment. Those runtime checks are an implementation-verification step, not a reason to change the $20 operating architecture.
