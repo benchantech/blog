@@ -3,7 +3,9 @@
  *
  * The historical content/version manifest remains frozen. Public destination
  * fields below reflect the 2026-09-10 operating change: full Developer Forward
- * is not currently offered and Lite has no coupon or paid-upgrade destination.
+ * is not currently offered and Lite has no active coupon or paid-upgrade
+ * destination. Legacy fields remain strings for compatibility with archived UI
+ * code, but both resolve safely to the public Developer Forward evidence hub.
  */
 
 import { DEVELOPER_FORWARD_DIGESTS } from "@/content/developer-forward/digests";
@@ -50,16 +52,19 @@ export const STORAGE = {
  *
  * `/developer-forward` remains the canonical indexed evidence hub.
  * `/developer-forward-lite` remains the standalone working experience.
- * `/df` is retained as a Benchantech-controlled shortcut and now resolves to
- * the evidence hub. There is deliberately no external full-course target and
- * no coupon target until a future course destination is actually chosen.
+ * `/df` is retained as a Benchantech-controlled shortcut.
+ *
+ * `fullTarget` and `couponTarget` are retained only because archived components
+ * still compile against the v1.1.0 shape. Neither is presented as an offer in
+ * the current public routes; both resolve to the evidence hub instead of an
+ * external checkout or coupon.
  */
 export const ROUTES = {
   canonical: "/developer-forward",
   publicAlternate: "/developer-forward-lite",
   redirect: "/df",
-  fullTarget: null,
-  couponTarget: null,
+  fullTarget: "/developer-forward",
+  couponTarget: "/developer-forward",
   learnerStateInUrl: false
 } as const;
 
