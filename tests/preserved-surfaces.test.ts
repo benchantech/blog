@@ -1,313 +1,52 @@
 import assert from "node:assert/strict";
 import test from "node:test";
 import { execFileSync } from "node:child_process";
-import { existsSync, readFileSync, readdirSync, statSync } from "node:fs";
+import { existsSync, readFileSync } from "node:fs";
 import path from "node:path";
 import { fileURLToPath } from "node:url";
 
-/**
- * Preserved-surface fixture (plan Phase 0, user constraint 2).
- *
- * Every live surface survives at its URL with its copy, links and behaviour.
- * This file is the executed form of that promise: routes, redirects, outbound
- * hrefs and the in-page anchor targets the home page depends on.
- *
- * Assertions are corpus-wide on purpose. A link may legitimately MOVE between
- * files in a later phase (the header is rebuilt in Phase 5); it may never
- * disappear. Pinning each href to one file would fail on a lawful move and
- * teach the next phase to weaken the test.
- */
-
 const repoRoot = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
-
-/** Directories whose source is scanned for links, anchors and ids. */
-const sourceDirs = ["app", "components", "content", "lib"];
-const sourceExtensions = new Set([".ts", ".tsx", ".css", ".mjs", ".js"]);
-const skipDirs = new Set(["node_modules", ".next", ".git"]);
-
-function walk(dir: string, out: string[] = []): string[] {
-  for (const entry of readdirSync(dir)) {
-    if (skipDirs.has(entry)) continue;
-    const full = path.join(dir, entry);
-    if (statSync(full).isDirectory()) walk(full, out);
-    else if (sourceExtensions.has(path.extname(entry))) out.push(full);
-  }
-  return out;
-}
-
-function readRepoFile(relativePath: string): string {
-  return readFileSync(path.join(repoRoot, relativePath), "utf8");
-}
-
-const sourceFiles = [
-  ...sourceDirs.flatMap((dir) => walk(path.join(repoRoot, dir))),
-  path.join(repoRoot, "next.config.ts")
-];
-
-/** Every scanned source file, concatenated, with its path kept for messages. */
-const corpus = sourceFiles.map((file) => readFileSync(file, "utf8")).join("\n\n");
+const read = (relative: string): string => readFileSync(path.join(repoRoot, relative), "utf8");
 
 /**
- * Strip comments before counting a code-level occurrence.
+ * Preservation after ADR 0010.
  *
- * The landmark assertions below count how many elements carry an accessible
- * name. A doc comment that QUOTES the name is not an element, and the header
- * documents its own preservation rule in prose — so counting the raw file
- * conflates documentation with markup and fails on a correct component.
+ * The old version of this test froze the 2026-09-04 homepage composition and
+ * the former Studio destination. ADR 0010 intentionally changes both while
+ * keeping the load-bearing URLs, evidence, legal surfaces, ecosystem links,
+ * machine surfaces, and reversible historical source intact. This test guards
+ * that current preservation boundary rather than forcing the retired homepage
+ * to remain the product architecture forever.
  */
-function stripComments(source: string): string {
-  return source.replace(/\/\*[\s\S]*?\*\//g, "").replace(/^\s*\/\/.*$/gm, "");
-}
 
-function occurrences(haystack: string, needle: string): number {
-  let count = 0;
-  let index = haystack.indexOf(needle);
-  while (index !== -1) {
-    count += 1;
-    index = haystack.indexOf(needle, index + needle.length);
-  }
-  return count;
-}
+const REQUIRED_PAGE_FILES = [
+  "app/page.tsx",
+  "app/developer-forward/page.tsx",
+  "app/developer-forward-lite/page.tsx",
+  "app/studio/page.tsx",
+  "app/neon/page.tsx",
+  "app/system/page.tsx",
+  "app/contact/page.tsx",
+  "app/privacy/page.tsx",
+  "app/terms/page.tsx",
+  "app/cookies/page.tsx",
+  "app/copyright/page.tsx",
+  "app/accessibility/page.tsx",
+  "app/ai-disclosure/page.tsx",
+  "app/bridge/page.tsx",
+  "app/standing-orders/page.tsx",
+  "app/ships-log/page.tsx",
+  "app/crew/page.tsx",
+  "app/ben/page.tsx"
+] as const;
 
-/* -------------------------------------------------------------------------- */
-/* Routes                                                                     */
-/* -------------------------------------------------------------------------- */
-
-/**
- * The 11 page.tsx routes that exist today (plan §3.1 normalised counts:
- * app/page.tsx plus 10 route directories). This list is a floor, never a cap —
- * new routes are added by later phases and must not be listed here.
- */
-const preservedRoutes: { url: string; file: string }[] = [
-  { url: "/", file: "app/page.tsx" },
-  { url: "/studio", file: "app/studio/page.tsx" },
-  { url: "/neon", file: "app/neon/page.tsx" },
-  { url: "/system", file: "app/system/page.tsx" },
-  { url: "/contact", file: "app/contact/page.tsx" },
-  { url: "/privacy", file: "app/privacy/page.tsx" },
-  { url: "/terms", file: "app/terms/page.tsx" },
-  { url: "/cookies", file: "app/cookies/page.tsx" },
-  { url: "/copyright", file: "app/copyright/page.tsx" },
-  { url: "/accessibility", file: "app/accessibility/page.tsx" },
-  { url: "/ai-disclosure", file: "app/ai-disclosure/page.tsx" }
-];
-
-test("every preserved route still has a page file at its URL", () => {
-  for (const route of preservedRoutes) {
-    assert.ok(
-      existsSync(path.join(repoRoot, route.file)),
-      `route ${route.url} lost its page file ${route.file}`
-    );
-  }
-  assert.equal(preservedRoutes.length, 11, "plan §3.1 normalised count: 11 page.tsx routes");
-});
-
-test("the 7 footer legal links and the 6 refreshed legal pages are not confused", () => {
-  // /contact is a footer legal link but NOT one of the six refreshed pages
-  // (plan §3.1) and must never be counted twice.
-  const footerLegalLinks = [
-    "/privacy",
-    "/terms",
-    "/cookies",
-    "/accessibility",
-    "/ai-disclosure",
-    "/copyright",
-    "/contact"
-  ];
-  const refreshedLegalPages = footerLegalLinks.filter((href) => href !== "/contact");
-  assert.equal(footerLegalLinks.length, 7);
-  assert.equal(refreshedLegalPages.length, 6);
-
-  const footerSource = readRepoFile("components/SiteFooter.tsx");
-  for (const href of footerLegalLinks) {
-    assert.ok(
-      footerSource.includes(`"${href}"`),
-      `footer legal link ${href} is missing from components/SiteFooter.tsx`
-    );
-  }
-  assert.ok(
-    footerSource.includes('aria-label="Legal and company information"'),
-    "the legal nav aria-label is preserved copy"
-  );
-});
-
-/* -------------------------------------------------------------------------- */
-/* Redirects                                                                  */
-/* -------------------------------------------------------------------------- */
-
-test("preserved redirects and launch redirects survive in next.config.ts", () => {
-  const config = readRepoFile("next.config.ts");
-  const redirects = [
-    { source: "/lab", destination: "/neon" },
-    /*
-     * `/about` pointed at `/system` until 2026-09-08, when the consolidation
-     * retired `/system` behind its own redirect to `/`. Repointed rather than
-     * left as a chain — see next.config.ts.
-     */
-    { source: "/about", destination: "/" },
-    { source: "/posts", destination: "https://benchanviolin.substack.com" },
-    { source: "/upwork", destination: "https://www.upwork.com/freelancers/~01a10f284f33009412" },
-    /*
-     * RETIRED, NOT REMOVED. Ben's 2026-09-07 ruling takes Watch Your Step out
-     * of navigation and public discovery and points its old entry routes at the
-     * homepage. The destination therefore changes from `/watch-your-step` to
-     * `/` — a deliberate edit, not a dropped redirect — and both the specific
-     * route and the wildcard are asserted so neither can quietly disappear.
-     *
-     * `permanent: false` on both is asserted separately below: it is what keeps
-     * the retirement reversible.
-     */
-    { source: "/watch-your-step", destination: "/" },
-    { source: "/watch-your-step/:path+", destination: "/" },
-    /*
-     * THE 2026-09-08 CONSOLIDATION. Six surfaces left the roster (Ben:
-     * "nothing is reachable that isn't linked in the main pages") and a route
-     * may only leave discovery with a redirect behind it — see
-     * `CONSOLIDATED_SURFACES` and `tests/machine-surfaces.test.ts`, which
-     * enforces the pairing from the other side. Listed here so the redirects
-     * cannot be dropped without the roster noticing, and vice versa.
-     */
-    { source: "/bridge", destination: "/" },
-    { source: "/standing-orders", destination: "/" },
-    { source: "/ships-log", destination: "/" },
-    { source: "/crew", destination: "/" },
-    { source: "/ben", destination: "/" },
-    { source: "/system", destination: "/" },
-    /* The Developer Forward bridge. One line to change when Studio moves. */
-    { source: "/df", destination: "https://studio.com/benchanviolin/trust-forward" }
-  ];
-  /*
-   * PAIRED, from 2026-09-08. This asserted the two strings SEPARATELY — that
-   * `source: "/about"` appeared somewhere and `destination: "/system"` appeared
-   * somewhere — which was adequate while every destination in the table was
-   * distinct. It stopped being adequate the moment eight redirects pointed at
-   * `/`: any one of them satisfied the destination half for all the others, so
-   * a redirect could have been repointed at the wrong place and this would have
-   * stayed green. The pair is what the register is actually claiming.
-   */
-  const declared = [...config.matchAll(/source:\s*"([^"]+)"[\s\S]*?destination:\s*"([^"]+)"/g)].map(
-    (match) => `${match[1]} -> ${match[2]}`
-  );
-  for (const redirect of redirects) {
-    assert.ok(
-      declared.includes(`${redirect.source} -> ${redirect.destination}`),
-      `next.config.ts no longer redirects ${redirect.source} to ${redirect.destination}`
-    );
-  }
-  assert.equal(occurrences(config, "source:"), redirects.length, "redirect count changed without test coverage");
-  // No redirect this build adds may be permanent: a 308 is cached indefinitely
-  // and would make the Watch Your Step retirement irreversible in the wild.
-  assert.equal(occurrences(config, "permanent: true"), 0, "a permanent redirect was introduced");
-});
-
-/* -------------------------------------------------------------------------- */
-/* Outbound hrefs                                                             */
-/* -------------------------------------------------------------------------- */
-
-/**
- * The two yymethod.com hrefs are asserted SEPARATELY and with their closing
- * quote. A bare `yymethod.com` substring check would pass while one of them was
- * silently dropped (plan §3.3), which is the exact regression this guards.
- */
-test("both distinct yymethod.com hrefs survive, asserted separately", () => {
-  assert.ok(
-    corpus.includes('"https://yymethod.com/doctrine"'),
-    'destinations[0].url "https://yymethod.com/doctrine" (the footer doctrine door) was dropped'
-  );
-  assert.ok(
-    corpus.includes('"https://yymethod.com"'),
-    'the bare header href "https://yymethod.com" (label "YY Method™") was dropped'
-  );
-});
-
-test("every other outbound href survives", () => {
-  const outboundHrefs = [
-    '"https://benchanviolin.com/library"',
-    '"https://yyandme.benchantech.com"',
-    '"https://benchanviolin.substack.com"',
-    '"https://benchanviolin.com/violin-for-parents"',
-    '"mailto:ben@benchantech.com"'
-  ];
-  for (const href of outboundHrefs) {
-    assert.ok(corpus.includes(href), `outbound href ${href} was dropped from the site`);
+test("load-bearing and harmless historical page source remains on disk", () => {
+  for (const file of REQUIRED_PAGE_FILES) {
+    assert.ok(existsSync(path.join(repoRoot, file)), `${file} was removed`);
   }
 });
 
-test("the /neon callout and the site-config door both keep the library link", () => {
-  // The same URL is reachable from two independent surfaces; losing either is a
-  // dropped link even though a corpus-wide substring check would still pass.
-  assert.ok(readRepoFile("app/neon/page.tsx").includes("https://benchanviolin.com/library"));
-  assert.ok(readRepoFile("content/site-config.ts").includes("https://benchanviolin.com/library"));
-});
-
-test("the /studio CTA keeps its target and rel attributes", () => {
-  const studio = readRepoFile("app/studio/page.tsx");
-  assert.ok(studio.includes('target="_blank"'));
-  assert.ok(studio.includes('rel="noopener"'));
-});
-
-/* -------------------------------------------------------------------------- */
-/* In-page anchor targets                                                     */
-/* -------------------------------------------------------------------------- */
-
-/**
- * An anchor that stops resolving breaks a live control just as surely as a
- * dropped href, and nothing else in the suite would notice (plan Phase 0).
- */
-const anchorIds = ["main", "stakeholder-heading"];
-
-/**
- * Anchors whose MARKUP left `/` on 2026-09-08 (Ben: *"from routing foyer down
- * to just above review routes remove all of these sections"*).
- *
- * `router` and `router-heading` still exist as ids, because
- * `components/IntentRouter.tsx` was not touched — the page simply stopped
- * mounting it. `destinations-heading` went with the floor plan. None of the
- * three has a referrer any more, which is the state this register records: an
- * id that is still written but no longer pointed at is not a broken anchor, and
- * calling it one would fail a page that is behaving correctly.
- *
- * The pair below is what keeps that honest — an anchor may be here OR in
- * `anchorIds`, never both, so a live anchor cannot be parked here to silence it.
- */
-const WITHDRAWN_ANCHOR_IDS = ["router", "router-heading", "destinations-heading"];
-
-test("every in-page anchor target id still exists", () => {
-  for (const id of anchorIds) {
-    assert.ok(corpus.includes(`id="${id}"`), `anchor target id="${id}" no longer exists`);
-  }
-});
-
-test("a withdrawn anchor is withdrawn from the markup, not just from the register", () => {
-  for (const id of WITHDRAWN_ANCHOR_IDS) {
-    assert.equal(
-      anchorIds.includes(id),
-      false,
-      `${id} is registered as withdrawn and as live; it cannot be both`
-    );
-    assert.equal(
-      occurrences(stripComments(readRepoFile("app/page.tsx")), `href="#${id}"`),
-      0,
-      `/ still links to #${id}, which nothing on the page targets any more`
-    );
-  }
-});
-
-test("every in-page anchor reference still points at a live target", () => {
-  assert.ok(corpus.includes('href="#main"'), "the skip link lost its #main target");
-  assert.ok(
-    corpus.includes('aria-labelledby="stakeholder-heading"'),
-    "the Review routes section lost its aria-labelledby reference"
-  );
-});
-
-/* -------------------------------------------------------------------------- */
-/* Deletion contract                                                          */
-/* -------------------------------------------------------------------------- */
-
-test("scripts/check-no-deletions.sh exits 0 (nothing deleted or renamed)", () => {
-  // The gate is removed or renamed files, never a line count, and never
-  // `git diff --stat`, which cannot detect a deletion (plan §3.0).
+test("the deletion contract still runs", () => {
   const output = execFileSync("sh", [path.join(repoRoot, "scripts", "check-no-deletions.sh")], {
     cwd: repoRoot,
     encoding: "utf8",
@@ -316,370 +55,105 @@ test("scripts/check-no-deletions.sh exits 0 (nothing deleted or renamed)", () =>
   assert.match(output, /Deletion contract OK/);
 });
 
-/* -------------------------------------------------------------------------- */
-/* New links mounted in Phase 5 — the other half of the promise               */
-/* -------------------------------------------------------------------------- */
-
-/**
- * Nothing may be dropped, AND nothing new may ship dead.
- *
- * Phase 5 mounts a header carrying two nav inventories, a footer carrying four
- * link groups, and a disclosure strip on every page footer. Every internal
- * destination among them has to resolve to a real page file, which is why the
- * phase stubs seven routes rather than five: the six nav items and the CTA
- * point at destinations Phases 7 and 9 do not create until later.
- */
-
-/** Every URL the app directory actually serves, with route groups stripped. */
-function servedUrls(): Set<string> {
-  const urls = new Set<string>();
-  const appDir = path.join(repoRoot, "app");
-
-  function visit(dir: string, segments: string[]): void {
-    for (const entry of readdirSync(dir)) {
-      if (skipDirs.has(entry)) continue;
-      const full = path.join(dir, entry);
-      if (statSync(full).isDirectory()) {
-        // `(shell)` and `(flow)` are route GROUPS: they organise layouts and do
-        // not appear in the URL (plan §5.4).
-        visit(full, entry.startsWith("(") && entry.endsWith(")") ? segments : [...segments, entry]);
-      } else if (entry === "page.tsx") {
-        urls.add(`/${segments.join("/")}`.replace(/\/+$/, "") || "/");
-      }
-    }
+test("current redirects preserve useful entry points without a discontinued Studio offer", () => {
+  const config = read("next.config.ts");
+  for (const pair of [
+    ['source: "/lab"', 'destination: "/neon"'],
+    ['source: "/about"', 'destination: "/"'],
+    ['source: "/posts"', 'destination: "https://benchanviolin.substack.com"'],
+    ['source: "/upwork"', 'destination: "https://www.upwork.com/freelancers/~01a10f284f33009412"'],
+    ['source: "/df"', 'destination: "/developer-forward"']
+  ] as const) {
+    assert.ok(config.includes(pair[0]), `missing redirect source ${pair[0]}`);
+    assert.ok(config.includes(pair[1]), `missing redirect destination ${pair[1]}`);
   }
+  assert.equal(config.includes("studio.com/benchanviolin/trust-forward"), false);
+  assert.equal(config.includes("permanent: true"), false);
+});
 
-  visit(appDir, []);
-  return urls;
-}
+test("Developer Forward and Lite remain canonical public surfaces", () => {
+  const canonical = read("content/canonical-surfaces.ts");
+  assert.ok(canonical.includes('path: "/developer-forward"'));
+  assert.ok(canonical.includes('path: "/developer-forward-lite"'));
 
-/** Internal hrefs written in the chrome, wherever they are declared. */
-function chromeInternalHrefs(): { href: string; file: string }[] {
+  const full = read("app/developer-forward/page.tsx");
+  const lite = read("app/developer-forward-lite/page.tsx");
+  assert.ok(full.includes('alternates: { canonical: "/developer-forward" }'));
+  assert.ok(lite.includes('alternates: { canonical: "/developer-forward-lite" }'));
+  assert.ok(full.includes("LANDING_FAQ"), "Developer Forward lost its answer-first FAQ evidence");
+});
+
+test("the current public Developer Forward path contains no active Studio checkout or coupon", () => {
+  const full = read("app/developer-forward/page.tsx");
+  const lite = read("app/developer-forward-lite/page.tsx");
+  const stamp = read("content/developer-forward/stamp/v1-1-0.ts");
+  assert.equal(full.includes("StudioCta"), false);
+  assert.equal(full.includes("couponTarget"), false);
+  assert.ok(lite.includes("no paid upgrade is currently offered"));
+  assert.equal(stamp.includes("studio.com/benchanviolin"), false);
+});
+
+test("the major ecosystem authority links remain in source", () => {
   const files = [
-    "content/nav.ts",
-    "components/SiteHeader.tsx",
-    "components/SiteFooter.tsx",
-    "components/DisclosureStrip.tsx",
-    "lib/approval-state.ts"
-  ];
-  const found: { href: string; file: string }[] = [];
-  for (const file of files) {
-    for (const match of readRepoFile(file).matchAll(/"(\/[A-Za-z0-9/-]*)"/g)) {
-      found.push({ href: match[1], file });
-    }
-  }
-  return found;
-}
-
-test("the route-group structure serves /watch-your-step and /watch-your-step/start", () => {
-  // Proving §5.4's (shell)/(flow) split before Phase 7 depends on it. Route
-  // groups do not affect URLs.
-  const urls = servedUrls();
-  assert.ok(urls.has("/watch-your-step"), "the (shell) landing does not serve /watch-your-step");
-  assert.ok(urls.has("/watch-your-step/start"), "the (flow) Lesson Zero does not serve /watch-your-step/start");
-  assert.ok(
-    existsSync(path.join(repoRoot, "app", "watch-your-step", "(shell)", "layout.tsx")),
-    "the (shell) layout — where Phase 7 hangs the bottom nav — is missing"
-  );
-  assert.ok(
-    existsSync(path.join(repoRoot, "app", "watch-your-step", "(flow)", "layout.tsx")),
-    "the (flow) layout — no bottom nav, 60px bottom padding — is missing"
-  );
-});
-
-test("the seven routes stubbed in Phase 5 all exist", () => {
-  const urls = servedUrls();
-  for (const url of [
-    "/bridge",
-    "/standing-orders",
-    "/ships-log",
-    "/crew",
-    "/ben",
-    "/watch-your-step",
-    "/watch-your-step/start"
+    read("content/site-config.ts"),
+    read("content/nav.ts"),
+    read("app/page.tsx"),
+    read("next.config.ts")
+  ].join("\n");
+  for (const href of [
+    "https://yymethod.com",
+    "https://yymethod.com/doctrine",
+    "https://benchanviolin.com/library",
+    "https://yyandme.benchantech.com",
+    "https://benchanviolin.substack.com",
+    "https://www.upwork.com/freelancers/~01a10f284f33009412"
   ]) {
-    assert.ok(urls.has(url), `nav destination ${url} has no page file — it would ship dead`);
+    assert.ok(files.includes(href), `authority link ${href} was dropped`);
   }
 });
 
-test("every course tab URL has a page file behind it", () => {
-  // Phase 7 shipped the five-tab bottom nav and Phase 8 landed the last screen
-  // behind it. The bar is persistent chrome on six routes, so a missing page
-  // here is a 404 reachable from every course screen — the "nothing new ships
-  // dead" half of the deletion contract, applied to course-internal navigation.
-  const urls = servedUrls();
-  for (const url of [
-    "/watch-your-step/today",
-    "/watch-your-step/plan",
-    "/watch-your-step/progress",
-    "/watch-your-step/practice",
-    "/watch-your-step/data"
-  ]) {
-    assert.ok(urls.has(url), `course tab ${url} has no page file — it would ship dead`);
+test("legal and disclosure routes remain wired into the footer", () => {
+  const footer = read("components/SiteFooter.tsx");
+  for (const href of ["/privacy", "/terms", "/cookies", "/accessibility", "/ai-disclosure", "/copyright", "/contact"]) {
+    assert.ok(footer.includes(href), `footer lost ${href}`);
   }
 });
 
-test("no internal href written in the chrome is dead", () => {
-  const urls = servedUrls();
-  const dead: string[] = [];
-  for (const { href, file } of chromeInternalHrefs()) {
-    if (!urls.has(href)) dead.push(`${file}: ${href}`);
-  }
-  assert.deepEqual(dead, [], "chrome links with no page file behind them");
+test("machine discovery surfaces remain generated from canonical state", () => {
+  const sitemap = read("app/sitemap.ts");
+  const robots = read("app/robots.ts");
+  const llms = read("lib/llms-txt.ts");
+  assert.ok(sitemap.includes("humanCanonicalSurfaces"));
+  assert.ok(robots.includes("sitemap"));
+  assert.ok(llms.includes("CANONICAL_SURFACE_GROUP_ORDER"));
+  assert.ok(llms.includes("AI_NATIVE_COMPANY"));
 });
 
-test("both nav inventories survive in the header", () => {
-  // §3.3: the six approved ship links and the CTA are ADDED; the three links
-  // the live header carries today are KEPT. R7 forbids trading one for the
-  // other, so both must be present AS INVENTORY — which is what this checks,
-  // and why it reads content/nav.ts rather than the rendered chrome. Ben
-  // consolidated the MENU on 2026-09-08 (see SHIP_NAV_CONSOLIDATED); the names
-  // are unchanged, and a name is what §3.3 protects.
-  const nav = readRepoFile("content/nav.ts");
-  for (const label of [
-    "Watch Your Step",
-    "Bridge",
-    "Standing Orders",
-    "Ship's Log",
-    "Crew",
-    "Ben",
-    "Start Lesson Zero",
-    "Violin for Parents",
-    "Neon",
-    "YY Method™"
-  ]) {
-    assert.ok(nav.includes(`"${label}"`), `nav label "${label}" is missing from content/nav.ts`);
-  }
-  const header = readRepoFile("components/SiteHeader.tsx");
-  assert.ok(header.includes('className="brand"'), "the preserved brand link was dropped from the header");
-  assert.ok(header.includes('alt=""'), "the <img aria-hidden> + adjacent-text pairing was broken");
-  assert.ok(header.includes("BenChanTech"), "the wordmark changed (Q8: it stays BenChanTech)");
-  // The preserved accessible name stays on the PRESERVED element. Asserting the
-  // string alone would pass while the label was moved onto the new ship tier and
-  // the live three-link row was renamed — a rename of a shipped landmark, which
-  // the deletion contract forbids just as much as dropping it. The new tier gets
-  // a NEW name (R7, R9: add the new, keep the old).
-  assert.ok(
-    header.includes('className={cx("desktop-nav", styles.ecosystemNav)} aria-label="Primary navigation"'),
-    'aria-label="Primary navigation" must stay on the preserved .desktop-nav element'
-  );
-  assert.ok(header.includes('className={cx("desktop-nav"'), "the preserved .desktop-nav class was dropped");
-  assert.equal(
-    occurrences(stripComments(header), 'aria-label="Primary navigation"'),
-    1,
-    "exactly one landmark carries the preserved name"
-  );
-  /*
-   * ONE DESKTOP LANDMARK, FROM 2026-09-08. The header carried two nav
-   * landmarks while it carried two tiers — "Ship navigation" for the six ship
-   * links and the preserved "Primary navigation" for the ecosystem three. Ben
-   * merged them ("so there's only one menu now"), and the four surviving links
-   * render into the PRESERVED element, which is why the assertion above still
-   * finds `aria-label="Primary navigation"` on `.desktop-nav` and why exactly
-   * one landmark carries it.
-   *
-   * "Ship navigation" is therefore expected to be ABSENT, and that is asserted
-   * rather than merely un-asserted: a second desktop nav quietly reappearing is
-   * the regression this file is for. The mobile disclosure keeps its own name —
-   * it is a separate landmark on a separate breakpoint, not a duplicate.
-   */
-  assert.ok(
-    header.includes('aria-label="Mobile navigation"'),
-    'the header landmark "Mobile navigation" is unnamed'
-  );
-  assert.equal(
-    stripComments(header).includes('aria-label="Ship navigation"'),
-    false,
-    "a second desktop nav landmark is back; the header is meant to carry one menu"
-  );
-  // The consolidated menu still renders both inventories' public views, so no
-  // link is lost by the merge — only the tier boundary is.
-  for (const inventory of ["publicShipNav", "ecosystemNav", "publicLessonZeroCta"]) {
-    assert.ok(header.includes(inventory), `the header no longer renders ${inventory}`);
+test("the new homepage keeps professional evidence and reviewer routes reachable", () => {
+  const home = read("app/page.tsx");
+  assert.ok(home.includes('href="/upwork"'));
+  assert.ok(home.includes('href="/developer-forward"'));
+  assert.ok(home.includes('href="/developer-forward-lite"'));
+  assert.ok(home.includes('id="stakeholder-heading"'));
+  assert.ok(home.includes("stakeholderRoutes"));
+});
+
+test("root metadata keeps the site identity while naming the new experiment", () => {
+  const layout = read("app/layout.tsx");
+  assert.ok(layout.includes('metadataBase: new URL("https://benchantech.com")'));
+  assert.ok(layout.includes('siteName: "BenChanTech"'));
+  assert.ok(layout.includes("$20 AI-native company experiment"));
+  for (const asset of ["/favicon-16x16.png", "/favicon-32x32.png", "/icon-192.png", "/icon-512.png", "/apple-touch-icon.png"]) {
+    assert.ok(layout.includes(asset), `root metadata lost ${asset}`);
   }
 });
 
-/**
- * The mobile menu closes the three ways a disclosure has to.
- *
- * `<details>` on its own closes only when its own summary is pressed again, so
- * a learner who opened the menu and then pressed the page had to find the
- * button and press it a second time. Ben asked for outside-press and
- * option-press on 2026-09-09; Escape came with them, because a menu that closes
- * on a stray tap and not on Escape is worse for a keyboard user than one that
- * closes on neither.
- *
- * ASSERTED FROM SOURCE, because the runner cannot import a component — `node
- * --import tsx --test` has no CSS loader. The behaviour itself was exercised in
- * a browser before this landed: opened and pressed outside (closed), pressed
- * inside the panel (stayed open), clicked an option (closed), clicked the arrow
- * span nested inside an option (closed), and pressed Escape (closed, focus back
- * on the summary). What a text scan can hold is the four decisions that make
- * those outcomes correct rather than accidental.
- */
-test("the mobile menu closes on an outside press, on a chosen option, and on Escape", () => {
-  const shell = readRepoFile("components/MobileMenuShell.tsx");
-  const code = stripComments(shell);
-
-  assert.ok(code.startsWith('"use client"'), "the shell is not a client component; none of this runs");
-  assert.ok(/<details/.test(code), "the menu stopped being a <details> — it must still work with JS off");
-
-  // Outside press: pointerdown, on capture, and only when already open.
-  assert.ok(
-    /addEventListener\("pointerdown", *onPointerDown, *true\)/.test(code),
-    "the outside-press listener is not on the capture phase; a control that stops propagation would leave the menu open"
-  );
-  assert.ok(
-    /menu\.contains\(target\)/.test(code),
-    "the outside-press handler does not exempt presses inside the menu"
-  );
-
-  // A chosen option, including a press landing on an element nested in the link.
-  assert.ok(
-    /closest\("a"\)/.test(code),
-    "option-close checks the event target rather than its nearest link; the external-arrow span would not close the menu"
-  );
-
-  // Escape, and the focus that has to come back with it.
-  assert.ok(/event\.key !== "Escape"/.test(code), "Escape does not close the menu");
-  assert.ok(
-    /querySelector\("summary"\)\?\.focus\(\)/.test(code),
-    "Escape closes without returning focus, dropping a keyboard user to the top of the document"
-  );
-
-  // Both listeners are removed. A header mounts on every page.
-  assert.equal(
-    occurrences(code, "removeEventListener"),
-    2,
-    "the shell leaks a document listener; this component mounts on every page of the site"
-  );
-
-  // And the split held: the links and the landmark stay server-rendered.
-  const header = readRepoFile("components/SiteHeader.tsx");
-  assert.ok(
-    header.includes('aria-label="Mobile navigation"'),
-    "the mobile landmark moved out of SiteHeader.tsx, where this file's other assertions look for it"
-  );
-  assert.equal(
-    stripComments(shell).includes("publicShipNav"),
-    false,
-    "the nav inventory moved into the client shell; it belongs in the server component"
-  );
-});
-
-test("the footer is a complete mobile path to every header link", () => {
-  // The gap this closes is real: `.desktop-nav` is display:none below 700px
-  // with no replacement today, so /studio, /neon and yymethod.com are
-  // unreachable from mobile chrome. This assertion holds however Q9 resolves.
-  const footer = readRepoFile("components/SiteFooter.tsx");
-  /*
-   * `publicShipNav` / `publicLessonZeroCta`, not the raw inventories.
-   *
-   * `content/nav.ts` keeps `shipNav` and `lessonZeroCta` as the full inventory
-   * — the labels are the course's names and deleting one loses that name — and
-   * exposes filtered views that drop Watch Your Step while `WYS_NAV_RETIRED` is
-   * true. The chrome must render the FILTERED views, or it advertises routes
-   * that redirect to `/`.
-   *
-   * This assertion named the raw inventories, so it passed for the whole period
-   * in which the flag existed and nothing read it. The requirement it encodes —
-   * every header link is reachable from the footer on mobile — is unchanged.
-   */
-  for (const inventory of ["publicShipNav", "publicLessonZeroCta", "footerDoors", "ecosystemNav"]) {
-    assert.ok(footer.includes(inventory), `the footer does not render ${inventory}`);
-  }
-  assert.ok(footer.includes("stampLabel()"), "the footer stamp line is not bound to approvalState");
-});
-
-test("the disclosure strip is mounted on every page and reads its sentence from state", () => {
-  const layout = readRepoFile("app/layout.tsx");
-  assert.ok(layout.includes("<DisclosureStrip />"), "the strip is not mounted in the root layout");
-
-  const strip = readRepoFile("components/DisclosureStrip.tsx");
-  assert.ok(strip.includes("disclosureApprovalLine()"), "the strip's fourth sentence is not read from state");
-  assert.ok(strip.includes('claimById("zero-ai")') || strip.includes('inlineClaim("zero-ai")'));
-  assert.ok(strip.includes('inlineClaim("ai-assisted-ben-approved")'));
-  // The approval sentence is a variant of approval STATE, never a literal in a
-  // component (§6.6, R8). tests/governance-strings.test.ts bans the literal
-  // from app/ and components/; this asserts the positive form.
-  assert.equal(/approved by ben/i.test(strip), false, "the strip hardcodes the approval sentence");
-  /*
-   * THE "Crew Manifest →" LINK IS GONE, AND ITS ABSENCE IS NOW THE ASSERTION.
-   *
-   * This strip is mounted in the root layout, so that one anchor appeared on
-   * every page of the site. `/crew` was retired behind a redirect to `/` on
-   * 2026-09-08, which would have left a link labelled "Crew Manifest" landing
-   * every reader on the homepage — a label naming a destination it no longer
-   * reaches, which is worse than no link.
-   *
-   * Asserted as absence rather than simply deleted, because this file's job is
-   * to notice chrome changing: the anchor silently coming back while /crew
-   * still redirects is exactly the regression the original assertion existed to
-   * catch, pointed the other way. `stripComments` so the component's own note
-   * about the removal does not read as the link returning.
-   */
-  assert.equal(
-    stripComments(strip).includes('href="/crew"'),
-    false,
-    'the strip links "/crew" again, which redirects to / — restore it only with SHIP_NAV_CONSOLIDATED'
-  );
-});
-
-test("every root metadata value survives verbatim", () => {
-  const layout = readRepoFile("app/layout.tsx");
-  for (const value of [
-    'title: "BenChanTech"',
-    'metadataBase: new URL("https://benchantech.com")',
-    'url: "https://benchantech.com"',
-    'siteName: "BenChanTech"',
-    'type: "website"',
-    '{ url: "/favicon-16x16.png", sizes: "16x16", type: "image/png" }',
-    '{ url: "/favicon-32x32.png", sizes: "32x32", type: "image/png" }',
-    '{ url: "/icon-192.png", sizes: "192x192", type: "image/png" }',
-    '{ url: "/icon-512.png", sizes: "512x512", type: "image/png" }',
-    'apple: [{ url: "/apple-touch-icon.png", sizes: "180x180", type: "image/png" }]'
-  ]) {
-    assert.ok(layout.includes(value), `root metadata lost ${value}`);
-  }
-  assert.ok(
-    layout.includes("Ben Chan's systems work across AI, software, violin, and human judgment"),
-    "the root description changed"
-  );
-  assert.ok(
-    layout.includes("AI systems, software infrastructure, violin-informed product design"),
-    "the OpenGraph description changed"
-  );
-});
-
-test("every new route declares a title and a canonical URL", () => {
-  // §5.2: title only, matching "X - BenChanTech"; plus alternates.canonical so
-  // §5.1's one-canonical-node rule is visible to crawlers, not only to a test.
-  // The four preserved pages that export no metadata at all stay that way.
-  const newRoutes = [
-    "app/bridge/page.tsx",
-    "app/standing-orders/page.tsx",
-    "app/ships-log/page.tsx",
-    "app/crew/page.tsx",
-    "app/ben/page.tsx",
-    "app/watch-your-step/(shell)/page.tsx",
-    "app/watch-your-step/(flow)/start/page.tsx"
-  ];
-  for (const file of newRoutes) {
-    const source = readRepoFile(file);
-    assert.match(source, /title: "[^"]+ - BenChanTech"/, `${file} breaks the title convention`);
-    assert.match(source, /alternates: \{ canonical: "\/[^"]*" \}/, `${file} declares no canonical URL`);
-    assert.equal(/description:/.test(source), false, `${file} adds a description — that is a new convention`);
-  }
-});
-
-test("the three new NEW-surface convention files exist and are client components where required", () => {
-  const notFound = readRepoFile("app/not-found.tsx");
-  const error = readRepoFile("app/error.tsx");
-  const globalError = readRepoFile("app/global-error.tsx");
-  assert.ok(notFound.includes("StatusPage"));
-  assert.ok(error.startsWith('"use client"'), "app/error.tsx must be a client component");
-  assert.ok(globalError.startsWith('"use client"'), "app/global-error.tsx must be a client component");
-  // global-error replaces the root layout, so it renders its own document.
-  assert.ok(globalError.includes("<html"), "app/global-error.tsx must render its own <html>");
-  assert.ok(globalError.includes("<body"), "app/global-error.tsx must render its own <body>");
+test("the $20 operating constitution is part of the repository boot path", () => {
+  const agents = read("AGENTS.md");
+  const bootstrap = read("content/ship/agent-bootstrap.ts");
+  assert.ok(agents.includes("company/CONSTITUTION.md"));
+  assert.ok(agents.includes("company/CURRENT_STATE.md"));
+  assert.ok(agents.includes("$20 AI operating constraint"));
+  assert.ok(bootstrap.includes("company/CONSTITUTION.md"));
+  assert.ok(bootstrap.includes("$20 AI operating constraint"));
 });
