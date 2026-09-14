@@ -1,59 +1,77 @@
-const productUrl = "https://benchanviolin.com/violin-for-parents";
+import type { Metadata } from "next";
+import { musicPracticeRpg } from "@/content/site-config";
+
+export const metadata: Metadata = {
+  title: "Music Practice RPG - BenChanTech",
+  description: "A continuing fantasy adventure shaped by real music practice. For any instrument or voice, alongside your own music and teacher assignments.",
+  alternates: { canonical: "/studio" },
+  openGraph: {
+    title: "Music Practice RPG - BenChanTech",
+    description: "Choose your next move, practice your music, and discover the consequences on Resonant Isle.",
+    url: "/studio"
+  }
+};
 
 export default function StudioPage() {
   return (
     <section className="detail-page">
-      <p className="eyebrow">Studio.com route</p>
-      <h1>Violin for Parents helps adults handle the uncertain moments between violin lessons.</h1>
+      <p className="eyebrow">{musicPracticeRpg.name} · on Studio.com</p>
+      <h1>Your real music practice moves the adventure forward.</h1>
       <p>
-        Violin for Parents is the current public product: an audio-first, adult-facing AI continuity coach for parents
-        and caregivers between violin lessons.
+        Music Practice RPG connects the music you are already learning with a continuing fantasy story.
+        Choose what your hero tries next, practice your instrument or voice, and return to discover the consequences.
       </p>
       <p>
-        It helps the parent establish what actually happened, consider the most important missing side, decide who owns
-        the decision, and choose one bounded next step without becoming the child&apos;s second violin teacher.
+        The adventure begins on Resonant Isle, where you arrive with your instrument and a world in need of repair.
+        Your choices and practice shape the next chapter, giving you a reason to pick up your music again tomorrow.
       </p>
       <p>
-        <a className="detail-link" href={productUrl} target="_blank" rel="noopener">
-          Get help with today&apos;s violin situation
+        <a className="detail-link" href={musicPracticeRpg.url} target="_blank" rel="noopener noreferrer">
+          Start your first quest on Studio.com <span className="sr-only">(opens in a new tab)</span>
         </a>
       </p>
 
       <div className="detail-grid">
         <article>
-          <h2>First move</h2>
+          <h2>Bring the music you already play</h2>
           <p>
-            A parent often arrives with a conclusion. The product should first separate observation from interpretation:
-            what did the child say, what did the parent see or hear, what changed, and what remains uncertain?
+            Use any instrument or your voice. Work on your own pieces, difficult passages, scales, exercises,
+            or teacher assignments. The adventure fits around your musical goals and practice time.
           </p>
         </article>
         <article>
-          <h2>AI boundary</h2>
+          <h2>Choose, practice, discover</h2>
           <p>
-            AI may organize observations, retrieve approved teaching, compare possibilities, prepare better questions,
-            and expose options. It must not silently replace the parent, child, current teacher, clinician, luthier, or
-            Ben Chan&apos;s actual source material.
+            Make a meaningful choice for your hero, then commit that move through real practice.
+            The story continues from earlier sessions: discoveries, mistakes, repairs, and unfinished business
+            can influence what comes next.
           </p>
         </article>
         <article>
-          <h2>Human authority</h2>
+          <h2>Effort matters</h2>
           <p>
-            The parent owns immediate protective action and family context. The teacher owns individualized violin
-            instruction. Appropriate professionals own medical and instrument-repair decisions.
+            Practice privately and log your time, or record for richer feedback. Rough attempts can matter too.
+            Choose a short, light story or a deeper fantasy experience. Curiosity gives you another reason
+            to return to your music without turning every performance into a grade.
           </p>
         </article>
         <article>
-          <h2>Why this belongs here</h2>
+          <h2>Your teacher stays in charge</h2>
           <p>
-            Ben Chan is a violinist, teacher, parent, and CTO building with AI. Violin for Parents is an applied example
-            of designing AI around explicit authority and judgment boundaries.
+            Teacher assignments remain the musical priority. The RPG adds story and curiosity to your routine.
+            Ben Chan brings his work as a violinist, educator, developer, and lifelong gamer to this practice adventure.
           </p>
         </article>
       </div>
 
       <p>
-        The public position is simple: use AI to see options and decide for yourself. In this product, AI helps narrow
-        the situation; it does not take over the lesson.
+        Tell the app what you play, what you are working on, and how much story you want.
+        Make your first move, practice, and come back to find out how the island responds.
+      </p>
+      <p>
+        <a className="detail-link" href={musicPracticeRpg.url} target="_blank" rel="noopener noreferrer">
+          Open Music Practice RPG <span className="sr-only">(opens in a new tab)</span>
+        </a>
       </p>
     </section>
   );
