@@ -1,13 +1,12 @@
 import type { Metadata } from "next";
-import { musicPracticeRpg } from "@/content/site-config";
 
 export const metadata: Metadata = {
-  title: "Music Practice RPG - BenChanTech",
-  description: "A continuing fantasy adventure shaped by real music practice. For any instrument or voice, alongside your own music and teacher assignments.",
+  title: "Studio.com Experiment Archive - BenChanTech",
+  description: "A preserved reviewer surface for Ben Chan's Studio.com experiments and the product-design lessons they produced.",
   alternates: { canonical: "/studio" },
   openGraph: {
-    title: "Music Practice RPG - BenChanTech",
-    description: "Choose your next move, practice your music, and discover the consequences on Resonant Isle.",
+    title: "Studio.com Experiment Archive - BenChanTech",
+    description: "A preserved record of Studio.com experimentation, product testing, and human-AI design boundaries.",
     url: "/studio"
   }
 };
@@ -15,63 +14,47 @@ export const metadata: Metadata = {
 export default function StudioPage() {
   return (
     <section className="detail-page">
-      <p className="eyebrow">{musicPracticeRpg.name} · on Studio.com</p>
-      <h1>Your real music practice moves the adventure forward.</h1>
+      <p className="eyebrow">Studio.com experiment archive</p>
+      <h1>This preserved surface records what the Studio.com experiments taught.</h1>
       <p>
-        Music Practice RPG connects the music you are already learning with a continuing fantasy story.
-        Choose what your hero tries next, practice your instrument or voice, and return to discover the consequences.
-      </p>
-      <p>
-        The adventure begins on Resonant Isle, where you arrive with your instrument and a world in need of repair.
-        Your choices and practice shape the next chapter, giving you a reason to pick up your music again tomorrow.
-      </p>
-      <p>
-        <a className="detail-link" href={musicPracticeRpg.url} target="_blank" rel="noopener noreferrer">
-          Start your first quest on Studio.com <span className="sr-only">(opens in a new tab)</span>
-        </a>
+        Ben Chan used Studio.com to test how quickly AI-assisted products could move from an idea to sustained use.
+        The active product offers have ended, but the practical findings remain part of the company&apos;s evidence.
       </p>
 
       <div className="detail-grid">
         <article>
-          <h2>Bring the music you already play</h2>
+          <h2>Prototype speed is not product proof</h2>
           <p>
-            Use any instrument or your voice. Work on your own pieces, difficult passages, scales, exercises,
-            or teacher assignments. The adventure fits around your musical goals and practice time.
+            AI can compress the time required to build an experiment. It does not prove that the result is accurate,
+            durable, useful, or worth returning to over time.
           </p>
         </article>
         <article>
-          <h2>Choose, practice, discover</h2>
+          <h2>Longitudinal use reveals the boundary</h2>
           <p>
-            Make a meaningful choice for your hero, then commit that move through real practice.
-            The story continues from earlier sessions: discoveries, mistakes, repairs, and unfinished business
-            can influence what comes next.
+            Memory, continuity, drift, and trust failures emerge through repeated use. A strong first session cannot
+            substitute for evidence gathered across days or weeks.
           </p>
         </article>
         <article>
-          <h2>Effort matters</h2>
+          <h2>Human authority stays explicit</h2>
           <p>
-            Practice privately and log your time, or record for richer feedback. Rough attempts can matter too.
-            Choose a short, light story or a deeper fantasy experience. Curiosity gives you another reason
-            to return to your music without turning every performance into a grade.
+            AI may generate options, structure an experience, and make iteration cheaper. Domain judgment and the
+            decision about what is safe or true remain human responsibilities.
           </p>
         </article>
         <article>
-          <h2>Your teacher stays in charge</h2>
+          <h2>Retirement is also evidence</h2>
           <p>
-            Teacher assignments remain the musical priority. The RPG adds story and curiosity to your routine.
-            Ben Chan brings his work as a violinist, educator, developer, and lifelong gamer to this practice adventure.
+            Ending an offer does not erase the experiment. Preserving this route keeps the record legible without
+            presenting a retired product as current.
           </p>
         </article>
       </div>
 
       <p>
-        Tell the app what you play, what you are working on, and how much story you want.
-        Make your first move, practice, and come back to find out how the island responds.
-      </p>
-      <p>
-        <a className="detail-link" href={musicPracticeRpg.url} target="_blank" rel="noopener noreferrer">
-          Open Music Practice RPG <span className="sr-only">(opens in a new tab)</span>
-        </a>
+        Current work continues through the public Ben Chan Tech experiment and its preserved case, method, and
+        operating-record surfaces.
       </p>
     </section>
   );

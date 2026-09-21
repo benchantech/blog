@@ -65,10 +65,6 @@ Priority preservation includes:
 - `/llms.txt` now states the current company mission, $20 constraint, and canonical homepage before listing the preserved surface map.
 - Preservation tests were rebased from the superseded 2026-09-04 homepage/Studio-offer assumptions to the current load-bearing surface rules.
 
-## Studio product update — 2026-09-14
-
-Ben directed `/studio` to present Music Practice RPG instead of Violin for Parents. The page, shared navigation labels, stakeholder description, and page metadata now describe the real-music fantasy practice adventure. Both product calls to action use `https://studio.com/apps/benchanviolin/music-practice-rpg?ref=benchanviolin&code=a`, the destination supplied by Ben. The `/studio` canonical URL remains in place. Earlier Violin for Parents references in historical governance and source material record the prior state.
-
 ## Verification boundary
 
 The GitHub connector can inspect and mutate the repository but does not execute the Next.js runtime. A real `npm test`, TypeScript/build run, and browser render remain required before merge or production deployment. Those runtime checks are an implementation-verification step, not a reason to change the $20 operating architecture.

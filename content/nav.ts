@@ -18,7 +18,7 @@
  * `app/layout.tsx`. Nothing here is written in Ben's first person (R10).
  */
 
-import { type DestinationId, destinations, musicPracticeRpg } from "@/content/site-config";
+import { type DestinationId, destinations } from "@/content/site-config";
 import { WYS_NAV_RETIRED } from "@/content/watch-your-step/config";
 
 export interface NavItem {
@@ -112,7 +112,7 @@ export const publicLessonZeroCta: NavItem | null = WYS_NAV_RETIRED ? null : less
  * `tests/preserved-surfaces.test.ts` asserts each separately.
  */
 export const ecosystemNav: readonly NavItem[] = [
-  { href: "/studio", label: musicPracticeRpg.name },
+  { href: "/studio", label: "Studio.com" },
   { href: "/neon", label: "Neon" },
   { href: "https://yymethod.com", label: "YY Method™", external: true }
 ];

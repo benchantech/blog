@@ -60,17 +60,11 @@ export const destinations = [
   }
 ] satisfies Destination[];
 
-/** Current Studio product, selected by Ben on 2026-09-14. */
-export const musicPracticeRpg = {
-  name: "Music Practice RPG",
-  url: "https://studio.com/apps/benchanviolin/music-practice-rpg?ref=benchanviolin&code=a"
-} as const;
-
 export const stakeholderRoutes = [
   {
     id: "studio",
-    title: musicPracticeRpg.name,
-    description: "Real music practice, meaningful choices, and a continuing fantasy adventure for any instrument or voice.",
+    title: "For Studio.com",
+    description: "Preserved product experiments, reviewer context, and human-AI design findings.",
     url: "/studio"
   },
   {
