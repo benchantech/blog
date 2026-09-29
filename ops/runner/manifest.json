@@ -12,6 +12,7 @@
       "cwd": ".",
       "branchRegex": "^goal-0016-run-[A-Za-z0-9._-]+$",
       "allowedNodeScripts": [
+        "scripts/verify-retired-redirects.mjs",
         "scripts/verify-runner-goal0016-profile.mjs"
       ]
     }
