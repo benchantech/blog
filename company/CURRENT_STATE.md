@@ -1,6 +1,6 @@
 # Ben Chan Tech — Current State
 
-**Date:** 2026-09-10
+**Date:** 2026-09-29
 **Branch:** `ai-native-company`
 
 ## Current experiment
@@ -64,6 +64,7 @@ Priority preservation includes:
 - Agent bootstrap now reads the company constitution/current state before product-era governance.
 - `/llms.txt` now states the current company mission, $20 constraint, and canonical homepage before listing the preserved surface map.
 - Preservation tests were rebased from the superseded 2026-09-04 homepage/Studio-offer assumptions to the current load-bearing surface rules.
+- Retired Watch Your Step and Author Ship public routes now use permanent redirects to `/`; their source remains preserved for history and provenance. Temporary shortcuts such as `/df` remain temporary.
 
 ## Verification boundary
 
