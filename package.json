@@ -12,7 +12,8 @@
     "start": "next start",
     "lint": "next lint",
     "test": "node --import tsx --test tests/*.test.ts",
-    "check:runner-goal0016-profile": "node scripts/verify-runner-goal0016-profile.mjs"
+    "check:runner-goal0016-profile": "node scripts/verify-runner-goal0016-profile.mjs",
+    "check:retired-redirects": "node scripts/verify-retired-redirects.mjs"
   },
   "dependencies": {
     "next": "^15.4.0",

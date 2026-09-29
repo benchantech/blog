@@ -8,17 +8,17 @@ const nextConfig: NextConfig = {
       { source: "/posts", destination: "https://benchanviolin.substack.com", permanent: false },
       { source: "/upwork", destination: "https://www.upwork.com/freelancers/~01a10f284f33009412", permanent: false },
 
-      /* Retired Watch Your Step surfaces remain reversible and preserved on disk. */
-      { source: "/watch-your-step", destination: "/", permanent: false },
-      { source: "/watch-your-step/:path+", destination: "/", permanent: false },
+      /* Retired Watch Your Step surfaces are permanently retired; source remains preserved on disk. */
+      { source: "/watch-your-step", destination: "/", permanent: true },
+      { source: "/watch-your-step/:path+", destination: "/", permanent: true },
 
-      /* Retired Author Ship presentation surfaces remain preserved on disk. */
-      { source: "/bridge", destination: "/", permanent: false },
-      { source: "/standing-orders", destination: "/", permanent: false },
-      { source: "/ships-log", destination: "/", permanent: false },
-      { source: "/crew", destination: "/", permanent: false },
-      { source: "/ben", destination: "/", permanent: false },
-      { source: "/system", destination: "/", permanent: false },
+      /* Retired Author Ship presentation surfaces are permanently retired; source remains preserved on disk. */
+      { source: "/bridge", destination: "/", permanent: true },
+      { source: "/standing-orders", destination: "/", permanent: true },
+      { source: "/ships-log", destination: "/", permanent: true },
+      { source: "/crew", destination: "/", permanent: true },
+      { source: "/ben", destination: "/", permanent: true },
+      { source: "/system", destination: "/", permanent: true },
 
       /*
        * `/df` remains a stable Benchantech-controlled shortcut, but the former
