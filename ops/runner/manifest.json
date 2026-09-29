@@ -15,6 +15,16 @@
         "scripts/verify-retired-redirects.mjs",
         "scripts/verify-runner-goal0016-profile.mjs"
       ]
+    },
+    {
+      "profileId": "goal-0016-gsc-sitemap-maintenance",
+      "goalId": "GOAL-0016",
+      "cwd": ".",
+      "branchRegex": "^goal-0016-run-[A-Za-z0-9._-]+$",
+      "allowedNodeScripts": [
+        "scripts/gsc-sync-sitemaps.mjs",
+        "scripts/verify-runner-gsc-sitemap-maintenance.mjs"
+      ]
     }
   ]
 }

@@ -13,7 +13,9 @@
     "lint": "next lint",
     "test": "node --import tsx --test tests/*.test.ts",
     "check:runner-goal0016-profile": "node scripts/verify-runner-goal0016-profile.mjs",
-    "check:retired-redirects": "node scripts/verify-retired-redirects.mjs"
+    "check:retired-redirects": "node scripts/verify-retired-redirects.mjs",
+    "check:gsc-sitemap-sync": "node scripts/gsc-sync-sitemaps.mjs",
+    "check:runner-gsc-sitemap-maintenance": "node scripts/verify-runner-gsc-sitemap-maintenance.mjs"
   },
   "dependencies": {
     "next": "^15.4.0",
