@@ -55,20 +55,33 @@ test("the deletion contract still runs", () => {
   assert.match(output, /Deletion contract OK/);
 });
 
-test("current redirects preserve useful entry points without a discontinued Studio offer", () => {
+test("current redirects distinguish permanent retirement from temporary shortcuts", () => {
   const config = read("next.config.ts");
-  for (const pair of [
-    ['source: "/lab"', 'destination: "/neon"'],
-    ['source: "/about"', 'destination: "/"'],
-    ['source: "/posts"', 'destination: "https://benchanviolin.substack.com"'],
-    ['source: "/upwork"', 'destination: "https://www.upwork.com/freelancers/~01a10f284f33009412"'],
-    ['source: "/df"', 'destination: "/developer-forward"']
+
+  for (const redirect of [
+    '{ source: "/watch-your-step", destination: "/", permanent: true }',
+    '{ source: "/watch-your-step/:path+", destination: "/", permanent: true }',
+    '{ source: "/bridge", destination: "/", permanent: true }',
+    '{ source: "/standing-orders", destination: "/", permanent: true }',
+    '{ source: "/ships-log", destination: "/", permanent: true }',
+    '{ source: "/crew", destination: "/", permanent: true }',
+    '{ source: "/ben", destination: "/", permanent: true }',
+    '{ source: "/system", destination: "/", permanent: true }'
   ] as const) {
-    assert.ok(config.includes(pair[0]), `missing redirect source ${pair[0]}`);
-    assert.ok(config.includes(pair[1]), `missing redirect destination ${pair[1]}`);
+    assert.ok(config.includes(redirect), `retired surface is not permanently redirected: ${redirect}`);
   }
+
+  for (const redirect of [
+    '{ source: "/lab", destination: "/neon", permanent: false }',
+    '{ source: "/about", destination: "/", permanent: false }',
+    '{ source: "/posts", destination: "https://benchanviolin.substack.com", permanent: false }',
+    '{ source: "/upwork", destination: "https://www.upwork.com/freelancers/~01a10f284f33009412", permanent: false }',
+    '{ source: "/df", destination: "/developer-forward", permanent: false }'
+  ] as const) {
+    assert.ok(config.includes(redirect), `temporary shortcut changed permanence unexpectedly: ${redirect}`);
+  }
+
   assert.equal(config.includes("studio.com/benchanviolin/trust-forward"), false);
-  assert.equal(config.includes("permanent: true"), false);
 });
 
 /*
