@@ -1,0 +1,20 @@
+{
+  "schemaVersion": 2,
+  "requestSchemaVersion": 2,
+  "requestId": "benchantech-retired-redirects-001",
+  "repositoryId": "benchantech",
+  "repositoryFullName": "benchantech/blog",
+  "profileId": "goal-0016-site-readiness",
+  "goalId": "GOAL-0016",
+  "branch": "goal-0016-run-benchantech-retired-redirects-001",
+  "targetSha": "c549d6174ff5035423d943e83aaac52b3e349f07",
+  "cwd": ".",
+  "kind": "npm-script",
+  "script": "check:retired-redirects",
+  "safetyValidation": "pass",
+  "exitCode": 0,
+  "startedAt": "2026-09-29T17:37:59Z",
+  "finishedAt": "2026-09-29T17:37:59Z",
+  "outputSha256": "101ebf7d1babfb558acb16f98550029c751610fbb6d4b2e8d8670a451d4ac371",
+  "output": "npm notice run benchantech@0.1.0 check:retired-redirects\nnpm notice run node scripts/verify-retired-redirects.mjs\nretired redirect permanence contract ok\n"
+}
