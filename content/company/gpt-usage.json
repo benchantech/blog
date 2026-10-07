@@ -1,7 +1,7 @@
 {
-  "observedAt": "2026-10-06T18:00:03-04:00",
-  "remainingPercent": 9,
-  "resetAt": "2026-10-09T21:10:52-04:00",
+  "observedAt": "2026-10-07T18:00:07-04:00",
+  "remainingPercent": 90,
+  "resetAt": "2026-10-14T08:05:47-04:00",
   "planCostMonthlyUsd": 20,
   "source": "automatically read from Codex CLI usage status"
 }
