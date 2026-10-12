@@ -236,5 +236,12 @@
     "resetAt": "2026-10-18T18:14:03-04:00",
     "planCostMonthlyUsd": 20,
     "source": "automatically read from Codex CLI usage status"
+  },
+  {
+    "observedAt": "2026-10-12T18:00:11-04:00",
+    "remainingPercent": 100,
+    "resetAt": "2026-10-19T18:00:11-04:00",
+    "planCostMonthlyUsd": 20,
+    "source": "automatically read from Codex CLI usage status"
   }
 ]
